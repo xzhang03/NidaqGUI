@@ -23,7 +23,8 @@ nicfg.serveradd = {'SZ', '\\anastasia\data\photometry';...
     'AL', '\\sweetness\Fiber Photometry';...
     'KF', '\\sweetness\Fiber Photometry';...
     'JR', '\\atlas\NIDAQ_run_LFP_etc\Ephys_Data';
-    'MB', '\\atlas\NIDAQ_run_LFP_etc\Ephys_Data'};
+    'MB', '\\atlas\NIDAQ_run_LFP_etc\Ephys_Data';
+    'RE', '\\sweetness\Fiber Photometry'};
 % =========================================================================
 % Not necessary to set
 nicfg.active           = false;
