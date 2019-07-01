@@ -217,11 +217,12 @@ if nicfg.active
         stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames);
     end
     
-    % Determine owner
-    serveradd = nicfg.serveradd{strcmpi(nicfg.serveradd(:,1),...
-        nicfg.MouseName(1:2)),2};
     
-    if ~isempty(serveradd)
+    if sum(strcmpi(nicfg.serveradd(:,1), nicfg.MouseName(1:2))) > 0 % If has a registered owner
+        % Determine owner
+        serveradd = nicfg.serveradd{strcmpi(nicfg.serveradd(:,1),...
+            nicfg.MouseName(1:2)),2};
+        
         disp(['Copying files to server address: ', serveradd]);
 
         % Grab file names
