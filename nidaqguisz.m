@@ -152,24 +152,42 @@ nicfg.active = get(hObject, 'Value');
 
 if nicfg.active
     disp('Starting...');
+    
     set(handles.TimeElapsedNumber, 'String', 'WAIT');
     drawnow();
     
     disp('Resetting nidaq...');
-    daqreset;
+    
+    if nicfg.useMLlibrary % Using MonkeyLogic DAQ library or not
+        daqtoolbox.daqreset;
+    else
+        daqreset;
+    end
     
     nicfg.MouseName = get(handles.MouseName, 'String'); % returns contents of Enter_ROI as a double
-    nicfg.Run = str2num(get(handles.Runs, 'String')); % returns contents of Enter_ROI as a double
+    nicfg.Run = str2double(get(handles.Runs, 'String')); % returns contents of Enter_ROI as a double
     % nicfg
     
+    % Reset arduino
     if nicfg.ArduinoCOM > -1 && ~isfield(nicfg, 'arduino_serial')
         nicfg.arduino_data = [];
         nicfg.arduino_serial = arduinoOpen(nicfg.ArduinoCOM);
         arduinoReadQuad(nicfg.arduino_serial);
     end
+    
+    % Start nidaq
     if nicfg.NidaqChannels > 0
         nidaqpath = fullfile(nicfg.BasePath, sprintf('%s-%s-%03i-nidaq.mat', nicfg.MouseName, datestamp(), nicfg.Run));
-        nicfg.nidaq_session = startNidaq(nidaqpath, nicfg.NidaqFrequency, nicfg.NidaqChannels, nicfg.DigitalString, nicfg.NidaqDigitalChannels);
+        
+        if nicfg.useMLlibrary % Using MonkeyLogic DAQ library or not
+            nicfg.nidaq_session = startNidaq_ML(nicfg.NidaqFrequency,...
+                nicfg.NidaqChannels, nicfg.NidaqDevice);
+        else
+            nicfg.nidaq_session = startNidaq(nidaqpath,...
+                nicfg.NidaqFrequency, nicfg.NidaqChannels,...
+                nicfg.DigitalString, nicfg.NidaqDigitalChannels,...
+                nicfg.NidaqDevice);
+        end
     end
     
     tic;
@@ -180,8 +198,10 @@ if nicfg.active
     
     timeconv = [0 0 86400 3600 60 1]';
     
-
-    fwrite(nicfg.arduino_serial, 1);
+    % Start camera pulsing
+    if nicfg.ArduinoCOM > -1
+        fwrite(nicfg.arduino_serial, 1);
+    end
     
     while get(hObject, 'Value') == 1
         if floor((tnow - tstart) * timeconv) > tseconds
@@ -191,7 +211,6 @@ if nicfg.active
         end
 
         drawnow();
-
         
 %         if nicfg.ArduinoCOM > -1 && toc > 1.0/nicfg.RunningFrequency
 %             tic;
@@ -201,22 +220,29 @@ if nicfg.active
         tnow = clock;
     end
     
-    fwrite(nicfg.arduino_serial, 0);
+    % Stop camera pulsing
+    if nicfg.ArduinoCOM > -1
+        fwrite(nicfg.arduino_serial, 0);
+    end
+    
     disp('Saving...');
     
     if nicfg.ArduinoCOM > -1
         fclose(nicfg.arduino_serial);
         nicfg = rmfield(nicfg, 'arduino_serial');
-        arduinopath = fullfile(nicfg.BasePath, sprintf('%s-%s-%03i-running.mat', nicfg.MouseName, datestamp(), nicfg.Run));
+%         arduinopath = fullfile(nicfg.BasePath, sprintf('%s-%s-%03i-running.mat', nicfg.MouseName, datestamp(), nicfg.Run));
 %         position = nicfg.arduino_data;
 %         speed = runningSpeed(position, nicfg.RunningFrequency);
 %         save(arduinopath, 'position', 'speed');
     end
     
     if isfield(nicfg, 'nidaq_session')
-        stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames);
+        if nicfg.useMLlibrary % Using MonkeyLogic DAQ library or not
+            stopNidaq_ML(nicfg.nidaq_session, nidaqpath);
+        else
+            stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames);
+        end
     end
-    
     
     if sum(strcmpi(nicfg.serveradd(:,1), nicfg.MouseName(1:2))) > 0 % If has a registered owner
         % Determine owner
@@ -263,6 +289,7 @@ if nicfg.active
     else
         disp('Did not copy files to server');
     end
+    
     disp('Finished');
     
     

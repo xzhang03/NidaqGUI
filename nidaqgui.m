@@ -134,6 +134,10 @@ end
 
 
 
+
+
+
+
 % --- Executes on button press in togglebutton1.
 function togglebutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to togglebutton1 (see GCBO)
@@ -153,20 +157,37 @@ if nicfg.active
     drawnow();
     
     disp('Resetting nidaq...')
-    daqreset;
+    
+    if nicfg.useMLlibrary % Using MonkeyLogic DAQ library or not
+        daqtoolbox.daqreset;
+    else
+        daqreset;
+    end
     
     nicfg.MouseName = get(handles.MouseName, 'String'); % returns contents of Enter_ROI as a double
-    nicfg.Run = str2num(get(handles.Runs, 'String')); % returns contents of Enter_ROI as a double
+    nicfg.Run = str2double(get(handles.Runs, 'String')); % returns contents of Enter_ROI as a double
     % nicfg
     
-    if nicfg.ArduinoCOM > -1
+    % Reset arduino
+    if nicfg.ArduinoCOM > -1 && ~isfield(nicfg, 'arduino_serial')
         nicfg.arduino_data = [];
         nicfg.arduino_serial = arduinoOpen(nicfg.ArduinoCOM);
         arduinoReadQuad(nicfg.arduino_serial);
     end
+    
+    % Start nidaq
     if nicfg.NidaqChannels > 0
         nidaqpath = fullfile(nicfg.BasePath, sprintf('%s-%s-%03i-nidaq.mat', nicfg.MouseName, datestamp(), nicfg.Run));
-        nicfg.nidaq_session = startNidaq(nidaqpath, nicfg.NidaqFrequency, nicfg.NidaqChannels, nicfg.DigitalString, nicfg.NidaqDigitalChannels);
+        
+        if nicfg.useMLlibrary % Using MonkeyLogic DAQ library or not
+            nicfg.nidaq_session = startNidaq_ML(nicfg.NidaqFrequency,...
+                nicfg.NidaqChannels, nicfg.NidaqDevice);
+        else
+            nicfg.nidaq_session = startNidaq(nidaqpath,...
+                nicfg.NidaqFrequency, nicfg.NidaqChannels,...
+                nicfg.DigitalString, nicfg.NidaqDigitalChannels,...
+                nicfg.NidaqDevice);
+        end
     end
     
     tic;
@@ -176,6 +197,12 @@ if nicfg.active
     tseconds = 0;
     
     timeconv = [0 0 86400 3600 60 1]'; % a vector to convert time to seconds
+    
+    
+    
+    
+    
+    
     while get(hObject, 'Value') == 1
         if floor((tnow - tstart) * timeconv) > tseconds
             tseconds = floor((tnow - tstart) * timeconv);
@@ -195,8 +222,14 @@ if nicfg.active
     
     disp('Saving...');
     
+    
+    
+    
+    
+    
     if nicfg.ArduinoCOM > -1
         fclose(nicfg.arduino_serial);
+        nicfg = rmfield(nicfg, 'arduino_serial');
         arduinopath = fullfile(nicfg.BasePath, sprintf('%s-%s-%03i-running.mat', nicfg.MouseName, datestamp(), nicfg.Run));
         position = nicfg.arduino_data;
         speed = runningSpeed(position, nicfg.RunningFrequency);
@@ -204,7 +237,11 @@ if nicfg.active
     end
     
     if isfield(nicfg, 'nidaq_session')
-        stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames);
+        if nicfg.useMLlibrary % Using MonkeyLogic DAQ library or not
+            stopNidaq_ML(nicfg.nidaq_session, nidaqpath);
+        else
+            stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames);
+        end
     end
     
     if sum(strcmpi(nicfg.serveradd(:,1), nicfg.MouseName(1:2))) > 0 % If has a registered owner

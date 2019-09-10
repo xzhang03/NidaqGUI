@@ -1,10 +1,11 @@
-function open_daq = startNidaq(path, frequency, nchannels, digitalchannelstr, ndigital)
+function open_daq = startNidaq(path, frequency, nchannels, digitalchannelstr, ndigital, daqname)
 %UNTITLED11 Summary of this function goes here
 %   Detailed explanation goes here
 
     if nargin < 2, frequency = 2000; end
     if nargin < 3, nchannels = 6; end
-    
+    if nargin < 6, daqname = 'Dev1'; end
+        
     [basepath, file, ~] = fileparts(path);
     logpath = fullfile(basepath, [file '-log.bin']);
     logfile = fopen(logpath, 'w');
@@ -13,7 +14,7 @@ function open_daq = startNidaq(path, frequency, nchannels, digitalchannelstr, nd
     daq_connection.Rate = frequency; 
     daq_connection.IsContinuous = true;
 
-    ai = daq_connection.addAnalogInputChannel('Dev1', 0:(nchannels-1) , 'Voltage'); 
+    ai = daq_connection.addAnalogInputChannel(daqname, 0:(nchannels-1) , 'Voltage'); 
     for i = 1:nchannels
         ai(i).Range = [-10 10];
     end
@@ -24,7 +25,7 @@ function open_daq = startNidaq(path, frequency, nchannels, digitalchannelstr, nd
             port_string = sprintf('%s:%i', port_string, ndigital - 1);
         end
         
-        daq_connection.addDigitalChannel('Dev1', port_string, 'InputOnly');
+        daq_connection.addDigitalChannel(daqname, port_string, 'InputOnly');
     end
         
     listener = daq_connection.addlistener('DataAvailable', @(src, event)logData(src, event, logfile));
