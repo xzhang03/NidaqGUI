@@ -5,6 +5,7 @@ nicfg.BasePath         = 'C:\Users\andermannlab\Documents\MATLAB\temp\';       %
 % nicfg.BasePath         = 'C:\Users\steph\OneDrive\Documents\MATLAB\temp';       % Set the path in which data will be saved
 nicfg.ArduinoCOM       = 5;             % Set the COM port for the Arduino, < 0 means off
 % nicfg.ArduinoCOM       = 8;             % Set the COM port for the Arduino, < 0 means off
+nicfg.RecordRunning    = false;         % Use quad encoder or not
 nicfg.NidaqDevice      = 'Dev1';        % Device name
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
 nicfg.NidaqChannels    = 4;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)

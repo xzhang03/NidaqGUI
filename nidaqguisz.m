@@ -63,7 +63,13 @@ nidaq_config_sz;
 global nicfg
 
 if isfield(nicfg, 'arduino_serial')
-        nicfg = rmfield(nicfg, 'arduino_serial');
+    nicfg = rmfield(nicfg, 'arduino_serial');
+end
+
+if ~isfield(nicfg, 'RecordRunning')
+    nicfg.RecordRunning = false;
+end
+
 end
 
 
@@ -212,10 +218,10 @@ if nicfg.active
 
         drawnow();
         
-%         if nicfg.ArduinoCOM > -1 && toc > 1.0/nicfg.RunningFrequency
-%             tic;
-%             nicfg.arduino_data = arduinoReadQuadsz(nicfg.arduino_serial);
-%         end
+        if nicfg.RecordRunning && nicfg.ArduinoCOM > -1 && toc > 1.0/nicfg.RunningFrequency
+            tic;
+            nicfg.arduino_data = arduinoReadQuad(nicfg.arduino_serial);
+        end
         
         tnow = clock;
     end
@@ -230,10 +236,12 @@ if nicfg.active
     if nicfg.ArduinoCOM > -1
         fclose(nicfg.arduino_serial);
         nicfg = rmfield(nicfg, 'arduino_serial');
-%         arduinopath = fullfile(nicfg.BasePath, sprintf('%s-%s-%03i-running.mat', nicfg.MouseName, datestamp(), nicfg.Run));
-%         position = nicfg.arduino_data;
-%         speed = runningSpeed(position, nicfg.RunningFrequency);
-%         save(arduinopath, 'position', 'speed');
+        if nicfg.RecordRunning
+            arduinopath = fullfile(nicfg.BasePath, sprintf('%s-%s-%03i-running.mat', nicfg.MouseName, datestamp(), nicfg.Run));
+            position = nicfg.arduino_data;
+            speed = runningSpeed(position, nicfg.RunningFrequency);
+            save(arduinopath, 'position', 'speed');
+        end
     end
     
     if isfield(nicfg, 'nidaq_session')
@@ -253,13 +261,17 @@ if nicfg.active
 
         % Grab file names
         [~,nidaqfn,~] = fileparts(nidaqpath);
-%         [~,arduinofn,~] = fileparts(arduinopath);
+        if nicfg.RecordRunning
+            [~,arduinofn,~] = fileparts(arduinopath); 
+        end
 
         % Make server file address
         nidaqpath_server = fullfile(serveradd, nicfg.MouseName, ...
                 sprintf('%s_%s', datestamp(),nicfg.MouseName), [nidaqfn, '.mat']);
-%         arduinopath_server = fullfile(serveradd, nicfg.MouseName, ...
-%                 sprintf('%s_%s', datestamp(),nicfg.MouseName), [arduinofn, '.mat']);
+        if nicfg.RecordRunning    
+            arduinopath_server = fullfile(serveradd, nicfg.MouseName, ...
+                    sprintf('%s_%s', datestamp(),nicfg.MouseName), [arduinofn, '.mat']);
+        end
 
         % Make mouse folder if needed
         if exist(fullfile(serveradd, nicfg.MouseName), 'dir') ~= 7
@@ -281,11 +293,13 @@ if nicfg.active
         end
 
         % Copy arduino file if does not exist
-%         if ~exist(arduinopath_server, 'file')
-%             copyfile(arduinopath, arduinopath_server);
-%         elseif input('Running file already exist. Overwrite? (1 = Yes, 0 = No): ') == 1
-%             copyfile(arduinopath, arduinopath_server);
-%         end
+        if nicfg.RecordRunning
+            if ~exist(arduinopath_server, 'file')
+                copyfile(arduinopath, arduinopath_server);
+            elseif input('Running file already exist. Overwrite? (1 = Yes, 0 = No): ') == 1
+                copyfile(arduinopath, arduinopath_server);
+            end
+        end
     else
         disp('Did not copy files to server');
     end
