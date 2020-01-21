@@ -11,7 +11,7 @@ nicfg.useMLlibrary     = false;          % Use monkeylogic library
 nicfg.NidaqChannels    = 4;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
 nicfg.NidaqDigitalChannels = 1;         % Set the number of digital channels on Port0 to record, starting at Line0
 nicfg.NidaqFrequency   = 2500;          % Set the recording frequency for the nidaq
-nicfg.RunningFrequency = 30.12;         % Set the frequency at which running is recorded
+nicfg.RunningFrequency = 20;         % Set the frequency at which running is recorded
 nicfg.DigitalString    = 'Port0/Line'; % Set a digital channel to be recorded, blank means no digital channels
 nicfg.ChannelNames     = { ...
                             'visual_stimulus', 1, ...

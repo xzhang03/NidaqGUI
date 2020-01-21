@@ -70,7 +70,7 @@ if ~isfield(nicfg, 'RecordRunning')
     nicfg.RecordRunning = false;
 end
 
-end
+
 
 
 
@@ -220,7 +220,7 @@ if nicfg.active
         
         if nicfg.RecordRunning && nicfg.ArduinoCOM > -1 && toc > 1.0/nicfg.RunningFrequency
             tic;
-            nicfg.arduino_data = arduinoReadQuad(nicfg.arduino_serial);
+            nicfg.arduino_data = [nicfg.arduino_data arduinoReadQuad(nicfg.arduino_serial)];
         end
         
         tnow = clock;
