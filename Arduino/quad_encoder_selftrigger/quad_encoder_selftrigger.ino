@@ -7,7 +7,7 @@
 Encoder myEnc(2,3); // pick your pins, reverse for sign flip
 
 bool pulsing = false;
-byte freq = 30; // Pulse at 30 Hz
+byte freq = 25; // Pulse at 30 Hz
 unsigned int ontime = 10000; // On for 10 ms
 unsigned int cycletime = 1000000 / freq;
 // unsigned int sweep_start;
