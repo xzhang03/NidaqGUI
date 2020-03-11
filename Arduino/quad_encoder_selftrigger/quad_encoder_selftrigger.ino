@@ -53,12 +53,13 @@ void loop() {
     m  = Serial.read();
     n = Serial.read();
 
-    /*
+    
     if (m == 5){
       // Give position
+      pos = myEnc.read();
       Serial.write((byte *) &pos, 4);
     }
-    */
+    
     if (m == 2){
       // Set frequency
       cycletime = 1000000 / n;

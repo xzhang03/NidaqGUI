@@ -176,12 +176,19 @@ if nicfg.active
     
     % Reset arduino
     if nicfg.ArduinoCOM > -1 && ~isfield(nicfg, 'arduino_serial')
+        disp('Starting Arduino...');
         nicfg.arduino_data = [];
         nicfg.arduino_serial = arduinoOpen(nicfg.ArduinoCOM);
-        arduinoReadQuad(nicfg.arduino_serial);
+        
+        % 2 Seconds to let arduino catch up
+        pause(2);
         
         % Set arduino frequency
         fwrite(nicfg.arduino_serial, uint8([2 nicfg.RunningFrequency]));
+        
+        % Ping arduino
+        fwrite(nicfg.arduino_serial, [5 0]);
+        fread(nicfg.arduino_serial, 1, 'int32');
     end
     
     % Start nidaq
