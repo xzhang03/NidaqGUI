@@ -24,7 +24,6 @@ void setup() {
   Serial.begin(9600);
   //SerialUSB.begin(115200); // for real-time feedback
   myEnc.write(0);
-  pos = myEnc.read();
   
   pinMode2(12, OUTPUT);
   pinMode2(13, OUTPUT);

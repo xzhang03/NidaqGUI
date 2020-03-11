@@ -170,9 +170,19 @@ if nicfg.active
     
     % Reset arduino
     if nicfg.ArduinoCOM > -1 && ~isfield(nicfg, 'arduino_serial')
+        disp('Starting Arduino...');
         nicfg.arduino_data = [];
         nicfg.arduino_serial = arduinoOpen(nicfg.ArduinoCOM);
-        arduinoReadQuad(nicfg.arduino_serial);
+        
+        % 2 Seconds to let arduino catch up
+        pause(2);
+        
+        % Set arduino frequency
+        fwrite(nicfg.arduino_serial, uint8([2 nicfg.RunningFrequency]));
+        
+        % Ping arduino
+        fwrite(nicfg.arduino_serial, [5 0]);
+        fread(nicfg.arduino_serial, 1, 'int32');
     end
     
     % Start nidaq
@@ -198,10 +208,10 @@ if nicfg.active
     
     timeconv = [0 0 86400 3600 60 1]'; % a vector to convert time to seconds
     
-    
-    
-    
-    
+    % Start camera pulsing
+    if nicfg.ArduinoCOM > -1
+        fwrite(nicfg.arduino_serial, [1 0]);
+    end
     
     while get(hObject, 'Value') == 1
         if floor((tnow - tstart) * timeconv) > tseconds
@@ -220,12 +230,12 @@ if nicfg.active
         tnow = clock;
     end
     
+    % Stop camera pulsing
+    if nicfg.ArduinoCOM > -1
+        fwrite(nicfg.arduino_serial, [0 0]);
+    end
+    
     disp('Saving...');
-    
-    
-    
-    
-    
     
     if nicfg.ArduinoCOM > -1
         fclose(nicfg.arduino_serial);
