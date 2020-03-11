@@ -5,13 +5,13 @@ nicfg.BasePath         = 'C:\Users\andermannlab\Documents\MATLAB\temp\';       %
 % nicfg.BasePath         = 'C:\Users\steph\OneDrive\Documents\MATLAB\temp';       % Set the path in which data will be saved
 nicfg.ArduinoCOM       = 5;             % Set the COM port for the Arduino, < 0 means off
 % nicfg.ArduinoCOM       = 8;             % Set the COM port for the Arduino, < 0 means off
-nicfg.RecordRunning    = false;         % Use quad encoder or not
+nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.NidaqDevice      = 'Dev1';        % Device name
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
 nicfg.NidaqChannels    = 4;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
 nicfg.NidaqDigitalChannels = 1;         % Set the number of digital channels on Port0 to record, starting at Line0
 nicfg.NidaqFrequency   = 2500;          % Set the recording frequency for the nidaq
-nicfg.RunningFrequency = 25;         % Set the frequency at which running is recorded
+nicfg.RunningFrequency = 30;         % Set the frequency at which running is recorded
 nicfg.DigitalString    = 'Port0/Line'; % Set a digital channel to be recorded, blank means no digital channels
 nicfg.ChannelNames     = { ...
                             'visual_stimulus', 1, ...

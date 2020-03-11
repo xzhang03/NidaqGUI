@@ -179,6 +179,9 @@ if nicfg.active
         nicfg.arduino_data = [];
         nicfg.arduino_serial = arduinoOpen(nicfg.ArduinoCOM);
         arduinoReadQuad(nicfg.arduino_serial);
+        
+        % Set arduino frequency
+        fwrite(nicfg.arduino_serial, uint8([2 nicfg.RunningFrequency]));
     end
     
     % Start nidaq
@@ -206,7 +209,7 @@ if nicfg.active
     
     % Start camera pulsing
     if nicfg.ArduinoCOM > -1
-        fwrite(nicfg.arduino_serial, 1);
+        fwrite(nicfg.arduino_serial, [1 0]);
     end
     
     while get(hObject, 'Value') == 1
@@ -228,7 +231,7 @@ if nicfg.active
     
     % Stop camera pulsing
     if nicfg.ArduinoCOM > -1
-        fwrite(nicfg.arduino_serial, 0);
+        fwrite(nicfg.arduino_serial, [0 0]);
     end
     
     disp('Saving...');

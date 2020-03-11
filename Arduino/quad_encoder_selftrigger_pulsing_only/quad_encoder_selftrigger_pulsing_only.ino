@@ -9,7 +9,7 @@
 bool pulsing = false;
 byte freq = 30; // Pulse at 30 Hz
 unsigned int ontime = 10000; // On for 10 ms
-unsigned int cycletime = 1000000 / freq;
+unsigned long cycletime = 1000000 / freq;
 // unsigned int sweep_start;
 unsigned long int pulsetime = 0;
 bool onoff = false;
