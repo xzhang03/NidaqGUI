@@ -15,9 +15,10 @@ unsigned long int pulsetime = 0;
 bool onoff = false;
 unsigned long int tnow;
 unsigned int step_size = 100; // in micros
-// long pos;
+long pos = 0;
 byte m, n;
 
+#define debugmode false
 
 
 void setup() {
@@ -41,7 +42,12 @@ void setup() {
   Serial.println(step_size);
   */
   
-  
+  if (debugmode){
+    Serial.println("Experiment start.");  
+    Serial.print("Cycle time: ");
+    Serial.print(cycletime);
+    Serial.println(" us.");
+  }
 }
 
 void loop() {
@@ -49,9 +55,14 @@ void loop() {
   
   if (Serial.available() >= 2){
     // Read 2 bytes
-    m  = Serial.read();
+    m = Serial.read();
     n = Serial.read();
 
+    if (debugmode){
+      m = m - '0';
+      n = n - '0';
+    }
+    
     /*
     if (m == 5){
       // Give position
@@ -63,21 +74,36 @@ void loop() {
     if (m == 2){
       // Set frequency
       cycletime = 1000000 / n;
+
+      if (debugmode){
+        Serial.print("New cycle time: ");
+        Serial.print(cycletime);
+        Serial.println(" us.");
+      }
     }
     else if (m == 1){
       // Start pulsing
       pulsing = true;
       pulsetime = micros();
-
+      if (debugmode){
+        Serial.println("Pulse start.");
+      }
       // myEnc.write(0);    // zero the position
       // pos = 0;
     }
     else if (m == 0){
       // End pulsing
       pulsing = false;
+      if (debugmode){
+        Serial.println("Pulse stop.");
+      }
+    }
+    else if (m == 5){
+      // Echo back 0
+      Serial.write((byte *) &pos, 4);
     }
   }
-
+  
   tnow = micros();
   
   // pos = myEnc.read();
@@ -88,12 +114,14 @@ void loop() {
         pulsetime = micros();
         // Serial.write((byte *) &pos, 4);
         digitalWrite2(12, HIGH);
+        digitalWrite2(13, HIGH);
         onoff = true;
       }
     }
     else if ((tnow - pulsetime) >= ontime){
       if (onoff){
         digitalWrite2(12, LOW);
+        digitalWrite2(13, LOW);
         onoff = false;
       }
     }
@@ -101,6 +129,7 @@ void loop() {
   else {
     if (onoff){
       digitalWrite2(12, LOW);
+      digitalWrite2(13, LOW);
       onoff = false;
     }
   }

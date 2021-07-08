@@ -181,7 +181,7 @@ if nicfg.active
         fwrite(nicfg.arduino_serial, uint8([2 nicfg.RunningFrequency]));
         
         % Ping arduino
-        fwrite(nicfg.arduino_serial, [5 0]);
+        fwrite(nicfg.arduino_serial, uint8([5 0]));
         fread(nicfg.arduino_serial, 1, 'int32');
     end
     
@@ -224,7 +224,7 @@ if nicfg.active
         
         if nicfg.ArduinoCOM > -1 && toc > 1.0/nicfg.RunningFrequency
             tic;
-            nicfg.arduino_data = [nicfg.arduino_data arduinoReadQuad(nicfg.arduino_serial)];
+            nicfg.arduino_data(end+1) = arduinoReadQuad(nicfg.arduino_serial);
         end
         
         tnow = clock;
