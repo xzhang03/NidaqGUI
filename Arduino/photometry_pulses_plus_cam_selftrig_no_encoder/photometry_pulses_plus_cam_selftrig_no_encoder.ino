@@ -18,9 +18,9 @@ Adafruit_DotStar strip = Adafruit_DotStar(
 
 // Encoder myEnc(2,3); // pick your pins, reverse for sign flip
 // pins
-byte ch1_pin = 1; // try to leave 3 4 open. 3 is fine if needed
+byte ch1_pin = 0; // try to leave 3 4 open. 3 is fine if needed
 byte ch2_pin = 2;
-byte cam_pin = 0;
+byte cam_pin = 1;
 byte led_pin = 13; // onboard led
 
 // time variables for camera
