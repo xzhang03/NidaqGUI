@@ -15,9 +15,10 @@
 
  
 // =============== Debug ===============
-#define debugmode true
-#define showpulses false
-
+#define debugmode false
+#define showpulses true
+unsigned long ttest1 = 0;
+unsigned long ttest2 = 0;
 
 // ============== Encoder ==============
 //#define ENCODER_DO_NOT_USE_INTERRUPTS
@@ -28,22 +29,22 @@ Encoder myEnc(4,5); // pick your pins, reverse for sign flip
 // =============== Modes ===============
 
 // Photometry mode
-bool optophotommode = true; // Green + red
+bool optophotommode = false; // Green + red
 bool tcpmode = false;
-bool samecoloroptomode = false; // Green + blue (same led for photometry and opto);
+bool samecoloroptomode = true; // Green + blue (same led for photometry and opto);
 bool useencoder = true;
 bool usefoodpulses = true;
 bool usescheduler = true;
 
 // pins
-byte ch1_pin = 2; // try to leave 0 1 open. 
-byte ch2_pin = 3; // 405 nm or red opto
-byte AOpin = 3; // Use same pin as ch2 until true analog outputs are used in the future
-byte tristatepin = 6; // Use to control tristate transceivers (AO (used as digital here), 0, or disconnected)
-byte cam_pin = 7; // Cam pulses
-byte switchpin = 8; // Toggle switch (active low)
-byte foodTTLpin = 9; // output TTL to trigger food etc
-byte led_pin = 13; // onboard led
+const byte ch1_pin = 2; // try to leave 0 1 open. 
+const byte ch2_pin = 3; // 405 nm or red opto
+const byte AOpin = 3; // Use same pin as ch2 until true analog outputs are used in the future
+const byte tristatepin = 6; // Use to control tristate transceivers (AO (used as digital here), 0, or disconnected). Active low
+const byte cam_pin = 7; // Cam pulses
+const byte switchpin = 8; // Toggle switch (active low)
+const byte foodTTLpin = 9; // output TTL to trigger food etc
+const byte led_pin = 13; // onboard led
 
 // time variables for camera
 unsigned long int tnow;
@@ -68,6 +69,7 @@ long cycletime_photom_1; // in micro secs (Ch1)
 long cycletime_photom_2; // in micro secs (Ch2)
 
 // tcp photometry time variables
+const int pulsewidth_1_tcp = 6000; // in micro secs (ch2)
 const int pulsewidth_2_tcp = 6000; // in micro secs (ch2)
 const long cycletime_photom_1_tcp = 10000; // in micro secs (Ch1)
 const long cycletime_photom_2_tcp = 10000; // in micro secs (Ch2)
@@ -85,9 +87,9 @@ byte scopto_per = 5; // Number of photometry pulses per opto pulse (AO). Can be:
 byte sctrain_length = 10; // Number of photometry pulses per stim period (BO). Duration is  BO / (50 / AO).
 long sctrain_cycle = 30 * 50; // First number is in seconds. How often does the train come on.
 unsigned int pulsewidth_1_scopto = 10000; // in micro secs (ch1)
-const int pulsewidth_2_scopto = 0; // in micro secs (ch1). Unused
 const long cycletime_photom_1_scopto = 20000; // in micro secs (Ch1)
 const long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrelevant
+bool lastpulsescopto = false; // Last pulse coming up
 
 // Scheduleer variables
 unsigned int preoptotime = 120; // in seconds (max 1310)
@@ -113,7 +115,6 @@ bool ch1_on = false;
 bool ch2_on = false;
 bool opto = false;
 bool train = false;
-bool transceiveron = true;
 
 // Counters
 byte pmt_counter_for_opto = 0;
@@ -121,7 +122,7 @@ byte opto_counter = 0;
 long counter_for_train = 0; // Number of cycles
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(19200);
   
   if (useencoder){
     myEnc.write(0);
@@ -131,6 +132,7 @@ void setup() {
   pinMode(led_pin, OUTPUT);
   pinMode(ch1_pin, OUTPUT);
   pinMode(ch2_pin, OUTPUT);
+  pinMode(tristatepin, OUTPUT);
   digitalWrite(cam_pin, LOW);
   digitalWrite(led_pin, LOW);
   digitalWrite(ch1_pin, LOW);
@@ -148,7 +150,6 @@ void setup() {
 }
 
 void loop() {
-//  sweep_start = micros(); // Debug for loop time
   tnow = micros();
   
   if (Serial.available() >= 2){
@@ -161,47 +162,120 @@ void loop() {
   }
   
   // Cam
-  if (pulsing){
-    if ((tnow - pulsetime) >= cycletime){
-      if (!onoff){
-        pulsetime = micros();
-        Serial.write((byte *) &pos, 4);
-        digitalWrite(cam_pin, HIGH);
-        digitalWrite(led_pin, HIGH);
-        onoff = true;
-      }
-    }
-    else if ((tnow - pulsetime) >= ontime){
-      if (onoff){
-        digitalWrite(cam_pin, LOW);
-        digitalWrite(led_pin, LOW);
-        onoff = false;
-      }
-    }
-  }
-  else {
-    if (onoff){
-      digitalWrite(cam_pin, LOW);
-      digitalWrite(led_pin, LOW);
-      onoff = false;
-    }
-  }
+  camerapulse();
 
   // photometry
   t1 = tnow - t0;
   
   // 1. Start a new cycle (once every 20 ms)
   if ((t1 >= (cycletime_photom_1 + cycletime_photom_2))){
+    // Debug ch1 on to ch1 on
+    // Serial.println(tnow - ttest1);
+    // ttest1 = tnow;
+    
     // This part happens once every 20 ms
     t0 = micros();
-    digitalWrite(ch1_pin, HIGH);
-    ch1_on = true;
-    // Serial.println(t1); Confirm only once every 20 ms
+    
+    // TCP mode
+    if (tcpmode){
+      digitalWrite(ch1_pin, HIGH);
+      ch1_on = true;
+      // Serial.println(t1); Confirm only once every 20 ms
+    }
 
+    // scopto mode
+    if (samecoloroptomode){
+      // Advance counters
+      pmt_counter_for_opto++; // Counting 1-5, on 1 opto is on
+      counter_for_train++; // Counting 1-1500, on 1 train is on
+
+      if (debugmode && showpulses){
+        Serial.print("Photometry ");
+        Serial.print(counter_for_train);
+        Serial.print(" - ");
+        Serial.println(pmt_counter_for_opto);
+      }
+      
+      // Beginning of each train cycle. Turn train mode on.
+      if (counter_for_train == 1){
+        // Debug train on to train on
+//        Serial.println(tnow - ttest1);
+//        ttest1 = tnow;
+        
+        train = true;
+        opto_counter = 0;
+        pulsewidth_1 = pulsewidth_1_scopto; // Change pulse width
+        digitalWrite(AOpin, HIGH);
+        digitalWrite(tristatepin, LOW);
+        
+        if (debugmode && showpulses){
+          Serial.println("Train on");
+          Serial.println("Analog on");
+          Serial.println("Transceiver on");
+          Serial.println("Ch1 pulse width set to scopto");
+        }
+      }
+
+      // Turn on opto mode
+      if (train){
+        if (pmt_counter_for_opto==1){
+          // Debug opto on to opto on
+//          Serial.println(tnow - ttest1);
+//          ttest1 = tnow;
+          
+          opto = true;
+        }
+      }
+      else {
+        // When no train just regular photometry
+        digitalWrite(ch1_pin, HIGH);
+        ch1_on = true;
+        // ttest1 = tnow;
+      }
+
+      // Turn on light
+      if (opto){
+        digitalWrite(ch1_pin, HIGH);
+        ch1_on = true;
+
+        opto_counter++;
+        opto = false;
+        if (debugmode && showpulses){
+          Serial.print("Opto ");
+          Serial.println(opto_counter);
+        }
+
+        // debug ch1 on to ch1 on
+//         ttest1 = tnow;
+      }
+
+      // Reset counter
+      // reset pmt counter
+      if (pmt_counter_for_opto >= scopto_per){
+        pmt_counter_for_opto = 0;
+      }
+      
+      // reset opto counter
+      if ((opto_counter >= sctrain_length) && train){
+        train = false;
+        lastpulsescopto = true;
+        if (debugmode && showpulses){
+          Serial.println("Train off");
+        }
+      }
+    
+      // Serial.println(counter_for_train);
+      // reset train counter
+      if (counter_for_train >= sctrain_cycle){
+        counter_for_train= 0;
+      }
+    }
+
+    // Optophotometry
     if (optophotommode){
       // Advance counters
-      pmt_counter_for_opto++;
-      counter_for_train++;
+      pmt_counter_for_opto++; // Counting 1-5, on 1 opto is on
+      counter_for_train++; // Counting 1-1500, on 1 train is on
 
       if (debugmode && showpulses){
         Serial.print("Photometry ");
@@ -212,7 +286,12 @@ void loop() {
 
       // Beginning of each train cycle. Turn train mode on.
       if (counter_for_train == 1){
+        // Debug train on to train on
+//        Serial.println(tnow - ttest1);
+//        ttest1 = tnow;
+        
         train = true;
+        opto_counter = 0;
         if (debugmode && showpulses){
           Serial.println("Train on");
         }
@@ -221,6 +300,10 @@ void loop() {
       // Turn on opto mode
       if (train){
         if (pmt_counter_for_opto==1){
+          // Debug opto on to opto on
+//          Serial.println(tnow - ttest1);
+//          ttest1 = tnow;
+          
           opto = true;
         }
       }
@@ -231,9 +314,8 @@ void loop() {
       }
       
       // reset opto counter
-      if (opto_counter >= train_length){
+      if ((opto_counter >= train_length) && train){
         train = false;
-        opto_counter = 0;
         if (debugmode && showpulses){
           Serial.println("Train off");
         }
@@ -256,6 +338,20 @@ void loop() {
     if (ch1_on){
       digitalWrite(ch1_pin, LOW);
       ch1_on = false;
+
+      // Serial.println(tnow - ttest1);
+      if (samecoloroptomode && lastpulsescopto){
+        lastpulsescopto = false;
+        // Return to normal pulse width after the train is off. Only at last pulse
+        pulsewidth_1 = pulsewidth_1_tcp;
+        digitalWrite(AOpin, LOW);
+        digitalWrite(tristatepin, HIGH);
+        if (debugmode && showpulses){
+          Serial.println("Ch1 pulse width returned to tcp");
+          Serial.println("Analog off");
+          Serial.println("Transceiver off");
+        }        
+      }
     }
   }
   
@@ -266,13 +362,18 @@ void loop() {
       if (!ch2_on){
         digitalWrite(ch2_pin, HIGH);
         ch2_on = true;
+
+        // debug ch2 on to ch2 on
+//        Serial.println(tnow - ttest1);
+//        ttest1 = tnow;
       }
     }
     // Opto photometry
     else if (optophotommode){
       // optophotometry
-      if (opto && !ch2_on){
+      if ((opto) && (!ch2_on)){
         digitalWrite(ch2_pin, HIGH);
+        // ttest1 = tnow; // Debug pulse width
         ch2_on = true;
         opto_counter++;
         opto = false;
@@ -282,20 +383,23 @@ void loop() {
         }
       }
     }
-    
   }
   
   // 4
   else if (t1 >= (cycletime_photom_1 + pulsewidth_2)){
-    // tcp
-    if (ch2_on && tcpmode){
+    // tcp and the other thing
+    if (ch2_on){
+      // Serial.println(tnow - ttest1); Debug pulse width
       digitalWrite(ch2_pin, LOW);
       ch2_on = false;
+
+      // debug ch2 on to ch2 off
+//      Serial.println(tnow - ttest1);
     }
   }
   
-  delayMicroseconds(step_size);
-//  Serial.println(micros() - sweep_start);
+// delayMicroseconds(step_size);
+// Serial.println(micros() - tnow);
 }
 
 // Parse serial
@@ -341,7 +445,7 @@ void parseserial(){
       pulsing = true;
       pulsetime = micros();
       if (debugmode){
-        Serial.println("Pulse start.");
+        Serial.println("Cam pulse start.");
       }
       if (useencoder){
         myEnc.write(0);    // zero the position
@@ -353,7 +457,7 @@ void parseserial(){
       // End pulsing
       pulsing = false;
       if (debugmode){
-        Serial.println("Pulse stop.");
+        Serial.println("Cam pulse stop.");
       }
       break;
 
@@ -474,28 +578,36 @@ void parseserial(){
 // Switch parameters
 void modeswitch(void){
   if (optophotommode){
+    pulsewidth_1 = pulsewidth_1_tcp;
     pulsewidth_2 = pulsewidth_2_opto; // Switch out the parameters
     cycletime_photom_1 = cycletime_photom_1_opto; // in micro secs (Ch1)
     cycletime_photom_2 = cycletime_photom_2_opto; // in micro secs (Ch2)
+    digitalWrite(tristatepin, LOW); // Let ch2 go through;
+        
     if (debugmode){
       Serial.println("Optophotometry mode.");
     }
   }
   
   else if (tcpmode){
+    pulsewidth_1 = pulsewidth_1_tcp;
     pulsewidth_2 = pulsewidth_2_tcp; // Switch out the parameters
     cycletime_photom_1 = cycletime_photom_1_tcp; // in micro secs (Ch1)
     cycletime_photom_2 = cycletime_photom_2_tcp; // in micro secs (Ch2)
+    digitalWrite(tristatepin, LOW); // Let ch2 go through;
+    
     if (debugmode){
       Serial.println("Two-color photometry mode.");
     }
   }
 
   else if (samecoloroptomode){
-    pulsewidth_1 = cycletime_photom_1_tcp; // Switch out the parameters. Use tcp mode until scopto is on
-    pulsewidth_2 = cycletime_photom_2_tcp; // Switch out the parameters
+    pulsewidth_1 = pulsewidth_1_tcp; // Switch out the parameters. Use tcp mode until scopto is on
+    pulsewidth_2 = pulsewidth_2_tcp; // Switch out the parameters
     cycletime_photom_1 = cycletime_photom_1_scopto; // in micro secs (Ch1)
     cycletime_photom_2 = cycletime_photom_2_scopto; // in micro secs (Ch2)
+    digitalWrite(tristatepin, HIGH); // DC Ch2
+    
     if (debugmode){
       Serial.println("Same-color optophotometry mode.");
     }
@@ -588,4 +700,31 @@ void showpara(void){
     Serial.println(step_size);
   }
 }
-  
+
+void camerapulse(void){
+  if (pulsing){
+    if ((tnow - pulsetime) >= cycletime){
+      if (!onoff){
+        pulsetime = micros();
+        Serial.write((byte *) &pos, 4);
+        digitalWrite(cam_pin, HIGH);
+        digitalWrite(led_pin, HIGH);
+        onoff = true;
+      }
+    }
+    else if ((tnow - pulsetime) >= ontime){
+      if (onoff){
+        digitalWrite(cam_pin, LOW);
+        digitalWrite(led_pin, LOW);
+        onoff = false;
+      }
+    }
+  }
+  else {
+    if (onoff){
+      digitalWrite(cam_pin, LOW);
+      digitalWrite(led_pin, LOW);
+      onoff = false;
+    }
+  }
+}
