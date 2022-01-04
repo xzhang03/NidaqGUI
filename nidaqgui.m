@@ -63,6 +63,14 @@ guidata(hObject, handles);
 nidaq_config;
 global nicfg
 
+if isfield(nicfg, 'arduino_serial')
+    nicfg = rmfield(nicfg, 'arduino_serial');
+end
+
+if ~isfield(nicfg, 'RecordRunning')
+    nicfg.RecordRunning = false;
+end
+
 
 % UIWAIT makes nidaqgui wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -172,7 +180,7 @@ if nicfg.active
     if nicfg.ArduinoCOM > -1 && ~isfield(nicfg, 'arduino_serial')
         disp('Starting Arduino...');
         nicfg.arduino_data = [];
-        nicfg.arduino_serial = arduinoOpen(nicfg.ArduinoCOM);
+        nicfg.arduino_serial = arduinoOpen(nicfg.ArduinoCOM, nicfg.baumrate);
         
         % 2 Seconds to let arduino catch up
         pause(2);

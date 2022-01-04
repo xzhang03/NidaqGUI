@@ -45,11 +45,11 @@ nicfg.omnibox.enable = true;
 
 % Modes
 % Two-color photometry
-nicfg.tcp.enable = true; % Default true.
+nicfg.tcp.enable = false; % Default true.
 
 % Optophotometry (two colors)
 % Pulse width is fixed at 10 ms
-nicfg.optophotometry.enable = false; % Default false
+nicfg.optophotometry.enable = true; % Default false
 nicfg.optophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
 nicfg.optophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.optophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
@@ -63,15 +63,15 @@ nicfg.scoptophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 s
 nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10.
 
 % Scheduler
-nicfg.scheduler.enable = false; % Default false
-nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
-nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
-nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride (experiemental). Default false.
+nicfg.scheduler.enable = true; % Default false
+nicfg.scheduler.delay = 5; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
+nicfg.scheduler.ntrains = 2; % Number of trains. Default 10.
+nicfg.scheduler.manualoverride = true; % Allow for manual swichingoverride (experiemental). Default false.
 
 % Opto-delayed TTL
 % TTL pulses that happen X seconds after each opto train onset (for food
 % delivery or synchronizing).
-nicfg.optodelayTTL.enable = false; % Default false
+nicfg.optodelayTTL.enable = true; % Default false
 nicfg.optodelayTTL.delay = 2; % Delay in seconds. E.g., 2 means 2 seconds. Default 2s.
 nicfg.optodelayTTL.pulsewidth = 15; % Pulsewidth in X * 10 ms. E.g., 15 means 150 ms pulses. Default is 15 (150 ms).
 nicfg.optodelayTTL.cycle = 30; % Pulse cycle in X * 10 ms. E.g., 30 means 300 ms pulses. Default is 30 (300 ms).

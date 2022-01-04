@@ -15,11 +15,12 @@
 
  
 // =============== Debug ===============
-#define debugmode true
+#define debugmode false
 #define showpulses false // Extremely verbose
-#define showopto true
-#define showscheduler true
-#define showfoodttl true
+#define showopto false
+#define showscheduler false
+#define showfoodttl false
+#define debugpins true
 unsigned long ttest1 = 0;
 bool ftest1 = false;
 
@@ -32,8 +33,8 @@ Encoder myEnc(4,5); // pick your pins, reverse for sign flip
 // =============== Modes ===============
 // Photometry mode
 bool optophotommode = false; // Green + red
-bool tcpmode = false;
-bool samecoloroptomode = true; // Green + blue (same led for photometry and opto);
+bool tcpmode = true;
+bool samecoloroptomode = false; // Green + blue (same led for photometry and opto);
 bool useencoder = true;
 bool usefoodpulses = true;
 bool usescheduler = false;
@@ -49,6 +50,14 @@ const byte switchpin = 8; // Toggle switch (active low)
 const byte foodTTLpin = 9; // output TTL to trigger food etc
 const byte foodTTLinput = 10; // input TTL for conditional food pulses (3.3 V only!!)
 const byte led_pin = 13; // onboard led
+
+// ============= debugpins =============
+const byte serialpin = 14; // Parity signal for serial pin
+const byte schedulerpin = 15; // On when scheduler is used
+const byte preoptopin = 16; // preopto
+const byte inoptopin = 17; // preopto
+const byte postoptopin = 20; // preopto
+bool serialpinon = false;
 
 // =============== Time ===============
 // General time variables
@@ -148,6 +157,7 @@ void setup() {
     myEnc.write(0);
   }
   
+  // Essential pin
   pinMode(cam_pin, OUTPUT);
   pinMode(led_pin, OUTPUT);
   pinMode(ch1_pin, OUTPUT);
@@ -163,6 +173,19 @@ void setup() {
   digitalWrite(ch2_pin, LOW);
   digitalWrite(foodTTLpin, LOW);
 
+  // Debug pin
+  pinMode(serialpin, OUTPUT); // Parity signal for serial pin
+  pinMode(schedulerpin, OUTPUT); // On when scheduler is used
+  pinMode(preoptopin, OUTPUT); // preopto
+  pinMode(inoptopin, OUTPUT); // preopto
+  pinMode(postoptopin, OUTPUT); // preopto
+
+  digitalWrite(serialpin, LOW);
+  digitalWrite(schedulerpin, LOW);
+  digitalWrite(preoptopin, LOW);
+  digitalWrite(inoptopin, LOW);
+  digitalWrite(postoptopin, LOW);
+
   // Load up the variables
   modeswitch();
   
@@ -177,7 +200,11 @@ void setup() {
   inpreopto = true;
   inopto = false;
   inpostopto = false;
-
+  if (debugpins && usescheduler){
+    digitalWrite(schedulerpin, HIGH);
+    digitalWrite(preoptopin, HIGH);
+  }
+  
   t0 = micros();
 }
 
@@ -238,7 +265,14 @@ void loop() {
           inputttl = !foodttlconditional;
           manualon = true;
           schedulerrunning = false; // Not flagging this makes manual turn on only turned-off-able by releasing the switch
-  
+
+          if (debugpins){
+            digitalWrite(schedulerpin, LOW);
+            digitalWrite(preoptopin, LOW);
+            digitalWrite(inoptopin, HIGH);
+            digitalWrite(postoptopin, LOW);
+          }
+          
           if (debugmode && showscheduler){
             Serial.println("Stim enabled manually. This can only be turned off manually");
           }
@@ -251,6 +285,13 @@ void loop() {
             inopto = false;
             manualon = false;
             schedulerrunning = false; // Not flagging this makes manual turn on only turned-off-able by releasing the switch
+
+            if (debugpins){
+              digitalWrite(schedulerpin, LOW);
+              digitalWrite(preoptopin, LOW);
+              digitalWrite(inoptopin, LOW);
+              digitalWrite(postoptopin, HIGH);
+            }
     
             if (debugmode && showscheduler){
               Serial.println("Stim disabled manually. ");
@@ -265,6 +306,12 @@ void loop() {
         inpreopto = false;
         inopto = true;
 
+        if (debugpins){
+          digitalWrite(preoptopin, LOW);
+          digitalWrite(inoptopin, HIGH);
+          digitalWrite(postoptopin, LOW);
+        }
+        
         if (debugmode && showscheduler){
           Serial.println("Stim is enabled. Entering opto phase.");
         }
@@ -519,6 +566,13 @@ void loop() {
           stimenabled = false;
           inopto = false;
           inpostopto = true;
+
+          if (debugpins){
+            digitalWrite(preoptopin, LOW);
+            digitalWrite(inoptopin, LOW);
+            digitalWrite(postoptopin, HIGH);
+          }
+          
           if (debugmode && showscheduler){
             Serial.println("Stim is disabled. Entering post-opto phase.");
           }
@@ -591,6 +645,13 @@ void loop() {
           stimenabled = false;
           inopto = false;
           inpostopto = true;
+
+          if (debugpins){
+            digitalWrite(preoptopin, LOW);
+            digitalWrite(inoptopin, LOW);
+            digitalWrite(postoptopin, HIGH);
+          }
+          
           if (debugmode && showscheduler){
             Serial.println("Stim is disabled. Entering post-opto phase.");
           }
@@ -636,11 +697,15 @@ void parseserial(){
   // 17: Enable manual scheduler override
 
   // ============ Food TTL ============
+  // 24: Use Food TTL or not (n = 1 yes, 0 no) 
   // 18: Delay time after opto (n * 1000 ms)
   // 19: Pulse on time (n * 10 ms)
   // 20: Pulse cycle time (n * 10 ms)
   // 21: Pulses per train (n)
   // 22: Conditional or not (n = 1 yes, 0 no) 
+
+  // ============= Encoder =============
+  // 23 encoder useage (n = 1 yes, 0 no) 
   
   
   switch (m){
@@ -665,6 +730,12 @@ void parseserial(){
         myEnc.write(0);    // zero the position
         pos = 0;        
       }
+
+      if (tcpmode){
+        usescheduler = false;
+        schedulerrunning = false;
+      }
+      
       // Scheduler reset
       if (usescheduler){
         ipreoptopulse = 0;
@@ -682,11 +753,23 @@ void parseserial(){
         inpostopto = false;
         stimenabled = false;
         schedulerrunning = true;
+
+        if (debugpins){
+          digitalWrite(schedulerpin, HIGH);
+          digitalWrite(preoptopin, HIGH);
+          digitalWrite(inoptopin, LOW);
+          digitalWrite(postoptopin, LOW);
+        }
       }
       else{
-        stimenabled = true;      
+        stimenabled = true;
+        if (debugpins){
+          digitalWrite(schedulerpin, LOW);
+          digitalWrite(preoptopin, LOW);
+          digitalWrite(inoptopin, LOW);
+          digitalWrite(postoptopin, LOW);
+        }      
       }
-            
       break;
 
     case 0:
@@ -705,7 +788,9 @@ void parseserial(){
       // Give position
       if (useencoder){
         pos = myEnc.read();
-      }      
+        // pos++;
+      }
+//      Serial.println(pos);      
       Serial.write((byte *) &pos, 4);
       break;
       
@@ -821,9 +906,22 @@ void parseserial(){
       // Reset
       if (usescheduler){
         stimenabled = false;
+
+        if (debugpins){
+          digitalWrite(schedulerpin, HIGH);
+          digitalWrite(preoptopin, HIGH);
+          digitalWrite(inoptopin, LOW);
+          digitalWrite(postoptopin, LOW);
+        }
       }
       else{
         stimenabled = true;
+        if (debugpins){
+          digitalWrite(schedulerpin, LOW);
+          digitalWrite(preoptopin, LOW);
+          digitalWrite(inoptopin, LOW);
+          digitalWrite(postoptopin, LOW);
+        }
       }
       schedulerrunning = false;
 
@@ -852,6 +950,15 @@ void parseserial(){
       }
       break;
 
+    case 24:
+      // 24: Use Food TTL or not (n = 1 yes, 0 no) 
+      usefoodpulses = (n == 1);
+      if (debugmode){
+        Serial.print("Food TTL used: ");
+        Serial.println(usefoodpulses);
+      }
+      break;
+    
     case 18:
       // 18: Delay time after opto (n * 1000 ms)
       nfoodpulsedelay = n * 1000;
@@ -897,7 +1004,27 @@ void parseserial(){
         Serial.println(foodttlconditional);
       }
       break;
+
+    case 23:
+      // 23 encoder useage (n = 1 yes, 0 no) 
+      useencoder = (n == 1);
+      if (debugmode){
+        Serial.print("Use encoder or not: ");
+        Serial.println(foodttlconditional);
+      }
+      break;
       
+  }
+
+  if (debugpins){
+    if (!serialpinon){
+      serialpinon = true;
+      digitalWrite(serialpin, HIGH);
+    }
+    else{
+      serialpinon = false;
+      digitalWrite(serialpin, LOW);
+    }
   }
 }
 
@@ -923,8 +1050,20 @@ void modeswitch(void){
     cycletime_photom_2 = cycletime_photom_2_tcp; // in micro secs (Ch2)
     digitalWrite(tristatepin, LOW); // Let ch2 go through;
     
+    // Disbale scheduler
+    stimenabled = false;
+    usescheduler = false;
+    schedulerrunning = false;
+    if (debugpins){
+      digitalWrite(schedulerpin, LOW);
+      digitalWrite(preoptopin, LOW);
+      digitalWrite(inoptopin, LOW);
+      digitalWrite(postoptopin, LOW);
+    }
+    
     if (debugmode){
       Serial.println("Two-color photometry mode.");
+      Serial.println("Scheduler is disabled");
     }
   }
 

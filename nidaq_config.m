@@ -3,6 +3,8 @@ global nicfg
 % Set the up the nidaq recording
 nicfg.BasePath         = 'C:\Users\andermannlab\Documents\MATLAB\temp\';       % Set the path in which data will be saved
 nicfg.ArduinoCOM       = 7;            % Set the COM port for the Arduino, < 0 means off
+nicfg.RecordRunning    = true;         % Use quad encoder or not
+nicfg.baumrate         = 9600;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev1';        % Device name
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
 nicfg.NidaqChannels    = 8;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)

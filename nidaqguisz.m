@@ -62,6 +62,9 @@ guidata(hObject, handles);
 nidaq_config_sz;
 global nicfg
 
+% Preset
+omniboxpreset(nicfg)
+
 if isfield(nicfg, 'arduino_serial')
     nicfg = rmfield(nicfg, 'arduino_serial');
 end
@@ -178,7 +181,7 @@ if nicfg.active
     if nicfg.ArduinoCOM > -1 && ~isfield(nicfg, 'arduino_serial')
         disp('Starting Arduino...');
         nicfg.arduino_data = [];
-        nicfg.arduino_serial = arduinoOpen(nicfg.ArduinoCOM);
+        nicfg.arduino_serial = arduinoOpen(nicfg.ArduinoCOM, nicfg.baumrate);
         
         % 2 Seconds to let arduino catch up
         pause(2);
@@ -189,6 +192,9 @@ if nicfg.active
         % Ping arduino
         fwrite(nicfg.arduino_serial, uint8([5 0]));
         fread(nicfg.arduino_serial, 1, 'int32');
+        
+        % Parse for omnibox v3
+        omniboxparse(nicfg)
     end
     
     % Start nidaq
