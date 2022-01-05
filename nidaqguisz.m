@@ -236,6 +236,7 @@ if nicfg.active
         
         if nicfg.RecordRunning && nicfg.ArduinoCOM > -1 && toc > 1.0/nicfg.RunningFrequency
             tic;
+            fwrite(nicfg.arduino_serial, [5 0]); % Request position info
             nicfg.arduino_data(end+1) = arduinoReadQuad(nicfg.arduino_serial);
         end
         

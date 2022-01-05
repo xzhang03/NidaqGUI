@@ -9,17 +9,19 @@
  * 4. Cam pulses with adjustable frequency
  * 5. Encoder at the same frequency at 4
  * 6. Preprogram experiment timescale: baseline -> opto -> postopto
- * 7. Mechanical switch to test 6
+ * 7. External input for scheduler (6)
  * 8. TTL pulses for other parts of the experiment
+ * 9. Audio syncing
+ * 
  */
 
  
 // =============== Debug ===============
-#define debugmode false
+#define debugmode false // Master switch for all serial debugging
 #define showpulses false // Extremely verbose
-#define showopto false
-#define showscheduler false
-#define showfoodttl false
+#define showopto true
+#define showscheduler true
+#define showfoodttl true
 #define debugpins true
 unsigned long ttest1 = 0;
 bool ftest1 = false;
@@ -33,13 +35,14 @@ Encoder myEnc(4,5); // pick your pins, reverse for sign flip
 // =============== Modes ===============
 // Photometry mode
 bool optophotommode = false; // Green + red
-bool tcpmode = true;
+bool tcpmode = true; //
 bool samecoloroptomode = false; // Green + blue (same led for photometry and opto);
 bool useencoder = true;
-bool usefoodpulses = true;
-bool usescheduler = false;
-bool manualscheduleoverride = false;
+bool usefoodpulses = false;
 bool syncaudio = false;
+bool usescheduler = true;
+bool manualscheduleoverride = true; // Only works when using scheduler
+bool listenmode = true;
 
 // =============== Pins ===============
 const byte ch1_pin = 2; // try to leave 0 1 open. 
@@ -118,7 +121,7 @@ const long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrelevant
 unsigned int preoptotime = 120; // in seconds (max 1310)
 unsigned int npreoptopulse = preoptotime * 50; // preopto pulse number
 unsigned int ipreoptopulse = 0; // preopto pulse number
-byte ntrain = 10; // Number of trains (red opto)
+byte ntrain = 10; // Number of trains
 byte itrain = 0; // Current number of trains
 bool inpreopto = true;
 bool inopto = false;
@@ -256,50 +259,37 @@ void loop() {
     if (!tcpmode){
       // Scheduler business here since it's not tcp
       // Manual stim
-      if (manualscheduleoverride){
+      if (manualscheduleoverride && usescheduler){
         if ((digitalRead(switchpin) == 0) && !manualon){
           stimenabled = true;
           inpreopto = false;
           inpostopto = false;
           inopto = true;
           itrain = 0;
+          ntrain = 1; // If manually triggered, it's only gonna be 1 train at a time
           pmt_counter_for_opto = 0;
           opto_counter = 0;
           counter_for_train = 0; // Number of cycles
           foodpulses_left = 0;
           inputttl = !foodttlconditional;
           manualon = true;
-          schedulerrunning = false; // Not flagging this makes manual turn on only turned-off-able by releasing the switch
 
           if (debugpins){
-            digitalWrite(schedulerpin, LOW);
             digitalWrite(preoptopin, LOW);
             digitalWrite(inoptopin, HIGH);
             digitalWrite(postoptopin, LOW);
           }
           
           if (debugmode && showscheduler){
-            Serial.println("Stim enabled manually. This can only be turned off manually");
+            Serial.println("External pulse detected detected.");
           }
         }
         if (manualon){
           if (digitalRead(switchpin) == 1){
-            stimenabled = false;
-            inpreopto = false;
-            inpostopto = true;
-            inopto = false;
             manualon = false;
-            schedulerrunning = false; // Not flagging this makes manual turn on only turned-off-able by releasing the switch
-
-            if (debugpins){
-              digitalWrite(schedulerpin, LOW);
-              digitalWrite(preoptopin, LOW);
-              digitalWrite(inoptopin, LOW);
-              digitalWrite(postoptopin, HIGH);
-            }
     
             if (debugmode && showscheduler){
-              Serial.println("Stim disabled manually. ");
+              Serial.println("External pulse detected ended.");
             }
           }
         }
@@ -322,7 +312,7 @@ void loop() {
         }
       }
       // Just advance
-      else if (schedulerrunning && inpreopto && (!stimenabled)){
+      else if (schedulerrunning && inpreopto && (!stimenabled) && (!listenmode)){
         ipreoptopulse++;
         if (debugmode && showscheduler){
           if ((ipreoptopulse % 50) == 0){
@@ -438,9 +428,6 @@ void loop() {
       if ((opto_counter >= sctrain_length) && train){
         train = false;
         lastpulseopto = true;
-        if (debugmode && showopto){
-          Serial.println("Train off");
-        }
       }
     
       // Serial.println(counter_for_train);
@@ -559,6 +546,10 @@ void loop() {
         pulsewidth_1 = pulsewidth_1_tcp;
         digitalWrite(AOpin, LOW);
         digitalWrite(tristatepin, HIGH);
+
+        if (debugmode && showopto){
+          Serial.println("Train off");
+        }
         
         if (debugmode && showopto){
           Serial.println("Ch1 pulse width returned to tcp");
@@ -637,14 +628,14 @@ void loop() {
       }
 
       
-      if ((opto_counter == 10) && optophotommode && train){
+      if ((opto_counter == train_length) && optophotommode && train){
         // reset opto counter
         train = false;
         
         if (debugmode && showopto){
           Serial.println("Train off");
         }
-        
+
         // Scheduler disable
         if ((itrain >= ntrain) && stimenabled && inopto && schedulerrunning){
           stimenabled = false;
@@ -700,6 +691,7 @@ void parseserial(){
   // 4: Set delay (delay_cycle = n * 50, n in seconds). Only relevant when scheduler is on
   // 16: Number of trains (n = n of trains)
   // 17: Enable manual scheduler override
+  // 27: Listening mode on or off (n = 1 yes, 0 no). Will turn on manual override.
 
   // ============ Food TTL ============
   // 24: Use Food TTL or not (n = 1 yes, 0 no) 
@@ -797,7 +789,9 @@ void parseserial(){
       // Give position
       if (useencoder){
         pos = myEnc.read();
-        // pos++;
+      }
+      else{
+        pos = 0;
       }
 //      Serial.println(pos);      
       Serial.write((byte *) &pos, 4);
@@ -1019,12 +1013,12 @@ void parseserial(){
       useencoder = (n == 1);
       if (debugmode){
         Serial.print("Use encoder or not: ");
-        Serial.println(foodttlconditional);
+        Serial.println(useencoder);
       }
       break;
 
     case 25:
-      // 24 Audio sync (n = 1 yes, 0 no);
+      // 25: Audio sync (n = 1 yes, 0 no);
       syncaudio = (n == 1);
       if (debugmode){
         Serial.print("Audio sync or not: ");
@@ -1033,11 +1027,26 @@ void parseserial(){
       break;
 
     case 26:
-      // 25 audio sync tone frequency (n * 100 Hz)
+      // 26: audio sync tone frequency (n * 100 Hz)
       audiofreq = n * 100;
       if (debugmode){
         Serial.print("Audio sync tone frequency: ");
         Serial.println(audiofreq);
+      }
+      break;
+
+    case 27:
+      // 27: Listening mode on or off (n = 1 yes, 0 no)
+      listenmode = (n == 1);
+      if (listenmode){
+        manualscheduleoverride = true;
+      }
+      if (debugmode){
+        Serial.print("Listening mode on or not: ");
+        Serial.println(listenmode);
+        if (listenmode){
+          Serial.println("Manual over-ride on.");
+        }
       }
       break;
   }
@@ -1156,6 +1165,8 @@ void showpara(void){
     Serial.println(ntrain);
     Serial.print("Manual Overrideable: ");
     Serial.println(manualscheduleoverride);
+    Serial.print("Listen mode: ");
+    Serial.println(listenmode);
     
     // Cam
     Serial.println("============== Camera ==============");
@@ -1202,7 +1213,9 @@ void camerapulse(void){
     if ((tnow - pulsetime) >= cycletime){
       if (!onoff){
         pulsetime = micros();
-//        Serial.write((byte *) &pos, 4);
+//        pos = myEnc.read();
+        // Serial.write((byte *) &pos, 4);
+        // Serial.println(pos);
         digitalWrite(cam_pin, HIGH);
         digitalWrite(led_pin, HIGH);
 

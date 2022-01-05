@@ -9,7 +9,7 @@ nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev1';        % Device name
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
-nicfg.NidaqChannels    = 4;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
+nicfg.NidaqChannels    = -1;%4;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
 nicfg.NidaqDigitalChannels = 1;         % Set the number of digital channels on Port0 to record, starting at Line0
 nicfg.NidaqFrequency   = 2500;          % Set the recording frequency for the nidaq
 nicfg.RunningFrequency = 30;         % Set the frequency at which running is recorded
@@ -66,7 +66,8 @@ nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 m
 nicfg.scheduler.enable = false; % Default false
 nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
-nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride (experiemental). Default false.
+nicfg.scheduler.manualoverride = true; % Allow for manual swichingoverride. Default true.
+nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each train triggered by external active low. This will enable manualoverride above.
 
 % Opto-delayed TTL
 % TTL pulses that happen X seconds after each opto train onset (for food

@@ -67,6 +67,9 @@ if nicfg.scheduler.enable
     
     % Manual override
     fwrite(nicfg.arduino_serial, uint8([17 nicfg.scheduler.manualoverride]));
+    
+    % Listen mode
+    fwrite(nicfg.arduino_serial, uint8([27 nicfg.scheduler.listenmode]));
 else
     % No Scheduler
     fwrite(nicfg.arduino_serial, uint8([15 0]));
