@@ -674,6 +674,7 @@ void parseserial(){
   // 0: stop pulse
   // 5: Quad encoder position
   // 9: Show all parameters
+  // 253: reboot (n = 104)
   
   // ========== Opto & photom ==========
   // 3: TCP mode (n = 0 TCP, n = 1 optophotometry, n = 2 samecolor optophotometry)
@@ -710,13 +711,23 @@ void parseserial(){
   
   
   switch (m){
+    case 253:
+      // Reboot
+      if (n == 104){
+        SCB_AIRCR = 0x05FA0004;
+      }
+      break;
+      
     case 2:
       // Set frequency
+      freq = n;
       cycletime = 1000000 / n;
 
       if (debugmode){
-        Serial.print("New cam cycle time (us): ");
-        Serial.println(cycletime);
+        Serial.print("New cam frequency (Hz): ");
+        Serial.println(n);
+        Serial.print("New cam cycle time (ms): ");
+        Serial.println(cycletime/1000);
       }
       break;
       
@@ -1172,8 +1183,8 @@ void showpara(void){
     Serial.println("============== Camera ==============");
     Serial.print("Cam frequency (Hz): ");
     Serial.println(freq);
-    Serial.print("Cam cycle time (us): ");
-    Serial.println(cycletime);
+    Serial.print("Cam cycle time (ms): ");
+    Serial.println(cycletime/1000);
     Serial.print("Cam on time (us): ");
     Serial.println(ontime);
     Serial.print("Audio sync: ");

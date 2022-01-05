@@ -23,3 +23,6 @@ fwrite(nicfg.arduino_serial, uint8([0 0]));
 %% Close
 fclose(nicfg.arduino_serial);
 disp('Closed.')
+
+%% Reset
+fwrite(nicfg.arduino_serial, uint8([253 104]));
