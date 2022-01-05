@@ -39,6 +39,7 @@ bool useencoder = true;
 bool usefoodpulses = true;
 bool usescheduler = false;
 bool manualscheduleoverride = false;
+bool syncaudio = false;
 
 // =============== Pins ===============
 const byte ch1_pin = 2; // try to leave 0 1 open. 
@@ -50,6 +51,7 @@ const byte switchpin = 8; // Toggle switch (active low)
 const byte foodTTLpin = 9; // output TTL to trigger food etc
 const byte foodTTLinput = 10; // input TTL for conditional food pulses (3.3 V only!!)
 const byte led_pin = 13; // onboard led
+const byte audiosyncpin = 21; // Pin for audio signal
 
 // ============= debugpins =============
 const byte serialpin = 14; // Parity signal for serial pin
@@ -63,7 +65,7 @@ bool serialpinon = false;
 // General time variables
 unsigned long int tnow, tnowmillis;
 
-// ========= Camera and encoder =========
+// ====== Camera, audio, and encoder ======
 // time variables for camera
 unsigned long int pulsetime = 0;
 unsigned int step_size = 10; // in micros
@@ -71,10 +73,13 @@ unsigned int step_size = 10; // in micros
 // cam trig variables
 bool pulsing = false;
 byte freq = 30; // Pulse at 30 Hz (default)
-unsigned int ontime = 20000; // On for 20 ms
+unsigned int ontime = 2000; // On for 2 ms
 unsigned long cycletime = 1000000 / freq;
 bool onoff = false;
 long pos = 0;
+unsigned int audiofreq = 2000;
+
+// ============== Serial ==============
 byte m, n;
 
 // ============ Photometry ============
@@ -703,9 +708,13 @@ void parseserial(){
   // 20: Pulse cycle time (n * 10 ms)
   // 21: Pulses per train (n)
   // 22: Conditional or not (n = 1 yes, 0 no) 
-
+  
   // ============= Encoder =============
   // 23 encoder useage (n = 1 yes, 0 no) 
+
+  // ============ Audio sync ============
+  // 25: Audio sync (n = 1 yes, 0 no)
+  // 26: Audio sync tone frequency (n * 100 Hz)
   
   
   switch (m){
@@ -1013,7 +1022,24 @@ void parseserial(){
         Serial.println(foodttlconditional);
       }
       break;
-      
+
+    case 25:
+      // 24 Audio sync (n = 1 yes, 0 no);
+      syncaudio = (n == 1);
+      if (debugmode){
+        Serial.print("Audio sync or not: ");
+        Serial.println(syncaudio);
+      }
+      break;
+
+    case 26:
+      // 25 audio sync tone frequency (n * 100 Hz)
+      audiofreq = n * 100;
+      if (debugmode){
+        Serial.print("Audio sync tone frequency: ");
+        Serial.println(audiofreq);
+      }
+      break;
   }
 
   if (debugpins){
@@ -1139,6 +1165,10 @@ void showpara(void){
     Serial.println(cycletime);
     Serial.print("Cam on time (us): ");
     Serial.println(ontime);
+    Serial.print("Audio sync: ");
+    Serial.println(syncaudio);
+    Serial.print("Audio sync tone frequency: ");
+    Serial.println(audiofreq);
 
     // Encoder
     Serial.println("============== Encoder ==============");
@@ -1172,9 +1202,15 @@ void camerapulse(void){
     if ((tnow - pulsetime) >= cycletime){
       if (!onoff){
         pulsetime = micros();
-        Serial.write((byte *) &pos, 4);
+//        Serial.write((byte *) &pos, 4);
         digitalWrite(cam_pin, HIGH);
         digitalWrite(led_pin, HIGH);
+
+        // Audio
+        if (syncaudio){
+          tone(audiosyncpin, audiofreq);
+        }
+        
         onoff = true;
       }
     }
@@ -1183,6 +1219,11 @@ void camerapulse(void){
         digitalWrite(cam_pin, LOW);
         digitalWrite(led_pin, LOW);
         onoff = false;
+
+        // Audio
+        if (syncaudio){
+          noTone(audiosyncpin);
+        }
       }
     }
   }
@@ -1191,6 +1232,11 @@ void camerapulse(void){
       digitalWrite(cam_pin, LOW);
       digitalWrite(led_pin, LOW);
       onoff = false;
+
+      // Audio
+      if (syncaudio){
+        noTone(audiosyncpin);
+      }
     }
   }
 }

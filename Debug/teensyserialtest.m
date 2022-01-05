@@ -1,12 +1,11 @@
 %% Open
 clear
-nidaq_config_sz_test;
-nicfg.arduino_serial = serial(nicfg.ArduinoCOM, 'BaudRate', nicfg.baumrate);
+nidaq_config_sz;
+nicfg.arduino_serial = serial(sprintf('COM%i', nicfg.ArduinoCOM), 'BaudRate', nicfg.baumrate);
 fopen(nicfg.arduino_serial);
 
 
 %% Parse
-nicfg.arduino_serial = s1;
 omniboxparse(nicfg)
 
 %% run

@@ -103,5 +103,16 @@ else
     fwrite(nicfg.arduino_serial, uint8([23 0]));
 end
 
+%% Audio sync
+if nicfg.audiosync.enable
+    % Audio enable
+    fwrite(nicfg.arduino_serial, uint8([25 1]));
+    
+    % Frequency
+    fwrite(nicfg.arduino_serial, uint8([26 nicfg.audiosync.freq]));
+else
+    fwrite(nicfg.arduino_serial, uint8([25 0]));
+end
+
 end
 

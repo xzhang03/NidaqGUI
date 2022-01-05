@@ -80,3 +80,7 @@ nicfg.optodelayTTL.conditional = false; % TTL delivery is conditional or not. If
 
 % Encoder
 nicfg.encoder.enable = true;
+
+% Audio sync
+nicfg.audiosync.enable = false; % Default false
+nicfg.audiosync.freq = 20; % Frequency in X * 100 Hz . E.g., 10 means 1000 Hz. Default is 20 (2000 Hz)
