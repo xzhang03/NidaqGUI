@@ -6,6 +6,7 @@ fopen(nicfg.arduino_serial);
 disp('Opened.')
 
 %% Parse
+nidaq_config_sz;
 omniboxparse(nicfg)
 
 %% run
@@ -26,3 +27,5 @@ disp('Closed.')
 
 %% Reset
 fwrite(nicfg.arduino_serial, uint8([253 104]));
+fclose(nicfg.arduino_serial);
+disp('Reset and closed.')
