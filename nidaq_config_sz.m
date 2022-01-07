@@ -61,23 +61,38 @@ nicfg.scoptophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 
 nicfg.scoptophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.scoptophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10.
+nicfg.scoptophotometry.tristatepol = false; % Tristate pin polarity (do not change once a box is made).
 
 % Scheduler
 nicfg.scheduler.enable = false; % Default false
-nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
+nicfg.scheduler.delay = 10;%120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = true; % Allow for manual swichingoverride. Default true.
-nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each train triggered by external active low. This will enable manualoverride above.
+nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
+nicfg.scheduler.listenpol = true; % Listen mode polarity (true = active high, false = active low). Do not change unless you know what you are doing.
 
 % Opto-delayed TTL
 % TTL pulses that happen X seconds after each opto train onset (for food
 % delivery or synchronizing).
+% Delivery (unconditional): Opto start => delivery delay => delivery
 nicfg.optodelayTTL.enable = false; % Default false
-nicfg.optodelayTTL.delay = 2; % Delay in seconds. E.g., 2 means 2 seconds. Default 2s.
+nicfg.optodelayTTL.delay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.pulsewidth = 15; % Pulsewidth in X * 10 ms. E.g., 15 means 150 ms pulses. Default is 15 (150 ms).
 nicfg.optodelayTTL.cycle = 30; % Pulse cycle in X * 10 ms. E.g., 30 means 300 ms pulses. Default is 30 (300 ms).
 nicfg.optodelayTTL.trainlength = 5; % Pulse train length. E.g., 5 means 5 pulses. Default is 5.
+
+% Opto-delayed TTL buzzer
+% Cue: Opto start => buzzer delay => buzzer duration
+nicfg.optodelayTTL.buzzerenable = false; % Buzzer or not (default false)
+nicfg.optodelayTTL.buzzerdelay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
+nicfg.optodelayTTL.buzzerdur = 10; % Delay in 100 ms. E.g., 10 means 1 seconds. Default 10 (1s)
+
+% Action: Opto start => action delay => action window
+% Delivery (conditional): Opto start => delivery delay => delivery window start => delivery (if action) => timeout (if no delivery)
 nicfg.optodelayTTL.conditional = false; % TTL delivery is conditional or not. If so, pin 10 must be hooked up with an active-high input. Input comes during the delay window will allow for subsequent pulse output.
+nicfg.optodelayTTL.actiondelay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
+nicfg.optodelayTTL.actiondur = 50; % Duratoin in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
+nicfg.optodelayTTL.deliverydur = 50; % Duratoin in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 
 % Encoder
 nicfg.encoder.enable = true;

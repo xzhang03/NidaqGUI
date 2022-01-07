@@ -38,23 +38,24 @@ bool optophotommode = false; // Green + red
 bool tcpmode = true; //
 bool samecoloroptomode = false; // Green + blue (same led for photometry and opto);
 bool useencoder = true;
-bool usefoodpulses = false;
+bool usefoodpulses = false; //
 bool syncaudio = false;
-bool usescheduler = true;
+bool usescheduler = false; // 
 bool manualscheduleoverride = true; // Only works when using scheduler
-bool listenmode = true;
+bool listenmode = false;
+bool usebuzzcue = false; //
 
 // =============== Pins ===============
 const byte ch1_pin = 2; // try to leave 0 1 open. 
 const byte ch2_pin = 3; // 405 nm or red opto
 const byte AOpin = 3; // Use same pin as ch2 until true analog outputs are used in the future
-const byte tristatepin = 6; // Use to control tristate transceivers (AO (used as digital here), 0, or disconnected). Active low
+const byte tristatepin = 6; // Use to control tristate transceivers (AO (used as digital here), 0, or disconnected). Default active low
 const byte cam_pin = 7; // Cam pulses
-const byte switchpin = 8; // Toggle switch (active low)
+const byte switchpin = 8; // External toggle to start a train (default active high). Usually used in listenmode
 const byte foodTTLpin = 9; // output TTL to trigger food etc
-const byte foodTTLinput = 10; // input TTL for conditional food pulses (3.3 V only!!)
+const byte foodTTLinput = 10; // input TTL for conditional food pulses (active high, 3.3 V only!!)
 const byte led_pin = 13; // onboard led
-const byte audiosyncpin = 21; // Pin for audio signal
+const byte audiopin = 21; // Pin for audio signal
 
 // ============= debugpins =============
 const byte serialpin = 14; // Parity signal for serial pin
@@ -80,6 +81,8 @@ unsigned int ontime = 2000; // On for 2 ms
 unsigned long cycletime = 1000000 / freq;
 bool onoff = false;
 long pos = 0;
+
+// Audio
 unsigned int audiofreq = 2000;
 
 // ============== Serial ==============
@@ -112,10 +115,11 @@ const long cycletime_photom_2_opto = 13500; // in micro secs (Ch2)
 // Same color opto variables
 byte scopto_per = 5; // Number of photometry pulses per opto pulse (AO). Can be: 1, 2, 5, 10, 25, 50. Pulse freq is 50 / AO
 byte sctrain_length = 10; // Number of photometry pulses per stim period (BO). Duration is  BO / (50 / AO).
-long sctrain_cycle = 30 * 50; // First number is in seconds. How often does the train come on.
+long sctrain_cycle = 30 * 50; // First number is in seconds. How often does the train come on. 
 unsigned int pulsewidth_1_scopto = 10000; // in micro secs (ch1)
 const long cycletime_photom_1_scopto = 20000; // in micro secs (Ch1)
 const long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrelevant
+bool tristatepinpol = false; // Polarity for the tristatepin (1 = active high, 0 = active low). Default active low.
 
 // ============ Scheduler ============
 unsigned int preoptotime = 120; // in seconds (max 1310)
@@ -129,6 +133,7 @@ bool inpostopto = false;
 bool stimenabled = true;
 bool schedulerrunning = false;
 bool manualon = false;
+bool listenpol = true; // Polarity for listen mode false = active low, true = active high. Either way, it has to be 3.3V logic
 
 // ============ Food TTL ============
 // Food TTL (basically sync'ed with opto)
@@ -138,11 +143,37 @@ unsigned int foodpulse_cycletime = 300; // in ms
 byte foodpulses = 5; // Number of food ttl pulses per stim period.
 byte foodpulses_left = 0; // Try counting down this time. Probably easier to debug
 unsigned long tfood0;
-bool foodttlconditional = false;
 bool inputttl = false;
 bool foodttlarmed = false;
-bool foodttlwait = false;
-bool foodtllon = false;
+bool foodttlwait = false; // In waiting for delivery
+bool foodttlon = false;
+
+// ======== Food TTL Conditional ========
+// Cue: Opto start => buzzer delay => buzzer duration
+// Action: Opto start => action delay => action window
+// Delivery: Opto start => delivery delay => delivery
+// Example: 
+/*  1. Opto start
+ *  2. 2s
+ *  3. Cue start, Action window start, potential delivery start.
+ *  4. 1s
+ *  5. Cue stop
+ *  6. 4s
+ *  7. Action window stop
+ *  8. potential delivery stop.
+ */
+
+bool foodttlconditional = false; //
+bool foodttlcuewait = false;
+bool foodttlactionwait = false;
+unsigned int buzzdelay = 2000;
+unsigned int buzzdur = 1000; // Time for buzzer cue 
+unsigned int actiondelay = 2000;
+unsigned int actiondur = 5000;
+unsigned int deliverydur = 5000;
+bool cueon = false;
+bool actionperiodon = false;
+
 
 // ============ Switches ============
 // photometry and optophotometry switches
@@ -172,7 +203,13 @@ void setup() {
   pinMode(ch2_pin, OUTPUT);
   pinMode(tristatepin, OUTPUT);
   pinMode(foodTTLpin, OUTPUT);
-  pinMode(switchpin, INPUT_PULLUP);
+  if (listenpol){
+    pinMode(switchpin, INPUT_PULLDOWN); // active high
+  }
+  else {
+    pinMode(switchpin, INPUT_PULLUP); // active low
+  }
+  
   pinMode(foodTTLinput, INPUT_PULLDOWN);
   
   digitalWrite(cam_pin, LOW);
@@ -260,7 +297,7 @@ void loop() {
       // Scheduler business here since it's not tcp
       // Manual stim
       if (manualscheduleoverride && usescheduler){
-        if ((digitalRead(switchpin) == 0) && !manualon){
+        if ((digitalRead(switchpin) == listenpol) && !manualon){
           stimenabled = true;
           inpreopto = false;
           inpostopto = false;
@@ -272,7 +309,16 @@ void loop() {
           counter_for_train = 0; // Number of cycles
           foodpulses_left = 0;
           inputttl = !foodttlconditional;
+          foodttlwait = false;
           manualon = true;
+
+          if (usebuzzcue){
+            foodttlcuewait = true;
+          }
+          
+          if (foodttlconditional){
+            foodttlactionwait = true;
+          }
 
           if (debugpins){
             digitalWrite(preoptopin, LOW);
@@ -285,7 +331,7 @@ void loop() {
           }
         }
         if (manualon){
-          if (digitalRead(switchpin) == 1){
+          if (digitalRead(switchpin) == !listenpol){
             manualon = false;
     
             if (debugmode && showscheduler){
@@ -346,14 +392,14 @@ void loop() {
       // Only if stim is enabled though
       if ((counter_for_train == 1) && stimenabled){
         // Debug train on to train on
-//        Serial.println(tnow - ttest1);
+//        Serial.println(tnow - ttest1);s
 //        ttest1 = tnow;
         
         train = true;
         opto_counter = 0;
         pulsewidth_1 = pulsewidth_1_scopto; // Change pulse width
         digitalWrite(AOpin, HIGH);
-        digitalWrite(tristatepin, LOW);
+        digitalWrite(tristatepin, tristatepinpol); // false = active low = on.
 
         if (usescheduler){
           itrain++; // Advance train count
@@ -373,6 +419,16 @@ void loop() {
           inputttl = !foodttlconditional;
           tfood0 = tnowmillis;
 
+          if (usebuzzcue){
+            foodttlcuewait = true;
+            cueon = false;
+          }
+          
+          if (foodttlconditional){
+            foodttlactionwait = true;
+            actionperiodon = false;
+          }
+          
           if (debugmode && showfoodttl){
             Serial.print("Food TTL armed at (ms): ");
             Serial.println(tfood0);
@@ -478,8 +534,17 @@ void loop() {
           foodttlwait = true;
           inputttl = !foodttlconditional;
           tfood0 = tnowmillis;
-          
 
+          if (usebuzzcue){
+            foodttlcuewait = true;
+            cueon = false;
+          }
+          
+          if (foodttlconditional){
+            foodttlactionwait = true;
+            actionperiodon = false;
+          }
+          
           if (debugmode && showfoodttl){
             Serial.print("Food TTL armed at (ms): ");
             Serial.println(tfood0);
@@ -545,7 +610,7 @@ void loop() {
         // Return to normal pulse width after the train is off. Only at last pulse
         pulsewidth_1 = pulsewidth_1_tcp;
         digitalWrite(AOpin, LOW);
-        digitalWrite(tristatepin, HIGH);
+        digitalWrite(tristatepin, !tristatepinpol); // !false = active low = off
 
         if (debugmode && showopto){
           Serial.println("Train off");
@@ -686,6 +751,7 @@ void parseserial(){
   // 12: Change scopto pulse per train (train_length = n)
   // 13: Change scopto pulse width (n * 1000)
   // 14: Reserved for opto pulse width
+  // 29: Tristate pin polarity (1 = active high, 0 = active low);
 
   // ============ Scheduler ============
   // 15: Use scheduler (n = 1 yes, 0 no) 
@@ -693,14 +759,24 @@ void parseserial(){
   // 16: Number of trains (n = n of trains)
   // 17: Enable manual scheduler override
   // 27: Listening mode on or off (n = 1 yes, 0 no). Will turn on manual override.
+  // 28: Listen mode polarity (1 = active high, 0 = active low)
 
   // ============ Food TTL ============
   // 24: Use Food TTL or not (n = 1 yes, 0 no) 
-  // 18: Delay time after opto (n * 1000 ms)
+  // 18: Delay time after opto (n * 100 ms)
   // 19: Pulse on time (n * 10 ms)
   // 20: Pulse cycle time (n * 10 ms)
   // 21: Pulses per train (n)
+  // 30: Use buzzer cue or not (n = 1 yes, 0 no)
+  // 31: Buzzer delay (n * 100 ms)
+  // 32: Buzzer duration (n * 100 ms)
+
+  // ====== Food TTL Conditional ======
   // 22: Conditional or not (n = 1 yes, 0 no) 
+  // 33: Action period delay (n * 100 ms)
+  // 34: Action period duration (n * 100 ms)
+  // 35: Delivery period duration (n * 100 ms);
+  
   
   // ============= Encoder =============
   // 23 encoder useage (n = 1 yes, 0 no) 
@@ -718,16 +794,15 @@ void parseserial(){
       }
       break;
       
-    case 2:
-      // Set frequency
-      freq = n;
-      cycletime = 1000000 / n;
-
+    case 0:
+      // End pulsing
+      pulsing = false;
+      if (usescheduler){
+        stimenabled = false;
+        schedulerrunning = false;
+      }
       if (debugmode){
-        Serial.print("New cam frequency (Hz): ");
-        Serial.println(n);
-        Serial.print("New cam cycle time (ms): ");
-        Serial.println(cycletime/1000);
+        Serial.println("Cam pulse stop.");
       }
       break;
       
@@ -759,12 +834,19 @@ void parseserial(){
         inputttl = !foodttlconditional;
         foodttlarmed = false;
         foodttlwait = false;
-        foodtllon = false;
+        foodttlon = false;
         inpreopto = true;
         inopto = false;
         inpostopto = false;
         stimenabled = false;
         schedulerrunning = true;
+        
+        if (foodttlconditional){
+          foodttlcuewait = false;
+          foodttlactionwait = false;
+          cueon = false;
+          actionperiodon = false;
+        }
 
         if (debugpins){
           digitalWrite(schedulerpin, HIGH);
@@ -784,35 +866,19 @@ void parseserial(){
       }
       break;
 
-    case 0:
-      // End pulsing
-      pulsing = false;
-      if (usescheduler){
-        stimenabled = false;
-        schedulerrunning = false;
-      }
+    case 2:
+      // Set frequency
+      freq = n;
+      cycletime = 1000000 / n;
+
       if (debugmode){
-        Serial.println("Cam pulse stop.");
+        Serial.print("New cam frequency (Hz): ");
+        Serial.println(n);
+        Serial.print("New cam cycle time (ms): ");
+        Serial.println(cycletime/1000);
       }
       break;
 
-    case 5:
-      // Give position
-      if (useencoder){
-        pos = myEnc.read();
-      }
-      else{
-        pos = 0;
-      }
-//      Serial.println(pos);      
-      Serial.write((byte *) &pos, 4);
-      break;
-      
-    case 9:
-      // List parameters
-      showpara();
-      break;
-      
     case 3:
       // tcp mode
       if (n == 0){
@@ -835,13 +901,25 @@ void parseserial(){
       }
       modeswitch();
       break;
-      
+
     case 4:
       // 4: Set delay (delay_cycle = n * 50, n in seconds). Only relevant when scheduler is on
       preoptotime = n; // in seconds (max 1310)
       npreoptopulse = preoptotime * 50; // preopto pulse number
       ipreoptopulse = 0;
       itrain = 0;
+      break;
+        
+    case 5:
+      // Give position
+      if (useencoder){
+        pos = myEnc.read();
+      }
+      else{
+        pos = 0;
+      }
+//      Serial.println(pos);      
+      Serial.write((byte *) &pos, 4);
       break;
       
     case 6:
@@ -870,6 +948,11 @@ void parseserial(){
         Serial.print("New opto train cycle (s): ");
         Serial.println(train_cycle / 50);
       }
+      break;
+
+    case 9:
+      // List parameters
+      showpara();
       break;
 
     case 10:
@@ -964,18 +1047,9 @@ void parseserial(){
       }
       break;
 
-    case 24:
-      // 24: Use Food TTL or not (n = 1 yes, 0 no) 
-      usefoodpulses = (n == 1);
-      if (debugmode){
-        Serial.print("Food TTL used: ");
-        Serial.println(usefoodpulses);
-      }
-      break;
-    
     case 18:
-      // 18: Delay time after opto (n * 1000 ms)
-      nfoodpulsedelay = n * 1000;
+      // 18: Delay time after opto (n * 100 ms)
+      nfoodpulsedelay = n * 100;
       if (debugmode){
         Serial.print("Delay time after opto (ms): ");
         Serial.println(nfoodpulsedelay);
@@ -1013,6 +1087,14 @@ void parseserial(){
     case 22:
       // 22: Conditional or not (n = 1 yes, 0 no) 
       foodttlconditional = (n == 1);
+      foodttlwait = false;
+      if (foodttlconditional){
+        foodttlcuewait = false;
+        foodttlactionwait = false;
+        cueon = false;
+        actionperiodon = false;
+      }
+      
       if (debugmode){
         Serial.print("Food pulses conditional or not: ");
         Serial.println(foodttlconditional);
@@ -1025,6 +1107,15 @@ void parseserial(){
       if (debugmode){
         Serial.print("Use encoder or not: ");
         Serial.println(useencoder);
+      }
+      break;
+
+    case 24:
+      // 24: Use Food TTL or not (n = 1 yes, 0 no) 
+      usefoodpulses = (n == 1);
+      if (debugmode){
+        Serial.print("Food TTL used: ");
+        Serial.println(usefoodpulses);
       }
       break;
 
@@ -1055,9 +1146,102 @@ void parseserial(){
       if (debugmode){
         Serial.print("Listening mode on or not: ");
         Serial.println(listenmode);
-        if (listenmode){
+        if (debugmode){
           Serial.println("Manual over-ride on.");
         }
+      }
+      break;
+
+    case 28:
+      // 28: Listen mode polarity (1 = active high, 0 = active low)
+      listenpol = (n == 1); // Polarity for listen mode false = active low, true = active high. Either way, it has to be 3.3V logic
+      if (listenpol){
+        pinMode(switchpin, INPUT_PULLDOWN); // active high
+      }
+      else {
+        pinMode(switchpin, INPUT_PULLUP); // active low
+      }
+      if (debugmode){
+        Serial.print("Input opto trigger polarity (1 = active high, 0 = active low): ");
+        Serial.println(listenpol);
+      }
+      break;
+
+    case 29:
+      // 29: Tristate pin polarity (1 = active high, 0 = active low);
+      tristatepinpol = (n == 1);
+      if (debugmode){
+        Serial.print("Tristate pin polarity (1 = active high, 0 = active low): ");
+        Serial.println(tristatepinpol);
+      }
+      
+      if (optophotommode || tcpmode){
+        digitalWrite(tristatepin, tristatepinpol); // Let it go through
+        if (debugmode){
+          Serial.print("Auto switched to output = ");
+          Serial.println(tristatepinpol);
+        }
+      }
+      else if (samecoloroptomode){
+        digitalWrite(tristatepin, !tristatepinpol); // Do not let it go through
+        if (debugmode){
+          Serial.print("Auto switched to output = ");
+          Serial.println(!tristatepinpol);
+        }
+      }
+      break;
+
+    case 30:
+      // 30: Use buzzer cue or not (n = 1 yes, 0 no)
+      usebuzzcue = (n == 1);
+      if (debugmode){
+        Serial.print("Use buzzer (1 = yes, 0 = no): ");
+        Serial.println(usebuzzcue);
+      }
+      break;
+
+    case 31:
+      // 31: Buzzer delay (n * 100 ms)
+      buzzdelay = n * 100;
+      if (debugmode){
+        Serial.print("New buzzer delay (ms): ");
+        Serial.println(buzzdelay);
+      }
+      break;
+
+    case 32:
+      // 32: Buzzer duration (n * 100 ms)
+      buzzdur = n * 100;
+      if (debugmode){
+        Serial.print("New buzzer duration (ms): ");
+        Serial.println(buzzdelay);
+      }
+      break;
+
+    case 33:
+      // Action period delay (n * 100 ms)
+      actiondelay = n * 100;
+      if (debugmode){
+        Serial.print("New action period delay (ms): ");
+        Serial.println(actiondelay);
+      }
+      break;
+
+    case 34:
+      // Action period delay (n * 100 ms)
+      actiondur = n * 100;
+      if (debugmode){
+        Serial.print("New action period duration (ms): ");
+        Serial.println(actiondur);
+      }
+      break;
+
+    case 35:
+      // 35: Delivery period duration (n * 100 ms);
+      deliverydur = n * 100;
+      if (debugmode){
+        Serial.print("New delivery period duration (ms): ");
+        Serial.println(deliverydur);
       }
       break;
   }
@@ -1082,7 +1266,7 @@ void modeswitch(void){
     pulsewidth_2 = pulsewidth_2_opto; // Switch out the parameters
     cycletime_photom_1 = cycletime_photom_1_opto; // in micro secs (Ch1)
     cycletime_photom_2 = cycletime_photom_2_opto; // in micro secs (Ch2)
-    digitalWrite(tristatepin, LOW); // Let ch2 go through;
+    digitalWrite(tristatepin, tristatepinpol); // Let ch2 go through. Write false if active low (false)
         
     if (debugmode){
       Serial.println("Optophotometry mode.");
@@ -1094,7 +1278,7 @@ void modeswitch(void){
     pulsewidth_2 = pulsewidth_2_tcp; // Switch out the parameters
     cycletime_photom_1 = cycletime_photom_1_tcp; // in micro secs (Ch1)
     cycletime_photom_2 = cycletime_photom_2_tcp; // in micro secs (Ch2)
-    digitalWrite(tristatepin, LOW); // Let ch2 go through;
+    digitalWrite(tristatepin, tristatepinpol); // Let ch2 go through; Write false if active low (false)
     
     // Disbale scheduler
     stimenabled = false;
@@ -1118,7 +1302,7 @@ void modeswitch(void){
     pulsewidth_2 = pulsewidth_2_tcp; // Switch out the parameters
     cycletime_photom_1 = cycletime_photom_1_scopto; // in micro secs (Ch1)
     cycletime_photom_2 = cycletime_photom_2_scopto; // in micro secs (Ch2)
-    digitalWrite(tristatepin, HIGH); // DC Ch2
+    digitalWrite(tristatepin, !tristatepinpol); // DC Ch2. Write true if active low (false)
     
     if (debugmode){
       Serial.println("Same-color optophotometry mode.");
@@ -1163,6 +1347,8 @@ void showpara(void){
     Serial.println(50 / scopto_per);
     Serial.print("Same-color opto train length (s): ");
     Serial.println(sctrain_length / (50/scopto_per));
+    Serial.print("Polarity for tristate enable (1 = active high, 0 = active low): ");
+    Serial.println(tristatepinpol); // Polarity for the tristatepin (1 = active high, 0 = active low). Default active low.)
 
     // Scheduler
     Serial.println("============== Scheduler ==============");
@@ -1178,6 +1364,8 @@ void showpara(void){
     Serial.println(manualscheduleoverride);
     Serial.print("Listen mode: ");
     Serial.println(listenmode);
+    Serial.print("Listen polarity: (1 - positive, 0 - negative)");
+    Serial.println(listenpol);
     
     // Cam
     Serial.println("============== Camera ==============");
@@ -1211,8 +1399,28 @@ void showpara(void){
     Serial.println(foodpulses);
     Serial.print("Food TTL trains: ");
     Serial.println("Same as opto");
+
+    // Food TTL Buzzer
+    Serial.println("========== Food TTL Buzzer ========");
+    Serial.print("Food TTL Buzzer: ");
+    Serial.println(usebuzzcue);
+    Serial.print("Food TTL Buzzer delay (ms): ");
+    Serial.println(buzzdelay);
+    Serial.print("Food TTL Buzzer duration (ms): ");
+    Serial.println(buzzdur);
+
+    // Food TTL Conditional
+    Serial.println("====== Food TTL Conditional ======");
+    Serial.print("Food TTL Conditional: ");
+    Serial.println(foodttlconditional);
+    Serial.print("Food TTL Action delay (ms): ");
+    Serial.println(actiondelay);
+    Serial.print("Food TTL Action duration (ms): ");
+    Serial.println(actiondur);
+    Serial.print("Food TTL Time out window (ms): ");
+    Serial.println(deliverydur);
     
-    // Food TTL
+    // System wide
     Serial.println("============= System =============");
     Serial.print("System-wide step time (us): ");
     Serial.println(step_size);
@@ -1232,7 +1440,7 @@ void camerapulse(void){
 
         // Audio
         if (syncaudio){
-          tone(audiosyncpin, audiofreq);
+          tone(audiopin, audiofreq);
         }
         
         onoff = true;
@@ -1246,7 +1454,7 @@ void camerapulse(void){
 
         // Audio
         if (syncaudio){
-          noTone(audiosyncpin);
+          noTone(audiopin);
         }
       }
     }
@@ -1259,38 +1467,124 @@ void camerapulse(void){
 
       // Audio
       if (syncaudio){
-        noTone(audiosyncpin);
+        noTone(audiopin);
       }
     }
   }
 }
 
 void foodttl(void){
-  if (foodttlwait){
-    if (((tnowmillis - tfood0) >= nfoodpulsedelay)){
-      // Out of the waiting period (happens once per train)
-      foodttlwait = false;
-      foodtllon = false;
-      if (inputttl){
-        foodpulses_left = foodpulses;
-        
-      }
-      
-      if (debugmode && showfoodttl){
-        Serial.print("Starting food delivery with ");
-        Serial.print(foodpulses_left);
-        Serial.print(" Pulses at (ms): ");
-        Serial.println(tnowmillis);
-      }
-    }
-    else if (foodttlconditional && !inputttl) {
-      inputttl = digitalRead(foodTTLinput); // active high
+  // 1. Cue
+  if (usebuzzcue){
+    if (foodttlcuewait){
+      // In waiting
+      if ((tnowmillis - tfood0) >= buzzdelay){
+        // First time trying to get out of the buzz delay
+        foodttlcuewait = false;
+        tone(audiopin, audiofreq);
+        cueon = true;
 
-      if (debugmode && showfoodttl){
-        if (inputttl){
-          Serial.print("Food TTL detected at (ms): ");
+        if (debugmode && showfoodttl){
+          Serial.print("Cue on at (ms): ");
           Serial.println(tnowmillis);
         }
+      }
+    }
+    else if (cueon){
+      // After waiting and cue is on
+      if ((tnowmillis - tfood0) >= (buzzdelay + buzzdur)){
+        // Cue long enough
+        cueon = false;
+        noTone(audiopin);
+        if (debugmode && showfoodttl){
+          Serial.print("Cue off at (ms): ");
+          Serial.println(tnowmillis);
+        }
+      }
+    }
+  }
+
+  // 2. Action
+  if (foodttlconditional){
+    if (foodttlactionwait){
+      // Waiting period for action
+      if ((tnowmillis - tfood0) >= actiondelay){
+        // First time trying to get out of the action delay
+        foodttlactionwait = false;
+        actionperiodon = true;
+
+        if (debugmode && showfoodttl){
+          Serial.print("Action period on at (ms): ");
+          Serial.println(tnowmillis);
+        }
+      }
+    }
+    else if (actionperiodon){
+      if(!inputttl){
+        // In action perdio until getting a pulse
+        inputttl = digitalRead(foodTTLinput); // active high
+
+        if (debugmode && showfoodttl){
+          if (inputttl){
+            Serial.print("Food TTL detected at (ms): ");
+            Serial.println(tnowmillis);
+          }
+        }
+      }
+      // Trying to end action period
+      if ((tnowmillis - tfood0) >= (buzzdelay + actiondur)){
+        // Action period long enough
+        actionperiodon = false;
+
+        if (debugmode && showfoodttl){
+          Serial.print("Action period off at (ms): ");
+          Serial.println(tnowmillis);
+        }
+      }
+    }
+  }
+  
+  // 3. Delivery
+  // In the waiting period for delivery
+  if (foodttlwait){
+    // In waiting
+    if (((tnowmillis - tfood0) >= nfoodpulsedelay) && ((tnowmillis - tfood0) < (nfoodpulsedelay + deliverydur))){
+      // Trying to get out of the waiting period
+      if (foodttlconditional){
+        // Trying to get out of the waiting period (happens when detection or time out (below)
+        if (inputttl){
+          foodpulses_left = foodpulses;
+          foodttlwait = false;
+          foodttlon = false;
+          if (debugmode && showfoodttl){
+            Serial.print("Starting food delivery with ");
+            Serial.print(foodpulses_left);
+            Serial.print(" Pulses at (ms): ");
+            Serial.println(tnowmillis);
+          }
+        }
+      }
+      else{
+        // Trying to get out of the waiting period (happens exactly once in unconditional)
+        foodttlwait = false;
+        foodttlon = false;
+        if (debugmode && showfoodttl){
+          Serial.print("Starting food delivery with ");
+          Serial.print(foodpulses_left);
+          Serial.print(" Pulses at (ms): ");
+          Serial.println(tnowmillis);
+        }
+      }
+    }
+
+    // Time out
+    if ((tnowmillis - tfood0) >= (nfoodpulsedelay + deliverydur)){
+      // Should never reach here unless conditional
+      foodttlwait = false;
+      foodttlon = false;
+      if (debugmode && showfoodttl){
+        Serial.print("Food delivery timed out at (ms): ");
+        Serial.println(tnowmillis);
       }
     }
   }
@@ -1299,19 +1593,19 @@ void foodttl(void){
   else{
     if (foodpulses_left > 0){
       // Still pulses left
-      if (((tnowmillis - tfood0) >= (foodpulse_cycletime)) && !foodtllon){
+      if (((tnowmillis - tfood0) >= (foodpulse_cycletime)) && !foodttlon){
         // Beginning of each cycle
         tfood0 = tnowmillis;
-        foodtllon = true;
+        foodttlon = true;
         digitalWrite(foodTTLpin, HIGH);
         if (debugmode && showfoodttl){
           Serial.print("Food pulse on at (ms): ");
           Serial.print(tnowmillis);
         }
       }
-      else if (((tnowmillis - tfood0) >= (foodpulse_ontime)) && foodtllon){
+      else if (((tnowmillis - tfood0) >= (foodpulse_ontime)) && foodttlon){
         // Turn off
-        foodtllon = false;
+        foodttlon = false;
         digitalWrite(foodTTLpin, LOW);
         foodpulses_left--;
         if (debugmode && showfoodttl){
@@ -1325,7 +1619,7 @@ void foodttl(void){
     else{
       // No pulses left
       foodttlarmed = false;
-      foodtllon = false;
+      foodttlon = false;
       if (debugmode && showfoodttl){
         Serial.print("Food delivery done at (ms): ");
         Serial.println(tnowmillis);

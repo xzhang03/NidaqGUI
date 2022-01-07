@@ -15,6 +15,10 @@ if (nicfg.tcp.enable + nicfg.optophotometry.enable + nicfg.scoptophotometry.enab
     msgbox('Must select 1 and only 1 from Tcp, Optophotometry, and Same-color optophotometry modes.')
 end
 
+if (nicfg.audiosync.enable && nicfg.optodelayTTL.buzzerenable)
+    msgbox('Cannot use audio sync and buzzer cue at the same time.')
+end
+
 %% TCP
 if nicfg.tcp.enable
     % TCP
@@ -52,6 +56,9 @@ if nicfg.scoptophotometry.enable
     
     % Pulse width
     fwrite(nicfg.arduino_serial, uint8([13 nicfg.scoptophotometry.pulsewidth]));
+    
+    % Tristate pin polarity
+    fwrite(nicfg.arduino_serial, uint8([29 nicfg.scoptophotometry.tristatepol]));
 end
 
 %% Scheduler
@@ -70,6 +77,9 @@ if nicfg.scheduler.enable
     
     % Listen mode
     fwrite(nicfg.arduino_serial, uint8([27 nicfg.scheduler.listenmode]));
+    
+    % Listen mode polarity
+    fwrite(nicfg.arduino_serial, uint8([28 nicfg.scheduler.listenpol]));
 else
     % No Scheduler
     fwrite(nicfg.arduino_serial, uint8([15 0]));
@@ -92,8 +102,26 @@ if nicfg.optodelayTTL.enable
     % Train length
     fwrite(nicfg.arduino_serial, uint8([21 nicfg.optodelayTTL.trainlength]));
     
+    % Buzzer
+    fwrite(nicfg.arduino_serial, uint8([30 nicfg.optodelayTTL.buzzerenable]));
+    
+    % Buzzer delay
+    fwrite(nicfg.arduino_serial, uint8([31 nicfg.optodelayTTL.buzzerdelay]));
+    
+    % Buzzer duration
+    fwrite(nicfg.arduino_serial, uint8([32 nicfg.optodelayTTL.buzzerdur]));
+    
     % Conditional
     fwrite(nicfg.arduino_serial, uint8([22 nicfg.optodelayTTL.conditional]));
+    
+    % Action period delay
+    fwrite(nicfg.arduino_serial, uint8([33 nicfg.optodelayTTL.actiondelay]));
+    
+    % Action period duration
+    fwrite(nicfg.arduino_serial, uint8([34 nicfg.optodelayTTL.actiondur]));
+    
+    % Delivery period duration
+    fwrite(nicfg.arduino_serial, uint8([35 nicfg.optodelayTTL.deliverydur]));
 else
     fwrite(nicfg.arduino_serial, uint8([24 0]));
 end
