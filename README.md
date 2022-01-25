@@ -3,7 +3,7 @@ GUI for photometry (modified from Arthur's work)
 Please find the original depository at https://github.com/asugden/nidaqgui
 
 ## Basic Idea
-A Matlab UI is used to designate filename and start/stop, as well as to specify experiment modes and structures to a microcontroller (see below). The microcontroller actually takes care the actual operation of the experiment.
+A Matlab UI is used to designate filename and start/stop, as well as to specify experiment modes and structures to a microcontroller (see below). The microcontroller takes care the actual operation of the experiment.
 
 ###### Functions:
   **Legacy**: UI specifies the start and the end of the camera-sync pulses, and camera pulse rate. Everything else is hard-coded. This is the simple version
