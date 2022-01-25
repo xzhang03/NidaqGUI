@@ -9,9 +9,7 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
   **Legacy**: UI specifies the start and the end of the camera-sync pulses, and camera pulse rate. Everything else is hard-coded. This is the simple version
     
     To run legacy: 
-    
     Microcontroller uses (just an example) /Arduino/quad_encoder_selftrigger_pulsing_only.ino
-    
     Matlab uses nidaqgui.m and nidaq_config.m
                    
   
@@ -28,9 +26,7 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
     9. Conditional stim.-delayed TTL output: A conditional version time-delayed TTL pulse (e.g., has to lick during cue to get water delivery)
     
     To run Omnibox: 
-    
     Microcontroller uses /Arduino/omniphotometrybox.ino
-    
     Matlab uses nidaqguisz.m and nidaq_config_sz.m
     
 ## Hardware
