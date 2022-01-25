@@ -65,7 +65,7 @@ nicfg.scoptophotometry.tristatepol = false; % Tristate pin polarity (do not chan
 
 % Scheduler
 nicfg.scheduler.enable = false; % Default false
-nicfg.scheduler.delay = 10;%120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
+nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = true; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
@@ -91,8 +91,8 @@ nicfg.optodelayTTL.buzzerdur = 10; % Delay in 100 ms. E.g., 10 means 1 seconds. 
 % Delivery (conditional): Opto start => delivery delay => delivery window start => delivery (if action) => timeout (if no delivery)
 nicfg.optodelayTTL.conditional = false; % TTL delivery is conditional or not. If so, pin 10 must be hooked up with an active-high input. Input comes during the delay window will allow for subsequent pulse output.
 nicfg.optodelayTTL.actiondelay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
-nicfg.optodelayTTL.actiondur = 50; % Duratoin in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
-nicfg.optodelayTTL.deliverydur = 50; % Duratoin in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
+nicfg.optodelayTTL.actiondur = 50; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
+nicfg.optodelayTTL.deliverydur = 50; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 
 % Encoder
 nicfg.encoder.enable = true;
