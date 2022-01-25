@@ -56,3 +56,14 @@ One photometry pulse and one opto pulse. Photometry pulse width and cycle length
 ![Scoptophotometry](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/SCoptophotometry.png)
 The same digital output controls the timing of both photometry and opto (same color). Photometry parameters are changeable in arduino (T1, T2, TPeriod1). Opto parameters are changeable in Matlab throug serial communicaiton (T3, T4, TPeriod2). TPeriod2 must be an integer multiplier of TPeriod1. Opto train lengths are also adjustable in terms of number of pulses. The second output sets the intensity of the LED during the opto period, and when it's in the photometry period, the output level is not LOW but **OPEN**. OPEN means the driver uses its own current limiting resistor (potentiometer) to set the intensity of the photometry pulses and uses the microcontroller defined intensty only during opto stims.
 
+## Camera/microphone synchronization pulses
+Parameters in mMtlab and serial communicated to microcontrollers. Pulsing starts when user clicks START on the GUI and stops when user clicks STOP.
+
+## Rotary encoder
+Microcontroller sends encoder position on demand as requested by Matlab.
+
+## Scheduler
+TBC
+
+## Behavioral Tasks (Scheduler)
+TBC
