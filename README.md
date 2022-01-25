@@ -24,8 +24,8 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
     5. Rotary encoder parameters (for tracking running)
     6. Scheduler (only optophotometry or scoptophotometry modes): Baseline -> Opto phase -> Post-opto phase
     7. Scheduler only: External TTL pulses for scheduler (each pulse trigger an opto train)
-    8. Scheduler only: A Time-delayed TTL pulse output after each train (e.g., to trigger water delivery)
-    9. Scheduler only: A conditional version time-delayed TTL pulse (e.g., has to lick during cue to get water delivery)
+    8. Stim.-delayed TTL output: A Time-delayed TTL pulse output after each train (e.g., to trigger water delivery)
+    9. Conditional stim.-delayed TTL output: A conditional version time-delayed TTL pulse (e.g., has to lick during cue to get water delivery)
     
     To run Omnibox: 
     
@@ -49,12 +49,12 @@ Two interleaved pulses, each to the digital inputs of the LED drivers. No schedu
 
 **Optophotometry**
 ![Optophotometry](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Optophotometry.png)
-One photometry pulse and one opto pulse. Photometry pulse width and cycle lengths are changeable in arduino (T1, TPeriod1). Opto parameters are changeable in Matlab through serial communicaiton (T2, TPeriod2), so can be changed on an experiment-by-experiment basis. TPeriod2 must be an integer multiplier of TPeriod1. Max T2 is [TPeriod1 - T1]. Opto train lengths are also adjustable in terms of number of pulses. The opto pulses immediately follow the offset of photometry pulse to allow max time following an opto pulse for LED to dim (LEDs don't dim instantly). Intensities are controlled by the current limiting resistors of the LED drivers.
+One photometry pulse and one opto pulse. Photometry pulse width and cycle lengths are changeable in arduino (T1, TPeriod1). Opto parameters are changeable in Matlab through serial communicaiton (T2, TPeriod2), so can be changed on an experiment-by-experiment basis. TPeriod2 must be an integer multiplier of TPeriod1. Max T2 is [TPeriod1 - T1]. Opto train lengths and train periods are also adjustable in terms of number of pulses. The opto pulses immediately follow the offset of photometry pulse to allow max time following an opto pulse for LED to dim (LEDs don't dim instantly). Intensities are controlled by the current limiting resistors of the LED drivers.
 
 
 **Same-color optophotometry**
 ![Scoptophotometry](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/SCoptophotometry.png)
-The same digital output controls the timing of both photometry and opto (same color). Photometry parameters are changeable in arduino (T1, T2, TPeriod1). Opto parameters are changeable in Matlab throug serial communicaiton (T3, T4, TPeriod2). TPeriod2 must be an integer multiplier of TPeriod1. Opto train lengths are also adjustable in terms of number of pulses. The second output sets the intensity of the LED during the opto period, and when it's in the photometry period, the output level is not LOW but **OPEN**. OPEN means the driver uses its own current limiting resistor (potentiometer) to set the intensity of the photometry pulses and uses the microcontroller defined intensty only during opto stims.
+The same digital output controls the timing of both photometry and opto (same color). Photometry parameters are changeable in arduino (T1, T2, TPeriod1). Opto parameters are changeable in Matlab throug serial communicaiton (T3, T4, TPeriod2). TPeriod2 must be an integer multiplier of TPeriod1. Opto train lengths and train periods are also adjustable in terms of number of pulses. The second output sets the intensity of the LED during the opto period, and when it's in the photometry period, the output level is not LOW but **OPEN**. OPEN means the driver uses its own current limiting resistor (potentiometer) to set the intensity of the photometry pulses and uses the microcontroller defined intensty only during opto stims.
 
 ## Camera/microphone synchronization pulses
 Parameters in mMtlab and serial communicated to microcontrollers. Pulsing starts when user clicks START on the GUI and stops when user clicks STOP.
@@ -63,7 +63,18 @@ Parameters in mMtlab and serial communicated to microcontrollers. Pulsing starts
 Microcontroller sends encoder position on demand as requested by Matlab.
 
 ## Scheduler
-TBC
+It's a automated mode to schedule optogenetic stimulation. The general structure is:
 
-## Behavioral Tasks (Scheduler)
-TBC
+ 1. **Pre-optogenetic period**. Specifify time since the start of user clicking START on the Matlab GUI.
+ 2. **Optogenetic stimulation period**. Specify the number of trains, and the train details are defined in the modes above.
+ 3. **Post-optogenetic period**.
+
+## Manually triggered scheduler (Listenmode; Scheduler mode required)
+In this mode, the pre-stim. period is infinitely long until the external trigger is fed in. One trigger pulse gives one train.
+
+## Stim.-delayed TTL output (Unconditional behavioral reward)
+A different train is generated after the offset of an opto. Train delay, pulse width, pulse cycle, and train lengths are specified in Matlab. This can be used to e.g., unconditionally deliver reward after an optogenetic stimulation train.
+
+## Conditional stim.-delayed TTL output (Conditional behavioral task)
+The generation of stimulation-delayed train is condition to a TTL input (e.g., licking) during the response period. An audio cue may be used to signal the onset of the response period.
+
