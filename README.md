@@ -13,7 +13,7 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
     Matlab uses nidaqgui.m and nidaq_config.m
                    
   
-  **Omnibox (v3)**: UI specifies the parameters in the following categories ([Sample scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Schematic_Omnibox%20v3_2022-01-31.png)):
+  **Omnibox (v3)**: UI specifies the parameters in the following categories ([Sample scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Schematic_Omnibox%20v3_2022-01-31.png)/[Sample breadboard](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/omnibox_half_breadboard.png)):
   
     1. Modes: Two-color photometry (e.g., 488 and 405 nm), optophotometry (e.g., 488 and 625 nm), same-color optophotometry (e.g., low-power photometry + high-power opto.)
     2. Timing of the modes
