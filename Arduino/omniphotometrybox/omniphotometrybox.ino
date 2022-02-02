@@ -29,7 +29,7 @@ bool ftest1 = false;
 // ============== Encoder ==============
 //#define ENCODER_DO_NOT_USE_INTERRUPTS
 #include <Encoder.h>
-Encoder myEnc(4,5); // pick your pins, reverse for sign flip
+Encoder myEnc(18,19); // pick your pins, reverse for sign flip
 
 
 // =============== Modes ===============
@@ -50,12 +50,12 @@ const byte ch1_pin = 2; // try to leave 0 1 open.
 const byte ch2_pin = 3; // 405 nm or red opto
 const byte AOpin = 3; // Use same pin as ch2 until true analog outputs are used in the future
 const byte tristatepin = 6; // Use to control tristate transceivers (AO (used as digital here), 0, or disconnected). Default active low
-const byte cam_pin = 7; // Cam pulses
+const byte cam_pin = 21; // Cam pulses
 const byte switchpin = 8; // External toggle to start a train (default active high). Usually used in listenmode
 const byte foodTTLpin = 9; // output TTL to trigger food etc
 const byte foodTTLinput = 10; // input TTL for conditional food pulses (active high, 3.3 V only!!)
 const byte led_pin = 13; // onboard led
-const byte audiopin = 21; // Pin for audio signal
+const byte audiopin = 4; // Pin for audio signal
 
 // ============= debugpins =============
 const byte serialpin = 14; // Parity signal for serial pin
