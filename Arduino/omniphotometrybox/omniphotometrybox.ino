@@ -53,7 +53,7 @@ const byte tristatepin = 6; // Use to control tristate transceivers (AO (used as
 const byte cam_pin = 21; // Cam pulses
 const byte switchpin = 8; // External toggle to start a train (default active high). Usually used in listenmode
 const byte foodTTLpin = 9; // output TTL to trigger food etc
-const byte foodTTLinput = 10; // input TTL for conditional food pulses (active high, 3.3 V only!!)
+const byte foodTTLinput = 22; // input TTL for conditional food pulses (active high, 3.3 V only!!)
 const byte led_pin = 13; // onboard led
 const byte audiopin = 4; // Pin for audio signal
 
