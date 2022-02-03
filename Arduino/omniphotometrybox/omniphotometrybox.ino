@@ -22,7 +22,7 @@
 #define showopto true
 #define showscheduler true
 #define showfoodttl true
-#define debugpins true
+#define debugpins false
 unsigned long ttest1 = 0;
 bool ftest1 = false;
 
@@ -49,19 +49,19 @@ bool usebuzzcue = false; //
 const byte ch1_pin = 2; // try to leave 0 1 open. 
 const byte ch2_pin = 3; // 405 nm or red opto
 const byte AOpin = 3; // Use same pin as ch2 until true analog outputs are used in the future
-const byte tristatepin = 6; // Use to control tristate transceivers (AO (used as digital here), 0, or disconnected). Default active low
+const byte tristatepin = 4; // Use to control tristate transceivers (AO (used as digital here), 0, or disconnected). Default active low
 const byte cam_pin = 21; // Cam pulses
-const byte switchpin = 8; // External toggle to start a train (default active high). Usually used in listenmode
+const byte switchpin = 17; // External toggle to start a train (default active high). Usually used in listenmode
 const byte foodTTLpin = 9; // output TTL to trigger food etc
 const byte foodTTLinput = 22; // input TTL for conditional food pulses (active high, 3.3 V only!!)
 const byte led_pin = 13; // onboard led
-const byte audiopin = 4; // Pin for audio signal
+const byte audiopin = 6; // Pin for audio signal
 
 // ============= debugpins =============
 const byte serialpin = 14; // Parity signal for serial pin
 const byte schedulerpin = 15; // On when scheduler is used
 const byte preoptopin = 16; // preopto
-const byte inoptopin = 17; // preopto
+const byte inoptopin = 23; // preopto
 const byte postoptopin = 20; // preopto
 bool serialpinon = false;
 
