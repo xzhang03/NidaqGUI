@@ -5,7 +5,7 @@ function val = arduinoReadQuad(open_serial)
 
     val = 0;
     if ~isempty(open_serial)
-%         fwrite(open_serial, 0);
+%         fwrite(open_serial, uint8(5));
 %         val = fread(open_serial, 1, 'int32');
         val = fread(open_serial, 1, 'int32');
     end
