@@ -65,6 +65,11 @@ global nicfg
 % Preset
 omniboxpreset(nicfg)
 
+% Plot
+% omniboxplot(nicfg)
+
+handles.MouseName.String = nicfg.MouseName;
+
 if isfield(nicfg, 'arduino_serial')
     nicfg = rmfield(nicfg, 'arduino_serial');
 end
