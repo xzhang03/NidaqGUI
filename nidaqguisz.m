@@ -161,6 +161,7 @@ nicfg.active = get(hObject, 'Value');
 
 if nicfg.active
     disp('Starting...');
+    nidaq_config_sz;
     
     set(handles.TimeElapsedNumber, 'String', 'WAIT');
     drawnow();

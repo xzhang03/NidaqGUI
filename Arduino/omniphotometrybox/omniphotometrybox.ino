@@ -122,7 +122,7 @@ const long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrelevant
 bool tristatepinpol = false; // Polarity for the tristatepin (1 = active high, 0 = active low). Default active low.
 
 // ============ Scheduler ============
-unsigned int preoptotime = 120; // in seconds (max 1310)
+unsigned int preoptotime = 120; //in seconds (max 1310)
 unsigned int npreoptopulse = preoptotime * 50; // preopto pulse number
 unsigned int ipreoptopulse = 0; // preopto pulse number
 byte ntrain = 10; // Number of trains
@@ -142,7 +142,7 @@ unsigned int foodpulse_ontime = 150; // in ms
 unsigned int foodpulse_cycletime = 300; // in ms
 byte foodpulses = 5; // Number of food ttl pulses per stim period.
 byte foodpulses_left = 0; // Try counting down this time. Probably easier to debug
-unsigned long tfood0;
+unsigned long tfood0, tfood1;
 bool inputttl = false;
 bool foodttlarmed = false;
 bool foodttlwait = false; // In waiting for delivery
@@ -166,7 +166,7 @@ bool foodttlon = false;
 bool foodttlconditional = false; //
 bool foodttlcuewait = false;
 bool foodttlactionwait = false;
-unsigned int buzzdelay = 2000;
+unsigned int buzzdelay = 2000; //
 unsigned int buzzdur = 1000; // Time for buzzer cue 
 unsigned int actiondelay = 2000;
 unsigned int actiondur = 5000;
@@ -801,6 +801,10 @@ void parseserial(){
         stimenabled = false;
         schedulerrunning = false;
       }
+      if (usebuzzcue){
+        noTone(audiopin);
+      }
+      
       if (debugmode){
         Serial.println("Cam pulse stop.");
       }
@@ -1214,7 +1218,7 @@ void parseserial(){
       buzzdur = n * 100;
       if (debugmode){
         Serial.print("New buzzer duration (ms): ");
-        Serial.println(buzzdelay);
+        Serial.println(buzzdur);
       }
       break;
 
@@ -1474,6 +1478,11 @@ void camerapulse(void){
 }
 
 void foodttl(void){
+//  unsigned int tfooddelta = (tnowmillis - tfood0);
+//  if ((tfooddelta % 100) == 0){
+//    Serial.println(tfooddelta);
+//  }
+      
   // 1. Cue
   if (usebuzzcue){
     if (foodttlcuewait){
@@ -1556,6 +1565,7 @@ void foodttl(void){
           foodpulses_left = foodpulses;
           foodttlwait = false;
           foodttlon = false;
+          tfood1 = tfood0; // % Setup cycle time for the actual delivery
           if (debugmode && showfoodttl){
             Serial.print("Starting food delivery with ");
             Serial.print(foodpulses_left);
@@ -1565,9 +1575,11 @@ void foodttl(void){
         }
       }
       else{
-        // Trying to get out of the waiting period (happens exactly once in unconditional)
+        // Unconditional
+        foodpulses_left = foodpulses;
         foodttlwait = false;
         foodttlon = false;
+        tfood1 = tfood0; // % Setup cycle time for the actual delivery
         if (debugmode && showfoodttl){
           Serial.print("Starting food delivery with ");
           Serial.print(foodpulses_left);
@@ -1593,20 +1605,22 @@ void foodttl(void){
   else{
     if (foodpulses_left > 0){
       // Still pulses left
-      if (((tnowmillis - tfood0) >= (foodpulse_cycletime)) && !foodttlon){
+      if (((tnowmillis - tfood1) >= (foodpulse_cycletime)) && !foodttlon){
         // Beginning of each cycle
-        tfood0 = tnowmillis;
+        tfood1 = tnowmillis;
         foodttlon = true;
         digitalWrite(foodTTLpin, HIGH);
+//        digitalWrite(led_pin, HIGH);
         if (debugmode && showfoodttl){
           Serial.print("Food pulse on at (ms): ");
           Serial.print(tnowmillis);
         }
       }
-      else if (((tnowmillis - tfood0) >= (foodpulse_ontime)) && foodttlon){
+      else if (((tnowmillis - tfood1) >= (foodpulse_ontime)) && foodttlon){
         // Turn off
         foodttlon = false;
         digitalWrite(foodTTLpin, LOW);
+//        digitalWrite(led_pin, LOW);
         foodpulses_left--;
         if (debugmode && showfoodttl){
           Serial.print("-");
