@@ -22,7 +22,7 @@ function varargout = nidaqguisz(varargin)
 
 % Edit the above text to modify the response to help nidaqguisz
 
-% Last Modified by GUIDE v2.5 17-Apr-2019 19:15:10
+% Last Modified by GUIDE v2.5 11-Feb-2022 10:50:33
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -62,11 +62,14 @@ guidata(hObject, handles);
 nidaq_config_sz;
 global nicfg
 
-% Preset
-omniboxpreset(nicfg)
-
-% Plot
-% omniboxplot(nicfg)
+% Can't load if omnibox is not on
+if nicfg.omnibox.enable
+    handles.togglebutton2.Enable = 'on';
+    handles.settinguploaded.String = 'Omnibox enabled';
+else
+    handles.togglebutton2.Enable = 'off';
+    handles.settinguploaded.String = 'Omnibox disabled';
+end
 
 handles.MouseName.String = nicfg.MouseName;
 
@@ -316,7 +319,7 @@ if nicfg.active
         end
 
         % Copy arduino file if does not exist
-        if nicfg.RecordRunning
+        if nicfg.RecordRunning && (nicfg.ArduinoCOM > -1)
             if ~exist(arduinopath_server, 'file')
                 copyfile(arduinopath, arduinopath_server);
             elseif input('Running file already exist. Overwrite? (1 = Yes, 0 = No): ') == 1
@@ -331,3 +334,23 @@ if nicfg.active
     
     
 end
+
+
+% --- Executes on button press in togglebutton2.
+function togglebutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to togglebutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of togglebutton2
+% Preset
+nidaq_config_sz;
+global nicfg
+handles.settinguploaded.String = 'Uploading...';
+omniboxpreset(nicfg)
+handles.settinguploaded.String = 'Setting Uploaded';
+
+
+% Plot
+% omniboxplot(nicfg)
+

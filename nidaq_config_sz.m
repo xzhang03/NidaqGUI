@@ -65,7 +65,7 @@ nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 m
 nicfg.scoptophotometry.tristatepol = false; % Tristate pin polarity (do not change once a box is made).
 
 % Scheduler
-nicfg.scheduler.enable = true;%***false; % Default false
+nicfg.scheduler.enable = false; % Default false
 nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = true; % Allow for manual swichingoverride. Default true.
@@ -76,7 +76,7 @@ nicfg.scheduler.listenpol = true; % Listen mode polarity (true = active high, fa
 % TTL pulses that happen X seconds after each opto train onset (for food
 % delivery or synchronizing).
 % Delivery (unconditional): Opto start => delivery delay => delivery
-nicfg.optodelayTTL.enable = true;%***false; % Default false
+nicfg.optodelayTTL.enable = false; % Default false
 nicfg.optodelayTTL.delay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.pulsewidth = 15; % Pulsewidth in X * 10 ms. E.g., 15 means 150 ms pulses. Default is 15 (150 ms).
 nicfg.optodelayTTL.cycle = 30; % Pulse cycle in X * 10 ms. E.g., 30 means 300 ms pulses. Default is 30 (300 ms).
