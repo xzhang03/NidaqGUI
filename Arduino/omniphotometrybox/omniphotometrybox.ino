@@ -108,9 +108,9 @@ const long cycletime_photom_2_tcp = 10000; // in micro secs (Ch2)
 byte opto_per = 5; // Number of photometry pulses per opto pulse (A). Can be: 1, 2, 5, 10, 25, 50. Pulse freq is 50 / A
 byte train_length = 10; // Number of opto pulses per train (B). Duration is  B / (50 / A).
 long train_cycle = 30 * 50; // First number is in seconds. How often does the train come on.
-const int pulsewidth_2_opto = 10000; // in micro secs (ch2)
-const long cycletime_photom_1_opto = 6500; // in micro secs (Ch1)
-const long cycletime_photom_2_opto = 13500; // in micro secs (Ch2)
+int pulsewidth_2_opto = 10000; // in micro secs (ch2)
+long cycletime_photom_1_opto = 6500; // in micro secs (Ch1)
+long cycletime_photom_2_opto = 13500; // in micro secs (Ch2)
 
 // Same color opto variables
 byte scopto_per = 5; // Number of photometry pulses per opto pulse (AO). Can be: 1, 2, 5, 10, 25, 50. Pulse freq is 50 / AO
@@ -286,11 +286,31 @@ void loop() {
     // This part happens once every 20 ms
     t0 = micros();
 
-    // TCP or optophotometry mode
+    // TCP or optophotometry mode. Turn on Ch1
     if (tcpmode || optophotommode){
       digitalWrite(ch1_pin, HIGH);
       ch1_on = true;
       // Serial.println(t1); Confirm only once every 20 ms
+    }
+
+    // optophotometry mode or scoptophotometry mode, turn off stim if the stim period is the same as the cycle (finish the previous cycle)
+    if (optophotommode && ch2_on){
+      digitalWrite(ch2_pin, LOW);
+      ch2_on = false;     
+    }
+    else if (samecoloroptomode && ch1_on){
+      // Basically you can only get in here during the stim cycles, regular photometry pulsewidths are too short
+      digitalWrite(ch1_pin, LOW);
+      ch1_on = false;
+
+      if (lastpulseopto){
+        lastpulseopto = false;
+
+        // Return to normal pulse width after the train is off. Only at last pulse
+        pulsewidth_1 = pulsewidth_1_tcp;
+        digitalWrite(AOpin, LOW);
+        digitalWrite(tristatepin, !tristatepinpol); // !false = active low = off
+      }
     }
     
     if (!tcpmode){
@@ -749,9 +769,11 @@ void parseserial(){
   // 10: Change scopto frequency (scopto_per = n, f = 50/n)
   // 11: Change scopto train cycle (train_cycle = n * 50)
   // 12: Change scopto pulse per train (train_length = n)
-  // 13: Change scopto pulse width (n * 1000)
-  // 14: Reserved for opto pulse width
+  // 13: Change scopto pulse width (n * 1000 us)
+  // 14: Change Opto pulse width (n * 1000 us)
   // 29: Tristate pin polarity (1 = active high, 0 = active low);
+  // 36: Cycle 1 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 100 us)
+  // 37: Cycle 2 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 100 us)
 
   // ============ Scheduler ============
   // 15: Use scheduler (n = 1 yes, 0 no) 
@@ -997,7 +1019,12 @@ void parseserial(){
       break;
 
     case 14:
-      // 14: Reserved for opto pulse width
+      // 14: Opto pulse width (n * 1000 us)
+      pulsewidth_2_opto = n * 1000;
+      if (debugmode){
+        Serial.print("New opto pulse width (us): ");
+        Serial.println(pulsewidth_2_opto);
+      }
       break;
 
     case 15:
@@ -1198,6 +1225,9 @@ void parseserial(){
     case 30:
       // 30: Use buzzer cue or not (n = 1 yes, 0 no)
       usebuzzcue = (n == 1);
+      if (!usebuzzcue){
+        noTone(audiopin);
+      }
       if (debugmode){
         Serial.print("Use buzzer (1 = yes, 0 = no): ");
         Serial.println(usebuzzcue);
@@ -1248,6 +1278,27 @@ void parseserial(){
         Serial.println(deliverydur);
       }
       break;
+
+    case 36:
+      // 36: Cycle 1 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 500 us)
+      cycletime_photom_1_opto = n * 100;
+      cycletime_photom_1 = cycletime_photom_1_opto; // in micro secs (Ch1)
+      if (debugmode){
+        Serial.print("New opto cycle 1 (us): ");
+        Serial.println(cycletime_photom_1_opto);
+      }
+      break;
+
+   case 37:
+      // 37: Cycle 2 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 500 us)
+      cycletime_photom_2_opto = n * 100;
+      cycletime_photom_2 = cycletime_photom_2_opto; // in micro secs (Ch1)
+      if (debugmode){
+        Serial.print("New opto cycle 2 (us): ");
+        Serial.println(cycletime_photom_2_opto);
+      }
+      break; 
+
   }
 
   if (debugpins){

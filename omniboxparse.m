@@ -38,6 +38,15 @@ if nicfg.optophotometry.enable
     
     % Train cycle
     fwrite(nicfg.arduino_serial, uint8([8 nicfg.optophotometry.cycle]));
+    
+    % Pulse width
+    fwrite(nicfg.arduino_serial, uint8([14 nicfg.optophotometry.pulsewidth]));
+    
+    % Pulse cycle 1
+    fwrite(nicfg.arduino_serial, uint8([36 nicfg.optophotometry.pulsecycle1]));
+    
+    % Pulse cycle 2
+    fwrite(nicfg.arduino_serial, uint8([37 nicfg.optophotometry.pulsecycle2]));
 end
 
 %% Same-color optophotometry

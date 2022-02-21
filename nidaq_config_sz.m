@@ -8,7 +8,7 @@ nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev1';        % Device name
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
-nicfg.NidaqChannels    = 4;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
+nicfg.NidaqChannels    = 0;%4;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
 nicfg.NidaqDigitalChannels = 1;         % Set the number of digital channels on Port0 to record, starting at Line0
 nicfg.NidaqFrequency   = 2500;          % Set the recording frequency for the nidaq
 nicfg.RunningFrequency = 30;         % Set the frequency at which running is recorded
@@ -49,11 +49,24 @@ nicfg.omnibox.enable = true;
 nicfg.tcp.enable = true; % Default true.
 
 % Optophotometry (two colors)
-% Pulse width is fixed at 10 ms
+% Variable pulse width. Variable pulse cycle (only use for pure optomode)
 nicfg.optophotometry.enable = false; % Default false
 nicfg.optophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
 nicfg.optophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.optophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
+nicfg.optophotometry.pulsewidth = 20; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10.
+
+% Change pulse cycles (CAUTION)
+% Generally only change these values for pure optomode
+% 1. To change pulse cycle for pure opto experiments, change pulsecycle1 to 0
+% and pulse cycle 2 to match the pulse frequency. It is the sum of the two
+% that matters.
+% 2. The final pulse frequency is determined by these values as well as freq
+% mod above
+% 3. Changing these values will also affect the train cycle (which assumes
+% each full cycle is 20 ms).
+nicfg.optophotometry.pulsecycle1 = 65; % Pulse cycle 1 in X * 100 us. E.g., 65 means 6.5 ms. Default 65 (6.5 ms)
+nicfg.optophotometry.pulsecycle2 = 135; % Pulse cycle 1 in X * 100 us. E.g., 135 means 13.5 ms. Default 135 (13.5 ms)
 
 % Same-color optophotometry
 % Variable pulse width. 20 ms means always on
