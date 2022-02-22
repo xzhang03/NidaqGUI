@@ -25,6 +25,7 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
     8. Stim.-delayed TTL output: A Time-delayed TTL pulse output after each train (e.g., to trigger water delivery)
     9. Conditional stim.-delayed TTL output: A conditional version time-delayed TTL pulse (e.g., has to lick during cue to get water delivery)
     10.Hardware strong RNG for randomizing opto-trials (scheduler only and does not apply to listen mode)
+    11.Harware randomized inter-trial interval (scheduler only and does not apply to listen mode)
     
     To run Omnibox: 
     Microcontroller uses /Arduino/omniphotometrybox.ino
@@ -52,10 +53,10 @@ One photometry pulse and one opto pulse. Photometry pulse width and cycle length
 You can use channel 2 for pure optogenetic stimulations. Pulse widths are adjustable to a max value of TPeriod1. In this mode, TPeriod1 is adjustable at a resolution of 0.1 ms to a max value of 51 ms. Please use caution and follow the following rules.
 
 1. The final pulse frequency is determined by TPeriod1 as well as by frequency modulator (a value that sets TPeriod2/TPeriod1). 
-  >For example, 10 Hz stimulation can be written as TPeriod1 = 20 ms and freqmod = 5 (stim comes on once every 5 x 20 ms). 
-  >15 Hz stimulation can be written as TPeriod1 = 11.1 ms and freqmod = 6 (stim comes on once every 6 x 11.1 ms). 
-  >20 Hz stimulation can be written as TPeriod1 = 10 ms and freqmod = 5 (stim comes on once every 5 x 10 ms). 
-  >30 Hz stimulation can be written as TPeriod1 = 11.1 ms and freqmod = 3 (stim comes on once every 3 x 11.1 ms). 
+  >For example, 10 Hz stimulation can be written as TPeriod1 = 20 ms and freqmod = 5 (stim comes on once every 5 x 20 = 100 ms). 
+  >15 Hz stimulation can be written as TPeriod1 = 11.1 ms and freqmod = 6 (stim comes on once every 6 x 11.1 = 66.6 ms). 
+  >20 Hz stimulation can be written as TPeriod1 = 10 ms and freqmod = 5 (stim comes on once every 5 x 10 = 50 ms). 
+  >30 Hz stimulation can be written as TPeriod1 = 11.1 ms and freqmod = 3 (stim comes on once every 3 x 11.1 = 33.3 ms). 
 3. TPeriod1 is operationally defined as the sum of PulseCycle1 and PulseCycle2. For normal usage, you can set PulseCycle1 to 0 and PulseCycle2 to whatever value that can be used for the stimulation frequency of choice (see 1 for examples). For maximum cycle time, set both values to 25.5 ms to obtain TPeriod1 = 51 ms.
 4. Changing TPeriod1 will also affect the train cycle, which by default assumes TPeriod1 = 20 ms. If you double TPeriod1, you should half the traincycle value that is uploaded to microcontroller in order for the final train cycle time (in real time units) to remain the same.
 
@@ -74,7 +75,7 @@ It's a automated mode to schedule optogenetic stimulation. The general structure
 
  1. **Pre-optogenetic period**. Specifify time since the start of user clicking START on the Matlab GUI.
  2. **Optogenetic stimulation period**. Specify the number of trains, and the train details are defined in the modes above.
-    RNG can be implemented to randomize whether opto stim is given or not. 
+    RNG can be implemented to randomize whether opto stim is given or not. Inter-trial interval can also be hardware randomized within the specified range.
  4. **Post-optogenetic period**.
 
 ## Manually triggered scheduler (Listenmode; Scheduler mode required)
