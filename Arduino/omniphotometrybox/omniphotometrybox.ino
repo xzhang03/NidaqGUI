@@ -45,7 +45,8 @@ bool usescheduler = false; //
 bool manualscheduleoverride = false; // Only works when using scheduler (keep false if the opto input is left floating)
 bool listenmode = false;
 bool usebuzzcue = false;
-bool useRNG = false;
+bool useRNG = false; // RNG for opto
+bool randomiti = false; // Randomize ITI
 
 // =============== Pins ===============
 const byte ch1_pin = 2; // try to leave 0 1 open. 
@@ -147,6 +148,11 @@ const byte maxrng = 100; // Max value RNG = (0 - X)
 byte threshrng = 30; // Below this is pass (0 - thresh)
 byte rngvec[maxrngind]; // Initialize array
 bool trainpass = true;
+
+// Randomize ITI
+byte rng_cycle_min = 30; // Min cycle when ITI is randomized (in seconds, assuming 20 ms pulse cycle)
+byte rng_cycle_max = 40; // Max cycle when ITI is randomized (in seconds, assuming 20 ms pulse cycle)
+byte rngvec_ITI[maxrngind]; // Initialize array for RNG ITI
 
 // ============ Food TTL ============
 // Food TTL (basically sync'ed with opto)
@@ -441,7 +447,13 @@ void loop() {
           // In scheduler and current train is on
           // This affects scopto
           if (useRNG){
+            // Figure out if current train passes
             trainpass = rngvec[itrain] < threshrng;
+          }
+
+          if (randomiti){
+            // Get randomized ITI. This affects scopto.
+            sctrain_cycle = rngvec_ITI[itrain] * 50;
           }
           
           itrain++; // Advance train count
@@ -455,6 +467,11 @@ void loop() {
             if (useRNG){
               Serial.print("RNG says train pass = ");
               Serial.println(trainpass);
+            }
+
+            if (randomiti){
+              Serial.print("RNG says next cycle is (s): ");
+              Serial.println(sctrain_cycle / 50);
             }
           }
         }
@@ -577,6 +594,11 @@ void loop() {
           if (useRNG){
             trainpass = rngvec[itrain] < threshrng;
           }
+
+          if (randomiti){
+            // Get randomized ITI. This affects scopto.
+            train_cycle = rngvec_ITI[itrain] * 50;
+          }
           
           itrain++; // Advance train count
 
@@ -589,6 +611,11 @@ void loop() {
             if (useRNG){
               Serial.print("RNG says train pass = ");
               Serial.println(trainpass);
+            }
+
+            if (randomiti){
+              Serial.print("RNG says next cycle is (s): ");
+              Serial.println(train_cycle / 50);
             }
           }
         }
@@ -838,6 +865,9 @@ void parseserial(){
   // ============ Hardware RNG ============
   // 38: use RNG or not (n = 1 yes, 0 no)
   // 39: Pass chance in percent (30 = 30% pass chance)
+  // 40: RNG ITI or not (n = 1 yes, 0 no)
+  // 41: min randomized ITI (n * 1 s)
+  // 42: max randomized ITI (n * 2 s)
 
   // ============ Food TTL ============
   // 24: Use Food TTL or not (n = 1 yes, 0 no) 
@@ -923,8 +953,16 @@ void parseserial(){
         stimenabled = false;
         schedulerrunning = true;
 
+        // Opto RNG
         if (useRNG){
-          rng();
+          // Generate array
+          rng(rngvec, maxrng, 0, maxrngind);
+        }
+
+        // RNG ITI
+        if (randomiti){
+          // Generate array
+          rng(rngvec_ITI, rng_cycle_max , rng_cycle_min, maxrngind);
         }
         
         if (foodttlconditional){
@@ -1381,7 +1419,33 @@ void parseserial(){
         Serial.println(trainpass);
       }
       break;
-      
+
+    case 40:
+      // 40: RNG ITI or not (n = 1 yes, 0 no)
+      randomiti = (n == 1);
+      if (debugmode){
+        Serial.print("Randomize ITI (1 = yes, 0 = no): ");
+        Serial.println(randomiti);
+      }
+      break;
+
+    case 41:
+      // 41: min randomized ITI (n * 1 s)
+      rng_cycle_min = n;
+      if (debugmode){
+        Serial.print("Min randomized ITI (s): ");
+        Serial.println(rng_cycle_min);
+      }
+      break;
+
+    case 42:
+      // 42: max randomized ITI (n * 2 s)
+      rng_cycle_max = n;
+      if (debugmode){
+        Serial.print("Max randomized ITI (s): ");
+        Serial.println(rng_cycle_max);
+      }
+      break;
   }
 
   if (debugpins){
@@ -1502,10 +1566,19 @@ void showpara(void){
     Serial.println(manualscheduleoverride);
     Serial.print("Listen mode: ");
     Serial.println(listenmode);
-    Serial.print("Listen polarity: (1 - positive, 0 - negative)");
+    Serial.print("Listen polarity (1 - positive, 0 - negative): ");
     Serial.println(listenpol);
-    Serial.print("Use RNG (Does not apply to listen mode): ");
+    Serial.print("Use opto RNG (Does not apply to listen mode): ");
     Serial.println(useRNG);
+    Serial.print("Opto RNG pass rate is (%): ");
+    Serial.println(threshrng);
+    Serial.print("Randomize ITI (1 - yes, 0 - no): ");
+    Serial.println(randomiti);
+    Serial.print("Randomized ITI range (s): [");
+    Serial.print(rng_cycle_min);
+    Serial.print(",");
+    Serial.print(rng_cycle_max);
+    Serial.println(")");
     
     // Cam
     Serial.println("============== Camera ==============");
@@ -1779,9 +1852,18 @@ void foodttl(void){
 }
 
 // RNG
-void rng(){
-  for (int rngind = 0; rngind < maxrngind; rngind++){
-    rngvec[rngind] = Entropy.random(0, maxrng); // SLOW 1 ms per, but high entropy
-//    rngvec[rngind] = random(0, maxrng); // Fast 0.1 us per
+void rng(byte *arraylc, byte maxrnglc, byte minrnglc, int l){
+  for (int rngind = 0; rngind < l; rngind++){
+    arraylc[rngind] = Entropy.random(minrnglc, maxrnglc); // SLOW 1 ms per
+//    result[rngind] = random(0, maxrnglc); // Fast 0.1 us per
+  }
+  if (debugmode){
+    Serial.print("Generated ");
+    Serial.print(l);
+    Serial.print(" RNG numbers [");
+    Serial.print(minrnglc);
+    Serial.print(",");
+    Serial.print(maxrnglc);
+    Serial.println(").");
   }
 }

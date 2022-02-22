@@ -90,11 +90,20 @@ if nicfg.scheduler.enable
     % Listen mode polarity
     fwrite(nicfg.arduino_serial, uint8([28 nicfg.scheduler.listenpol]));
     
-    % use RNG
+    % use opto RNG
     fwrite(nicfg.arduino_serial, uint8([38 nicfg.scheduler.useRNG]));
     
     % RNG pass chance
     fwrite(nicfg.arduino_serial, uint8([39 nicfg.scheduler.passchance]));
+    
+    % Randomize ITI
+    fwrite(nicfg.arduino_serial, uint8([40 nicfg.scheduler.randomITI]));
+    
+    % Randomize ITI min seconds
+    fwrite(nicfg.arduino_serial, uint8([41 nicfg.scheduler.randomITI_min]));
+    
+    % Randomize ITI max seconds
+    fwrite(nicfg.arduino_serial, uint8([42 nicfg.scheduler.randomITI_max]));
 else
     % No Scheduler
     fwrite(nicfg.arduino_serial, uint8([15 0]));
