@@ -21,9 +21,10 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
     4. Buzzer for synchronizing high-sampling rate microphones
     5. Rotary encoder parameters (for tracking running)
     6. Scheduler (only optophotometry or scoptophotometry modes): Baseline -> Opto phase -> Post-opto phase
-    7. Scheduler only: External TTL pulses for scheduler (each pulse trigger an opto train)
+    7. Listen mode (passive scheduler): External TTL pulses for scheduler (each pulse trigger an opto train)
     8. Stim.-delayed TTL output: A Time-delayed TTL pulse output after each train (e.g., to trigger water delivery)
     9. Conditional stim.-delayed TTL output: A conditional version time-delayed TTL pulse (e.g., has to lick during cue to get water delivery)
+    10.Hardware strong RNG for randomizing opto-trials (scheduler only and does not apply to listen mode)
     
     To run Omnibox: 
     Microcontroller uses /Arduino/omniphotometrybox.ino
@@ -73,7 +74,8 @@ It's a automated mode to schedule optogenetic stimulation. The general structure
 
  1. **Pre-optogenetic period**. Specifify time since the start of user clicking START on the Matlab GUI.
  2. **Optogenetic stimulation period**. Specify the number of trains, and the train details are defined in the modes above.
- 3. **Post-optogenetic period**.
+    RNG can be implemented to randomize whether opto stim is given or not. 
+ 4. **Post-optogenetic period**.
 
 ## Manually triggered scheduler (Listenmode; Scheduler mode required)
 In this mode, the pre-stim. period is infinitely long until the external trigger is fed in. One trigger pulse gives one train.
