@@ -89,6 +89,12 @@ if nicfg.scheduler.enable
     
     % Listen mode polarity
     fwrite(nicfg.arduino_serial, uint8([28 nicfg.scheduler.listenpol]));
+    
+    % use RNG
+    fwrite(nicfg.arduino_serial, uint8([38 nicfg.scheduler.useRNG]));
+    
+    % RNG pass chance
+    fwrite(nicfg.arduino_serial, uint8([39 nicfg.scheduler.passchance]));
 else
     % No Scheduler
     fwrite(nicfg.arduino_serial, uint8([15 0]));

@@ -54,7 +54,7 @@ nicfg.optophotometry.enable = false; % Default false
 nicfg.optophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
 nicfg.optophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.optophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
-nicfg.optophotometry.pulsewidth = 20; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10.
+nicfg.optophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
 
 % Change pulse cycles (CAUTION)
 % Generally only change these values for pure optomode
@@ -74,16 +74,21 @@ nicfg.scoptophotometry.enable = false; % Default false
 nicfg.scoptophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
 nicfg.scoptophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.scoptophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
-nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10.
+nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
 nicfg.scoptophotometry.tristatepol = false; % Tristate pin polarity (do not change once a box is made).
 
 % Scheduler
 nicfg.scheduler.enable = false; % Default false
 nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
-nicfg.scheduler.manualoverride = true; % Allow for manual swichingoverride. Default true.
+nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
 nicfg.scheduler.listenpol = true; % Listen mode polarity (true = active high, false = active low). Do not change unless you know what you are doing.
+
+% Hardware RNG (Scheduler only and does not apply to the listening mode)
+% May implement RNG values imported from Matlab in the future
+nicfg.scheduler.useRNG = false; % Default false
+nicfg.scheduler.passchance = 30; % Pass chance in percentage (30 = 30% pass)
 
 % Opto-delayed TTL
 % TTL pulses that happen X seconds after each opto train onset (for food

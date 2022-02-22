@@ -12,6 +12,7 @@
  * 7. External input for scheduler (6)
  * 8. TTL pulses for other parts of the experiment
  * 9. Audio syncing
+ * 10.Hardware random number generator for opto trials
  * 
  */
 
@@ -41,9 +42,10 @@ bool useencoder = true;
 bool usefoodpulses = false; //
 bool syncaudio = false;
 bool usescheduler = false; // 
-bool manualscheduleoverride = true; // Only works when using scheduler
+bool manualscheduleoverride = false; // Only works when using scheduler (keep false if the opto input is left floating)
 bool listenmode = false;
-bool usebuzzcue = false; //
+bool usebuzzcue = false;
+bool useRNG = false;
 
 // =============== Pins ===============
 const byte ch1_pin = 2; // try to leave 0 1 open. 
@@ -94,14 +96,14 @@ unsigned long int t0; // When each cycle begins
 unsigned long int t1; // Time in each cycle
 int pulsewidth_1 = 6000; // in micro secs (ch1)
 int pulsewidth_2 = 6000; // in micro secs (ch2)
-long cycletime_photom_1; // in micro secs (Ch1)
-long cycletime_photom_2; // in micro secs (Ch2)
+unsigned long cycletime_photom_1; // in micro secs (Ch1)
+unsigned long cycletime_photom_2; // in micro secs (Ch2)
 
 // tcp photometry time variables
 const int pulsewidth_1_tcp = 6000; // in micro secs (ch2)
 const int pulsewidth_2_tcp = 6000; // in micro secs (ch2)
-const long cycletime_photom_1_tcp = 10000; // in micro secs (Ch1)
-const long cycletime_photom_2_tcp = 10000; // in micro secs (Ch2)
+const unsigned long cycletime_photom_1_tcp = 10000; // in micro secs (Ch1)
+const unsigned long cycletime_photom_2_tcp = 10000; // in micro secs (Ch2)
 
 // ============ Opto ============
 // Opto varaibles
@@ -109,16 +111,16 @@ byte opto_per = 5; // Number of photometry pulses per opto pulse (A). Can be: 1,
 byte train_length = 10; // Number of opto pulses per train (B). Duration is  B / (50 / A).
 long train_cycle = 30 * 50; // First number is in seconds. How often does the train come on.
 int pulsewidth_2_opto = 10000; // in micro secs (ch2)
-long cycletime_photom_1_opto = 6500; // in micro secs (Ch1)
-long cycletime_photom_2_opto = 13500; // in micro secs (Ch2)
+unsigned long cycletime_photom_1_opto = 6500; // in micro secs (Ch1)
+unsigned long cycletime_photom_2_opto = 13500; // in micro secs (Ch2)
 
 // Same color opto variables
 byte scopto_per = 5; // Number of photometry pulses per opto pulse (AO). Can be: 1, 2, 5, 10, 25, 50. Pulse freq is 50 / AO
 byte sctrain_length = 10; // Number of photometry pulses per stim period (BO). Duration is  BO / (50 / AO).
 long sctrain_cycle = 30 * 50; // First number is in seconds. How often does the train come on. 
 unsigned int pulsewidth_1_scopto = 10000; // in micro secs (ch1)
-const long cycletime_photom_1_scopto = 20000; // in micro secs (Ch1)
-const long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrelevant
+const unsigned long cycletime_photom_1_scopto = 20000; // in micro secs (Ch1)
+const unsigned long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrelevant
 bool tristatepinpol = false; // Polarity for the tristatepin (1 = active high, 0 = active low). Default active low.
 
 // ============ Scheduler ============
@@ -134,6 +136,17 @@ bool stimenabled = true;
 bool schedulerrunning = false;
 bool manualon = false;
 bool listenpol = true; // Polarity for listen mode false = active low, true = active high. Either way, it has to be 3.3V logic
+
+// ============ Hardware RNG ============
+// RNG is only used in scheduler mode (and not in listening mode)
+// RNG is used to control whether a train of stimulation (optophotometry or scoptophotometry) passes
+// RNG does not affect the food TTL
+#include <Entropy.h>
+#define maxrngind 256 // Max 256 trials
+const byte maxrng = 100; // Max value RNG = (0 - X)
+byte threshrng = 30; // Below this is pass (0 - thresh)
+byte rngvec[maxrngind]; // Initialize array
+bool trainpass = true;
 
 // ============ Food TTL ============
 // Food TTL (basically sync'ed with opto)
@@ -191,6 +204,9 @@ long counter_for_train = 0; // Number of cycles
 
 void setup() {
   Serial.begin(19200);
+
+  // Initialize RNG
+  Entropy.Initialize();
   
   if (useencoder){
     myEnc.write(0);
@@ -422,6 +438,12 @@ void loop() {
         digitalWrite(tristatepin, tristatepinpol); // false = active low = on.
 
         if (usescheduler){
+          // In scheduler and current train is on
+          // This affects scopto
+          if (useRNG){
+            trainpass = rngvec[itrain] < threshrng;
+          }
+          
           itrain++; // Advance train count
 
           if (debugmode && showscheduler){
@@ -429,6 +451,11 @@ void loop() {
             Serial.print(itrain);
             Serial.print("/");
             Serial.println(ntrain);
+
+            if (useRNG){
+              Serial.print("RNG says train pass = ");
+              Serial.println(trainpass);
+            }
           }
         }
 
@@ -481,7 +508,14 @@ void loop() {
 
       // Turn on light
       if (opto){
-        digitalWrite(ch1_pin, HIGH);
+        // RNG (only in scheduler mode and useRNG is on can RNG be considered)
+        if ((!usescheduler) || (!useRNG) || (trainpass)){
+          // schedule mode is off or
+          // not using RNG or
+          // train passed anyway
+          // In other words, this step is skipped when schedulemode = 1 && useRNG = 1 && and trainpass = 0
+          digitalWrite(ch1_pin, HIGH);
+        }
         ch1_on = true;
 
         opto_counter++;
@@ -538,6 +572,12 @@ void loop() {
         opto_counter = 0;
 
         if (usescheduler){
+          // In scheduler and RNG mode is on
+          // This affects optophotometry only
+          if (useRNG){
+            trainpass = rngvec[itrain] < threshrng;
+          }
+          
           itrain++; // Advance train count
 
           if (debugmode && showscheduler){
@@ -545,6 +585,11 @@ void loop() {
             Serial.print(itrain);
             Serial.print("/");
             Serial.println(ntrain);
+
+            if (useRNG){
+              Serial.print("RNG says train pass = ");
+              Serial.println(trainpass);
+            }
           }
         }
 
@@ -679,7 +724,14 @@ void loop() {
     else if (optophotommode){
       // optophotometry
       if ((opto) && (!ch2_on)){
-        digitalWrite(ch2_pin, HIGH);
+        // RNG (only in scheduler mode and useRNG is on can RNG be considered)
+        if ((!usescheduler) || (!useRNG) || (trainpass)){
+          // schedule mode is off or
+          // not using RNG or
+          // train passed anyway
+          // In other words, this step is skipped when schedulemode = 1 && useRNG = 1 && and trainpass = 0
+          digitalWrite(ch2_pin, HIGH);
+        }
         ch2_on = true;
         opto_counter++;
         opto = false;
@@ -783,6 +835,10 @@ void parseserial(){
   // 27: Listening mode on or off (n = 1 yes, 0 no). Will turn on manual override.
   // 28: Listen mode polarity (1 = active high, 0 = active low)
 
+  // ============ Hardware RNG ============
+  // 38: use RNG or not (n = 1 yes, 0 no)
+  // 39: Pass chance in percent (30 = 30% pass chance)
+
   // ============ Food TTL ============
   // 24: Use Food TTL or not (n = 1 yes, 0 no) 
   // 18: Delay time after opto (n * 100 ms)
@@ -866,6 +922,10 @@ void parseserial(){
         inpostopto = false;
         stimenabled = false;
         schedulerrunning = true;
+
+        if (useRNG){
+          rng();
+        }
         
         if (foodttlconditional){
           foodttlcuewait = false;
@@ -1297,8 +1357,31 @@ void parseserial(){
         Serial.print("New opto cycle 2 (us): ");
         Serial.println(cycletime_photom_2_opto);
       }
-      break; 
+      break;
+       
+    case 38:
+      // 38: use RNG or not (n = 1 yes, 0 no)
+      useRNG = (n == 1);
 
+      if (useRNG){
+        trainpass = false;
+      }
+      
+      if (debugmode){
+        Serial.print("Use RNG (1 = yes, 0 = no): ");
+        Serial.println(useRNG);
+      }
+      break;
+
+    case 39:
+      // 39: Pass chance in percent (30 = 30% pass chance)
+      trainpass = n;
+      if (debugmode){
+        Serial.print("New RNG pass chance (%): ");
+        Serial.println(trainpass);
+      }
+      break;
+      
   }
 
   if (debugpins){
@@ -1421,6 +1504,8 @@ void showpara(void){
     Serial.println(listenmode);
     Serial.print("Listen polarity: (1 - positive, 0 - negative)");
     Serial.println(listenpol);
+    Serial.print("Use RNG (Does not apply to listen mode): ");
+    Serial.println(useRNG);
     
     // Cam
     Serial.println("============== Camera ==============");
@@ -1690,5 +1775,13 @@ void foodttl(void){
         Serial.println(tnowmillis);
       }
     }
+  }
+}
+
+// RNG
+void rng(){
+  for (int rngind = 0; rngind < maxrngind; rngind++){
+    rngvec[rngind] = Entropy.random(0, maxrng); // SLOW 1 ms per, but high entropy
+//    rngvec[rngind] = random(0, maxrng); // Fast 0.1 us per
   }
 }
