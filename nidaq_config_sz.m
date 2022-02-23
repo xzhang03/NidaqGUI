@@ -91,6 +91,10 @@ nicfg.scheduler.listenpol = true; % Listen mode polarity (true = active high, fa
 nicfg.scheduler.useRNG = false; % Default false
 nicfg.scheduler.passchance = 30; % Pass chance in percentage (30 = 30% pass)
 
+% Control experiments (no stim)
+% Basically sets RNG mode and pass chance = 0
+nicfg.scheduler.control = false;
+
 % Randomized ITI
 % (Scheduler only and does not apply to the listening mode)
 % May implement RNG values imported from Matlab in the future
