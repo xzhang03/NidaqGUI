@@ -90,11 +90,21 @@ if nicfg.scheduler.enable
     % Listen mode polarity
     fwrite(nicfg.arduino_serial, uint8([28 nicfg.scheduler.listenpol]));
     
-    % use opto RNG
-    fwrite(nicfg.arduino_serial, uint8([38 nicfg.scheduler.useRNG]));
-    
-    % RNG pass chance
-    fwrite(nicfg.arduino_serial, uint8([39 nicfg.scheduler.passchance]));
+    % Use RNG to determine if opto goes through or not
+    if nicfg.scheduler.control
+        % Control experiment
+        % use opto RNG
+        fwrite(nicfg.arduino_serial, uint8([38 1]));
+
+        % RNG pass chance
+        fwrite(nicfg.arduino_serial, uint8([39 0]));
+    else
+        % use opto RNG
+        fwrite(nicfg.arduino_serial, uint8([38 nicfg.scheduler.useRNG]));
+
+        % RNG pass chance
+        fwrite(nicfg.arduino_serial, uint8([39 nicfg.scheduler.passchance]));
+    end
     
     % Randomize ITI
     fwrite(nicfg.arduino_serial, uint8([40 nicfg.scheduler.randomITI]));
