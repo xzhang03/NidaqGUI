@@ -90,7 +90,7 @@ nicfg.scheduler.listenpol = true; % Listen mode polarity (true = active high, fa
 % Hardware Opto RNG (determines a train goes through or not)
 % (Scheduler only and does not apply to the listening mode)
 % May implement RNG values imported from Matlab in the future
-nicfg.scheduler.useRNG = true; % Default false
+nicfg.scheduler.useRNG = false; % Default false
 nicfg.scheduler.passchance = 30; % Pass chance in percentage (30 = 30% pass)
 
 % Control experiments (no stim)
@@ -100,9 +100,9 @@ nicfg.scheduler.control = false;
 % Randomized ITI
 % (Scheduler only and does not apply to the listening mode)
 % May implement RNG values imported from Matlab in the future
-nicfg.scheduler.randomITI = false; % Default false
-nicfg.scheduler.randomITI_min = 30; % Lowest value of ITI (inclusive, in seconds). Applies to both optophotometry and scoptophotometry
-nicfg.scheduler.randomITI_max = 40; % Highest value of ITI (exclusive, in seconds). Applies to both optophotometry and scoptophotometry
+nicfg.scheduler.randomITI = true; % Default false
+nicfg.scheduler.randomITI_min = 10; % Lowest value of ITI (inclusive, in seconds). Applies to both optophotometry and scoptophotometry
+nicfg.scheduler.randomITI_max = 11; % Highest value of ITI (exclusive, in seconds). Applies to both optophotometry and scoptophotometry
 
 % Opto-delayed TTL
 % TTL pulses that happen X seconds after each opto train onset (for food

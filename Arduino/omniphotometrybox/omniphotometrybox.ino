@@ -839,6 +839,7 @@ void parseserial(){
   // 5: Quad encoder position
   // 9: Show all parameters
   // 253: reboot (n = 104)
+  // 255: status update (n = variable)
   
   // ========== Opto & photom ==========
   // 3: TCP mode (n = 0 TCP, n = 1 optophotometry, n = 2 samecolor optophotometry)
@@ -895,6 +896,29 @@ void parseserial(){
   
   
   switch (m){
+    case 255:
+     // 255: status update (n = variable)
+     long echo;
+     switch (n){
+      case 0:
+      // Scheduler
+      if (!usescheduler){
+        echo = 65536; // Echo back 65536 as no scheduler
+      }
+      if (inpreopto){
+        echo = 65537; // Echo back 65537 as preopto
+      }
+      else if (inpostopto){
+        echo = 65538; // Echo back 65538 as postopto
+      }
+      else {
+        echo = ntrain * 255 + itrain; // first byte shows n train, second byte shows itrain
+      }
+      break;
+     }
+     Serial.write((byte *) &echo, 4);
+     break;
+     
     case 253:
       // Reboot
       if (n == 104){

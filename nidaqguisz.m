@@ -182,6 +182,9 @@ if nicfg.active
         daqreset;
     end
     
+    % Live update
+    updatecounter = 0;
+    
     nicfg.MouseName = get(handles.MouseName, 'String'); % returns contents of Enter_ROI as a double
     nicfg.Run = str2double(get(handles.Runs, 'String')); % returns contents of Enter_ROI as a double
     % nicfg
@@ -247,6 +250,19 @@ if nicfg.active
             tic;
             fwrite(nicfg.arduino_serial, [5 0]); % Request position info
             nicfg.arduino_data(end+1) = arduinoReadQuad(nicfg.arduino_serial);
+            
+            if nicfg.omnibox.enable
+                % Live update 
+                updatecounter = updatecounter + 1;
+                if updatecounter == nicfg.RunningFrequency
+                    % Once every s
+                    updatecounter = 0;
+                    fwrite(nicfg.arduino_serial, [255 0]); % Request scheduler info
+                    str = omniliveupdate(arduinoReadQuad(nicfg.arduino_serial));
+                    handles.settinguploaded.String = str;
+                end
+%                 toc
+            end
         end
         
         tnow = clock;
