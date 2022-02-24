@@ -319,6 +319,13 @@ void loop() {
     if (optophotommode && ch2_on){
       digitalWrite(ch2_pin, LOW);
       ch2_on = false;     
+
+      // Scheduler disable
+      if ((itrain >= ntrain) && stimenabled && inopto && schedulerrunning){
+        stimenabled = false;
+        inopto = false;
+        inpostopto = true;
+      }
     }
     else if (samecoloroptomode && ch1_on){
       // Basically you can only get in here during the stim cycles, regular photometry pulsewidths are too short
@@ -332,6 +339,13 @@ void loop() {
         pulsewidth_1 = pulsewidth_1_tcp;
         digitalWrite(AOpin, LOW);
         digitalWrite(tristatepin, !tristatepinpol); // !false = active low = off
+
+        // Scheduler disable
+        if ((itrain >= ntrain) && stimenabled && inopto && schedulerrunning){
+          stimenabled = false;
+          inopto = false;
+          inpostopto = true;
+        }
       }
     }
     
