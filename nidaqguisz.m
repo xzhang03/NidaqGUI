@@ -291,6 +291,7 @@ if nicfg.active
             stopNidaq_ML(nicfg.nidaq_session, nidaqpath);
         else
             omnisetting = nicfg;
+            omnisetting = rmfield(omnisetting, 'nidaq_session');
             stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames, omnisetting);
         end
     end
