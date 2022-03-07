@@ -290,7 +290,8 @@ if nicfg.active
         if nicfg.useMLlibrary % Using MonkeyLogic DAQ library or not
             stopNidaq_ML(nicfg.nidaq_session, nidaqpath);
         else
-            stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames);
+            omnisetting = nicfg;
+            stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames, omnisetting);
         end
     end
     
