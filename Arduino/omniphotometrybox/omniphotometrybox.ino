@@ -915,20 +915,29 @@ void parseserial(){
      long echo;
      switch (n){
       case 0:
-      // Scheduler
-      if (!usescheduler){
-        echo = 65536; // Echo back 65536 as no scheduler
-      }
-      if (inpreopto){
-        echo = 65537; // Echo back 65537 as preopto
-      }
-      else if (inpostopto){
-        echo = 65538; // Echo back 65538 as postopto
-      }
-      else {
-        echo = ntrain * 255 + itrain; // first byte shows n train, second byte shows itrain
-      }
-      break;
+        // Scheduler
+        if (!usescheduler){
+          echo = 65536; // Echo back 65536 as no scheduler
+        }
+        if (inpreopto){
+          echo = 65537; // Echo back 65537 as preopto
+        }
+        else if (inpostopto){
+          echo = 65538; // Echo back 65538 as postopto
+        }
+        else {
+          echo = ntrain * 255 + itrain; // first byte shows n train, second byte shows itrain
+        }
+        break;
+
+      case 38:
+        if (useRNG && usescheduler){
+          echo = trainpass;
+        }
+        else{
+          echo = 65536; // Echo back 65536 as no RNG
+        }
+        break;
      }
      Serial.write((byte *) &echo, 4);
      break;
