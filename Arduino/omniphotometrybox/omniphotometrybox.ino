@@ -1460,7 +1460,7 @@ void parseserial(){
 
     case 39:
       // 39: Pass chance in percent (30 = 30% pass chance)
-      trainpass = n;
+      threshrng = n;
       if (debugmode){
         Serial.print("New RNG pass chance (%): ");
         Serial.println(trainpass);

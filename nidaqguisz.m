@@ -259,7 +259,7 @@ if nicfg.active
                     updatecounter = 0;
                     fwrite(nicfg.arduino_serial, [255 0]); % Request scheduler info
                     schedulerinfo = arduinoReadQuad(nicfg.arduino_serial);
-                    fwrite(nicfg.arduino_serial, [255 0]); % Request RNG info
+                    fwrite(nicfg.arduino_serial, [255 38]); % Request RNG info
                     rnginfo = arduinoReadQuad(nicfg.arduino_serial);
                     str = omniliveupdate(schedulerinfo, rnginfo);
                     handles.settinguploaded.String = str;

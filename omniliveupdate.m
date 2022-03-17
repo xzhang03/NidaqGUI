@@ -15,7 +15,7 @@ function str = omniliveupdate(echoscheduler, echoRNG)
     if echoRNG == 65536
         strRNG = 'RNG: off';
     else
-        strRNG = sprintf("RNG: %i", itrain);
+        strRNG = sprintf("RNG: %i", echoRNG);
     end
     
     str = sprintf('%s. %s', str, strRNG);
