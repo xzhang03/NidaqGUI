@@ -17,6 +17,7 @@ function open_daq = startNidaq(path, frequency, nchannels, digitalchannelstr, nd
     ai = daq_connection.addAnalogInputChannel(daqname, 0:(nchannels-1) , 'Voltage'); 
     for i = 1:nchannels
         ai(i).Range = [-10 10];
+        ai(i).TerminalConfig = 'SingleEnded';
     end
     
     if ndigital > 0
