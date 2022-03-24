@@ -22,7 +22,7 @@ function varargout = nidaqguisz(varargin)
 
 % Edit the above text to modify the response to help nidaqguisz
 
-% Last Modified by GUIDE v2.5 11-Feb-2022 10:50:33
+% Last Modified by GUIDE v2.5 24-Mar-2022 13:29:30
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,8 +58,11 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
-
-nidaq_config_sz;
+% Default config
+handles.loadconfig.UserData.fn = 'nidaq_config_sz';
+handles.loadconfig.UserData.fp = handles.loadconfig.UserData.fn;
+run(handles.loadconfig.UserData.fp);
+handles.configname.Text = sprintf('[%s]', handles.loadconfig.UserData.fn);
 global nicfg
 
 % Can't load if omnibox is not on
@@ -169,7 +172,7 @@ nicfg.active = get(hObject, 'Value');
 
 if nicfg.active
     disp('Starting...');
-    nidaq_config_sz;
+    run(handles.loadconfig.UserData.fp);
     
     set(handles.TimeElapsedNumber, 'String', 'WAIT');
     drawnow();
@@ -365,7 +368,7 @@ function togglebutton2_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of togglebutton2
 % Preset
-nidaq_config_sz;
+run(handles.loadconfig.UserData.fp);
 global nicfg
 handles.settinguploaded.String = 'Uploading...';
 omniboxpreset(nicfg)
@@ -375,3 +378,21 @@ handles.settinguploaded.String = 'Setting Uploaded';
 % Plot
 % omniboxplot(nicfg)
 
+
+
+% --------------------------------------------------------------------
+function loadconfig_Callback(hObject, eventdata, handles)
+% hObject    handle to loadconfig (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[fn, fp] = uigetfile({'nidaq_config*.m';'*.m';'*.*'}, 'Select Config File');
+[~, handles.loadconfig.UserData.fn, ~] = fileparts(fn);
+handles.loadconfig.UserData.fp = fullfile(fp, fn);
+handles.configname.Text = sprintf('[%s]', handles.loadconfig.UserData.fn);
+
+% --------------------------------------------------------------------
+function configname_Callback(hObject, eventdata, handles)
+% hObject    handle to configname (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+edit(handles.loadconfig.UserData.fn);
