@@ -13,7 +13,7 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
     Matlab uses nidaqgui.m and nidaq_config.m
                    
   
-  **Omnibox (v3)**: UI specifies the parameters in the following categories ([Sample scheme passive encoder](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Schematic_Omnibox%20v3_2022-02-02.png)/[Sample breadboard IR encoder](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/omnibox_half_breadboard.png)):
+  **Omnibox (v3)**: UI specifies the parameters in the following categories ([Sample scheme IR encoder](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Schematic_Omnibox%20v3_2022-03-24.png)/[Sample breadboard IR encoder](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/omnibox_half_breadboard.png)):
   
     1. Modes: Two-color photometry (e.g., 488 and 405 nm), optophotometry (e.g., 488 and 625 nm), same-color optophotometry (e.g., low-power photometry + high-power opto.)
     2. Timing of the modes
@@ -30,6 +30,9 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
     To run Omnibox: 
     Microcontroller uses /Arduino/omniphotometrybox.ino
     Matlab uses nidaqguisz.m and nidaq_config_sz.m
+    
+    PCB for Omnibox:
+    [EasyEDA](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/EasyEDA_PCB_Omnibox%20v3_2022-03-24.json) and [Gerber files](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/Gerber_PCB_Omnibox%20v3.zip).
     
 ## Hardware
 
