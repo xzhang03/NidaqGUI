@@ -412,4 +412,5 @@ function prevchannel_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 run(handles.loadconfig.UserData.fp);
 global nicfg
+daqreset;
 previewchannel(nicfg);
