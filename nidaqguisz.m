@@ -22,7 +22,7 @@ function varargout = nidaqguisz(varargin)
 
 % Edit the above text to modify the response to help nidaqguisz
 
-% Last Modified by GUIDE v2.5 24-Mar-2022 13:29:30
+% Last Modified by GUIDE v2.5 29-Mar-2022 11:43:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -396,3 +396,20 @@ function configname_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 edit(handles.loadconfig.UserData.fn);
+
+
+% --------------------------------------------------------------------
+function MenuTag_Callback(hObject, eventdata, handles)
+% hObject    handle to MenuTag (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function prevchannel_Callback(hObject, eventdata, handles)
+% hObject    handle to prevchannel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+run(handles.loadconfig.UserData.fp);
+global nicfg
+previewchannel(nicfg);
