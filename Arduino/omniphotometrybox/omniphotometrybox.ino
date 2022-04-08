@@ -1,4 +1,4 @@
-// Third Gen photometry box v3.0
+// Third Gen photometry box v3.1
 // Handle almost everything you need for photometry
 // Needs a decen number of pins
 // Stephen Zhang
@@ -16,9 +16,11 @@
  * 
  */
 
+// ================ PCB ================
+#define PCB false
  
 // =============== Debug ===============
-#define debugmode false // Master switch for all serial debugging
+#define debugmode true // Master switch for all serial debugging
 #define showpulses false // Extremely verbose
 #define showopto true
 #define showscheduler true
@@ -30,8 +32,13 @@ bool ftest1 = false;
 // ============== Encoder ==============
 //#define ENCODER_DO_NOT_USE_INTERRUPTS
 #include <Encoder.h>
-Encoder myEnc(18,19); // pick your pins, reverse for sign flip
-
+#if PCB
+  // PCB
+  Encoder myEnc(16,17); // pick your pins, reverse for sign flip
+#else
+  // Proto
+  Encoder myEnc(18,19); // pick your pins, reverse for sign flip
+#endif
 
 // =============== Modes ===============
 // Photometry mode
@@ -54,11 +61,18 @@ const byte ch2_pin = 3; // 405 nm or red opto
 const byte AOpin = 3; // Use same pin as ch2 until true analog outputs are used in the future
 const byte tristatepin = 4; // Use to control tristate transceivers (AO (used as digital here), 0, or disconnected). Default active low
 const byte cam_pin = 21; // Cam pulses
-const byte switchpin = 17; // External toggle to start a train (default active high). Usually used in listenmode
-const byte foodTTLpin = 9; // output TTL to trigger food etc
+#if PCB
+  const byte switchpin = 10; // External toggle to start a train (default active high). Usually used in listenmode
+  const byte foodTTLpin = 15; // output TTL to trigger food etc
+#else
+  const byte switchpin = 15; // Use if in PCB mode
+  const byte foodTTLpin = 9; // output TTL to trigger food etc
+#endif
 const byte foodTTLinput = 22; // input TTL for conditional food pulses (active high, 3.3 V only!!)
 const byte led_pin = 13; // onboard led
 const byte audiopin = 6; // Pin for audio signal
+const byte i2csda = 18; // Reserve for future i2c
+const byte i2cscl = 19; // Reserve for future i2c
 
 // ============= debugpins =============
 const byte serialpin = 14; // Parity signal for serial pin
@@ -209,6 +223,7 @@ byte opto_counter = 0;
 long counter_for_train = 0; // Number of cycles
 
 void setup() {
+  // Serial
   Serial.begin(19200);
 
   // Initialize RNG
@@ -217,7 +232,7 @@ void setup() {
   if (useencoder){
     myEnc.write(0);
   }
-  
+
   // Essential pin
   pinMode(cam_pin, OUTPUT);
   pinMode(led_pin, OUTPUT);
@@ -225,6 +240,7 @@ void setup() {
   pinMode(ch2_pin, OUTPUT);
   pinMode(tristatepin, OUTPUT);
   pinMode(foodTTLpin, OUTPUT);
+
   if (listenpol){
     pinMode(switchpin, INPUT_PULLDOWN); // active high
   }
