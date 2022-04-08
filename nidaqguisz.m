@@ -22,7 +22,7 @@ function varargout = nidaqguisz(varargin)
 
 % Edit the above text to modify the response to help nidaqguisz
 
-% Last Modified by GUIDE v2.5 29-Mar-2022 11:43:01
+% Last Modified by GUIDE v2.5 08-Apr-2022 12:26:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -414,3 +414,18 @@ run(handles.loadconfig.UserData.fp);
 global nicfg
 daqreset;
 previewchannel(nicfg);
+
+
+% --------------------------------------------------------------------
+function reboot_Callback(hObject, eventdata, handles)
+% hObject    handle to reboot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+answer = questdlg('Do you want to reboot the box?', ...
+	'Reboot', 'Yes','No','No');
+global nicfg
+
+switch answer
+    case 'Yes'
+        omniboxreboot(nicfg);
+end

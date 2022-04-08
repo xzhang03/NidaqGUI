@@ -125,7 +125,7 @@ const unsigned long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrel
 bool tristatepinpol = false; // Polarity for the tristatepin (1 = active high, 0 = active low). Default active low.
 
 // ============ Scheduler ============
-unsigned int preoptotime = 120; //in seconds (max 1310)
+unsigned int preoptotime = 120; //in seconds (max is high because unsigned int is 32 bit for teensy)
 unsigned int npreoptopulse = preoptotime * 50; // preopto pulse number
 unsigned int ipreoptopulse = 0; // preopto pulse number
 byte ntrain = 10; // Number of trains
@@ -871,7 +871,7 @@ void parseserial(){
 
   // ============ Scheduler ============
   // 15: Use scheduler (n = 1 yes, 0 no) 
-  // 4: Set delay (delay_cycle = n * 50, n in seconds). Only relevant when scheduler is on
+  // 4: Set delay (delay_cycle = n * 10 * 50, n = 1 means 10 seconds). Only relevant when scheduler is on
   // 16: Number of trains (n = n of trains)
   // 17: Enable manual scheduler override
   // 27: Listening mode on or off (n = 1 yes, 0 no). Will turn on manual override.
@@ -1074,8 +1074,8 @@ void parseserial(){
       break;
 
     case 4:
-      // 4: Set delay (delay_cycle = n * 50, n in seconds). Only relevant when scheduler is on
-      preoptotime = n; // in seconds (max 1310)
+      // 4: Set delay (delay_cycle = n * 10 * 50, n = 1 means 10 seconds). Only relevant when scheduler is on
+      preoptotime = n * 10; // in seconds (max is high because npreoptopulse is unsigned int which is 32 bits)
       npreoptopulse = preoptotime * 50; // preopto pulse number
       ipreoptopulse = 0;
       itrain = 0;

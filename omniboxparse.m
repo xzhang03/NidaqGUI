@@ -75,8 +75,8 @@ if nicfg.scheduler.enable
     % Scheduler
     fwrite(nicfg.arduino_serial, uint8([15 1]));
     
-    % Delay
-    fwrite(nicfg.arduino_serial, uint8([4 nicfg.scheduler.delay]));
+    % Delay (passing time as units of 10 seconds)
+    fwrite(nicfg.arduino_serial, uint8([4 nicfg.scheduler.delay / 10]));
     
     % Number of trains
     fwrite(nicfg.arduino_serial, uint8([16 nicfg.scheduler.ntrains]));
