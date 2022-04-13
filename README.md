@@ -33,6 +33,10 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
     
 PCB for Omniphotometrybox: [EasyEDA](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/EasyEDA_PCB_Omnibox%20v3.json), [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Schematic_Omnibox%20v3_2022-04-08.png), and [Gerber files](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/Gerber_PCB_Omnibox%20v3.zip). Parts numbers on Digikey: WM5514-ND (BNC), CP-435107RS-ND (4-cond Audio/I2C jack).
 
+PCB for IR encoder: [EasyEDA](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/EasyEDA_PCB_IR%20rotary%20encoder%20v1.json), [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Schematic_IR%20rotary%20encoder%20v1_2022-04-13.png), and [Gerber files](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/Gerber_PCB_IR%20rotary%20encoder%20v1_2022-04-13.zip).
+
+PCB for buzzer: [EasyEDA](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/EasyEDA_PCB_Buzzer_2022-04-13.json), [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Schematic_Buzzer_2022-04-13.png), and [Gerber files](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/Gerber_PCB_Buzzer_2022-04-13.zip).
+
 Bread for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/omnibox_half_breadboard.png)
     
 ## Hardware
