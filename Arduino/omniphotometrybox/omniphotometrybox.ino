@@ -65,7 +65,7 @@ const byte cam_pin = 21; // Cam pulses
   const byte switchpin = 10; // External toggle to start a train (default active high). Usually used in listenmode
   const byte foodTTLpin = 15; // output TTL to trigger food etc
 #else
-  const byte switchpin = 15; // Use if in PCB mode
+  const byte switchpin = 17; // Use if in PCB mode
   const byte foodTTLpin = 9; // output TTL to trigger food etc
 #endif
 const byte foodTTLinput = 22; // input TTL for conditional food pulses (active high, 3.3 V only!!)
