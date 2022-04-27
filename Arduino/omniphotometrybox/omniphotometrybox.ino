@@ -20,7 +20,7 @@
 #define PCB false
  
 // =============== Debug ===============
-#define debugmode true // Master switch for all serial debugging
+#define debugmode false // Master switch for all serial debugging
 #define showpulses false // Extremely verbose
 #define showopto true
 #define showscheduler true
@@ -46,6 +46,7 @@ bool optophotommode = false; // Green + red
 bool tcpmode = true; //
 bool samecoloroptomode = false; // Green + blue (same led for photometry and opto);
 bool useencoder = true;
+bool echoencoderc = true;
 bool usefoodpulses = false; //
 bool syncaudio = false;
 bool usescheduler = false; // 
@@ -105,6 +106,11 @@ unsigned int audiofreq = 2000;
 // ============== Serial ==============
 byte m, n;
 
+// number of pulses
+long pcount = 0;
+bool autoencserial = true;
+byte echo[4] = {0, 0, 0, 0};
+
 // ============ Photometry ============
 // photometry time variables
 unsigned long int t0; // When each cycle begins
@@ -142,7 +148,7 @@ bool tristatepinpol = false; // Polarity for the tristatepin (1 = active high, 0
 unsigned int preoptotime = 120; //in seconds (max is high because unsigned int is 32 bit for teensy)
 unsigned int npreoptopulse = preoptotime * 50; // preopto pulse number
 unsigned int ipreoptopulse = 0; // preopto pulse number
-byte ntrain = 10; // Number of trains
+unsigned int ntrain = 10; // Number of trains
 byte itrain = 0; // Current number of trains
 bool inpreopto = true;
 bool inopto = false;
@@ -240,6 +246,7 @@ void setup() {
   pinMode(ch2_pin, OUTPUT);
   pinMode(tristatepin, OUTPUT);
   pinMode(foodTTLpin, OUTPUT);
+  pinMode(audiopin, OUTPUT);
 
   if (listenpol){
     pinMode(switchpin, INPUT_PULLDOWN); // active high
@@ -888,7 +895,7 @@ void parseserial(){
   // ============ Scheduler ============
   // 15: Use scheduler (n = 1 yes, 0 no) 
   // 4: Set delay (delay_cycle = n * 10 * 50, n = 1 means 10 seconds). Only relevant when scheduler is on
-  // 16: Number of trains (n = n of trains)
+  // 16: Number of trains (n * 10 of trains)
   // 17: Enable manual scheduler override
   // 27: Listening mode on or off (n = 1 yes, 0 no). Will turn on manual override.
   // 28: Listen mode polarity (1 = active high, 0 = active low)
@@ -918,7 +925,8 @@ void parseserial(){
   
   
   // ============= Encoder =============
-  // 23 encoder useage (n = 1 yes, 0 no) 
+  // 23: encoder useage (n = 1 yes, 0 no) 
+  // 43: auto encoder serial feedback (n = 1 yes, 0 no)
 
   // ============ Audio sync ============
   // 25: Audio sync (n = 1 yes, 0 no)
@@ -926,36 +934,51 @@ void parseserial(){
   
   
   switch (m){
+    // Initialize echo
+    
     case 255:
+      echo[0] = 0;
+      echo[1] = 0;
+      echo[2] = 0;
+      echo[3] = 0;
+    
      // 255: status update (n = variable)
-     long echo;
      switch (n){
       case 0:
+        // Echo back scheduler info
+        echo[3] = 1;
+        
         // Scheduler
         if (!usescheduler){
-          echo = 65536; // Echo back 65536 as no scheduler
+          echo[2] = 1; // Echo back [0 0 1 1] as no scheduler
         }
         if (inpreopto){
-          echo = 65537; // Echo back 65537 as preopto
+          echo[2] = 2; // Echo back [0 0 2 1] as preopto
         }
         else if (inpostopto){
-          echo = 65538; // Echo back 65538 as postopto
+          echo[2] = 3;; // Echo back [0 0 3 1] as postopto
         }
         else {
-          echo = ntrain * 255 + itrain; // first byte shows n train, second byte shows itrain
+          echo[0] = itrain;
+          echo[1] = ntrain; // first byte shows n train, second byte shows itrain
         }
         break;
 
       case 38:
-        if (useRNG && usescheduler){
-          echo = trainpass;
-        }
-        else{
-          echo = 65536; // Echo back 65536 as no RNG
-        }
+        // Echo back rng info
+        echo[3] = 2;
+        echo[2] = useRNG; // Echo back [X X 0 2] as no RNG
+        echo[1] = usescheduler; // Echo back [X 0 X 2] as no RNG
+        echo[0] = trainpass;
+        break;
+
+      case 39:
+        // Echo back pass chance
+        echo[3] = 3;
+        echo[0] = threshrng;
         break;
      }
-     Serial.write((byte *) &echo, 4);
+     Serial.write(echo, 4);
      break;
      
     case 253:
@@ -968,6 +991,9 @@ void parseserial(){
     case 0:
       // End pulsing
       pulsing = false;
+      if (echoencoderc){
+        Serial.write((byte *) &pcount, 4);
+      }
       if (usescheduler){
         stimenabled = false;
         schedulerrunning = false;
@@ -990,7 +1016,8 @@ void parseserial(){
       }
       if (useencoder){
         myEnc.write(0);    // zero the position
-        pos = 0;        
+        pos = 0;
+        pcount = 0;  
       }
 
       if (tcpmode){
@@ -1101,12 +1128,14 @@ void parseserial(){
       // Give position
       if (useencoder){
         pos = myEnc.read();
+        //      Serial.println(pos);      
+        Serial.write((byte *) &pos, 4);
       }
       else{
         pos = 0;
+        //      Serial.println(pos);      
+        Serial.write((byte *) &pos, 4);
       }
-//      Serial.println(pos);      
-      Serial.write((byte *) &pos, 4);
       break;
       
     case 6:
@@ -1221,8 +1250,8 @@ void parseserial(){
       break;
 
     case 16:
-      // 16: Number of trains (n = n of trains)
-      ntrain = n;
+      // 16: Number of trains (n * 10 of trains)
+      ntrain = n * 10;
       itrain = 0;
       if (debugmode){
         Serial.print("Number of trains: ");
@@ -1479,7 +1508,7 @@ void parseserial(){
       threshrng = n;
       if (debugmode){
         Serial.print("New RNG pass chance (%): ");
-        Serial.println(trainpass);
+        Serial.println(threshrng);
       }
       break;
 
@@ -1507,6 +1536,15 @@ void parseserial(){
       if (debugmode){
         Serial.print("Max randomized ITI (s): ");
         Serial.println(rng_cycle_max);
+      }
+      break;
+
+    case 43:
+      // 43: auto encoder serial feedback (n = 1 yes, 0 no)
+      autoencserial = (n == 1);
+      if (debugmode){
+        Serial.print("Auto encoder serial communication (1 = yes, 0 = no): ");
+        Serial.println(autoencserial);
       }
       break;
   }
@@ -1660,6 +1698,8 @@ void showpara(void){
     Serial.println("============== Encoder ==============");
     Serial.print("Encoder enabled: ");
     Serial.println(useencoder);
+    Serial.print("Auto encoder serial: ");
+    Serial.println(autoencserial);
 
     // Food TTL
     Serial.println("============= Food TTL =============");
@@ -1708,8 +1748,11 @@ void camerapulse(void){
     if ((tnow - pulsetime) >= cycletime){
       if (!onoff){
         pulsetime = micros();
-//        pos = myEnc.read();
-        // Serial.write((byte *) &pos, 4);
+        if (autoencserial){
+          pos = myEnc.read();
+          Serial.write((byte *) &pos, 4); // Send position
+        }
+        
         // Serial.println(pos);
         digitalWrite(cam_pin, HIGH);
         digitalWrite(led_pin, HIGH);
@@ -1720,6 +1763,9 @@ void camerapulse(void){
         }
         
         onoff = true;
+
+        // Advance pulse counter
+        pcount++;
       }
     }
     else if ((tnow - pulsetime) >= ontime){

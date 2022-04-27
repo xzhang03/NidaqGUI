@@ -1,21 +1,21 @@
 function str = omniliveupdate(echoscheduler, echoRNG)
     % Parse value from teensy for live update on UI
-    if echoscheduler == 65536
+    if echoscheduler(3) == 1
         str = 'No scheduler';
-    elseif echoscheduler == 65537
+    elseif echoscheduler(3) == 2
         str = 'Scheduler: Pre-opto';
-    elseif echoscheduler == 65538
+    elseif echoscheduler(3) == 3
         str = 'Scheduler: Post-opto';
     else
-        itrain = mod(echoscheduler, 255);
-        ntrain = (echoscheduler - itrain) / 255;
+        itrain = echoscheduler(1);
+        ntrain = echoscheduler(2);
         str = sprintf("Scheduler: %i/%i", itrain, ntrain);
     end
     
-    if echoRNG == 65536
+    if echoRNG(3) == 0
         strRNG = 'RNG: off';
     else
-        strRNG = sprintf("RNG: %i", echoRNG);
+        strRNG = sprintf("RNG: %i", echoRNG(1));
     end
     
     str = sprintf('%s. %s', str, strRNG);

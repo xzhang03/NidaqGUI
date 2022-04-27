@@ -195,7 +195,7 @@ if nicfg.active
     % Reset arduino
     if nicfg.ArduinoCOM > -1 && ~isfield(nicfg, 'arduino_serial')
         disp('Starting Arduino...');
-        nicfg.arduino_data = [];
+        nicfg.arduino_data = zeros(1, 2000); % Initialize for 2000
         nicfg.arduino_serial = arduinoOpen(nicfg.ArduinoCOM, nicfg.baumrate);
         
         % 2 Seconds to let arduino catch up
@@ -231,7 +231,6 @@ if nicfg.active
     disp('Iterating');
     tstart = clock;
     tnow = clock;
-    tseconds = 0;
     
     timeconv = [0 0 86400 3600 60 1]';
     
@@ -240,55 +239,87 @@ if nicfg.active
         fwrite(nicfg.arduino_serial, [1 0]);
     end
     
+    % Cycletime and initialize
+    pind = 0; % Position writing index
+    schedulerinfo = [0 0 0 0];
+    rnginfo = [0 0 0 0];
+    dcount = 0;
+    
     while get(hObject, 'Value') == 1
-        if floor((tnow - tstart) * timeconv) > tseconds
-            tseconds = floor((tnow - tstart) * timeconv);
-            elapsedmins = floor(tseconds/60.0);
-            set(handles.TimeElapsedNumber, 'String', sprintf('%3i:%02i', elapsedmins, tseconds - elapsedmins*60));
-        end
-
+        
         drawnow();
         
-        if nicfg.RecordRunning && nicfg.ArduinoCOM > -1 && toc > 1.0/nicfg.RunningFrequency
-            tic;
-            fwrite(nicfg.arduino_serial, [5 0]); % Request position info
-            nicfg.arduino_data(end+1) = arduinoReadQuad(nicfg.arduino_serial);
+        if nicfg.RecordRunning && nicfg.ArduinoCOM > -1            
+            % Read serial if serial is avalable
+            d = arduinoReadQuad(nicfg.arduino_serial);
             
-            if nicfg.omnibox.enable
-                % Live update 
-                updatecounter = updatecounter + 1;
-                if updatecounter == nicfg.RunningFrequency
-                    % Once every s
-                    updatecounter = 0;
-                    fwrite(nicfg.arduino_serial, [255 0]); % Request scheduler info
-                    schedulerinfo = arduinoReadQuad(nicfg.arduino_serial);
-                    fwrite(nicfg.arduino_serial, [255 38]); % Request RNG info
-                    rnginfo = arduinoReadQuad(nicfg.arduino_serial);
-                    str = omniliveupdate(schedulerinfo, rnginfo);
-                    handles.settinguploaded.String = str;
+            if ~isempty(d)
+                if d < 100
+                    dcount = dcount + 1;
                 end
-%                 toc
             end
+            
+            % Parse serial
+            [nicfg.arduino_data, pind, schedulerinfo, rnginfo] = ...
+                omniserialparse(d, nicfg.arduino_data, pind, schedulerinfo, rnginfo);
+            
+            % Live update (once every second)
+            updatecounter = updatecounter + 1;
+            if updatecounter == nicfg.RunningFrequency
+                % Once every s
+                updatecounter = 0;
+                fwrite(nicfg.arduino_serial, [255 0]); % Request scheduler info
+                fwrite(nicfg.arduino_serial, [255 38]); % Request RNG info
+
+                str = omniliveupdate(schedulerinfo, rnginfo);
+                handles.settinguploaded.String = str;
+
+                tseconds = floor((tnow - tstart) * timeconv);
+                elapsedmins = floor(tseconds/60.0);
+                set(handles.TimeElapsedNumber, 'String', sprintf('%3i:%02i', elapsedmins, tseconds - elapsedmins*60));
+            end
+
         end
         
         tnow = clock;
     end
     
+    % Debug about aliasing
+%     disp(nicfg.arduino_serial.BytesAvailable);
+    
     % Stop camera pulsing
     if nicfg.ArduinoCOM > -1
         fwrite(nicfg.arduino_serial, [0 0]);
+
+        pause(1);
+
+        % Finish collecting data on the esrial buffer
+        while nicfg.arduino_serial.BytesAvailable >= 4
+            d = arduinoReadQuad(nicfg.arduino_serial);
+            
+            % Parse serial
+            [nicfg.arduino_data, pind, schedulerinfo, rnginfo] = ...
+                omniserialparse(d, nicfg.arduino_data, pind, schedulerinfo, rnginfo);
+        end
+        
+        pcount = nicfg.arduino_data(pind);
+        pind = pind - 1;
+        nicfg.arduino_data = nicfg.arduino_data(1:pind);
+        
     end
     
     disp('Saving...');
+    disp(dcount);
     
     if nicfg.ArduinoCOM > -1
         fclose(nicfg.arduino_serial);
         nicfg = rmfield(nicfg, 'arduino_serial');
         if nicfg.RecordRunning
             arduinopath = fullfile(nicfg.BasePath, sprintf('%s-%s-%03i-running.mat', nicfg.MouseName, datestamp(), nicfg.Run));
+            
             position = nicfg.arduino_data;
             speed = runningSpeed(position, nicfg.RunningFrequency);
-            save(arduinopath, 'position', 'speed');
+            save(arduinopath, 'position', 'speed', 'pcount', 'pind');
         end
     end
     

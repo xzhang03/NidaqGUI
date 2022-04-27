@@ -1,7 +1,8 @@
-    
-channel2look = 4;
+channel2look = 3;
 
-pulseind = find(diff(data(4,:))>1);
-times = timestamps(pulseind);
+pulses = chainfinder(data(channel2look,:) > 1);
 
-pulserate = 1 / ((times(end) - times(2)) / (length(times)-2))   
+lpulse = size(pulses,1);
+lrun = length(speed);
+lpulse/lrun
+

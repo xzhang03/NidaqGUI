@@ -78,8 +78,8 @@ if nicfg.scheduler.enable
     % Delay (passing time as units of 10 seconds)
     fwrite(nicfg.arduino_serial, uint8([4 nicfg.scheduler.delay / 10]));
     
-    % Number of trains
-    fwrite(nicfg.arduino_serial, uint8([16 nicfg.scheduler.ntrains]));
+    % Number of trains (increments of 10)
+    fwrite(nicfg.arduino_serial, uint8([16 nicfg.scheduler.ntrains / 10]));
     
     % Manual override
     fwrite(nicfg.arduino_serial, uint8([17 nicfg.scheduler.manualoverride]));
@@ -167,6 +167,9 @@ if nicfg.encoder.enable
 else
     fwrite(nicfg.arduino_serial, uint8([23 0]));
 end
+
+% Auto echo
+fwrite(nicfg.arduino_serial, uint8([43 nicfg.encoder.autoecho]));
 
 %% Audio sync
 if nicfg.audiosync.enable
