@@ -77,7 +77,6 @@ nicfg.scoptophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 
 nicfg.scoptophotometry.trainlength = 0; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.scoptophotometry.cycle = 2; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
-nicfg.scoptophotometry.tristatepol = false; % Tristate pin polarity (do not change once a box is made).
 
 % Scheduler
 nicfg.scheduler.enable = true; % Default false
@@ -85,7 +84,6 @@ nicfg.scheduler.delay = 10; % Delayed opto start in seconds. E.g., 120 means 2 m
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
-nicfg.scheduler.listenpol = true; % Listen mode polarity (true = active high, false = active low). Do not change unless you know what you are doing.
 
 % Hardware Opto RNG (determines a train goes through or not)
 % (Scheduler only and does not apply to the listening mode)
@@ -130,6 +128,11 @@ nicfg.optodelayTTL.deliverydur = 5; % Duration in 100 ms. E.g., 50 means 5 secon
 
 % Encoder
 nicfg.encoder.enable = true;
+nicfg.encoder.autoecho = true; % Using auto echo (turn off for debugging)
+
+% Trial and RNG info echo
+nicfg.onlineecho.enable = true; % Auto trial and rng echo (n = 1 yes, 0 no)
+nicfg.onlineecho.periodicity = 10; % Periodicity in 100 ms. E.g., 10 means 1 second. Default 10 (1s)
 
 % Audio sync
 nicfg.audiosync.enable = false; % Default false

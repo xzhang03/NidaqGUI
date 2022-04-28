@@ -23,10 +23,16 @@ end
 if nicfg.tcp.enable
     % TCP
     fwrite(nicfg.arduino_serial, uint8([3 0]));
+    
+    % Disp
+    disp('Mode -> TCP');
 end
 
 %% Optophotometry
 if nicfg.optophotometry.enable
+    % Mode
+    disp('Mode -> Optophotometry');
+    
     % Optophotometry
     fwrite(nicfg.arduino_serial, uint8([3 1]));
     
@@ -51,6 +57,9 @@ end
 
 %% Same-color optophotometry
 if nicfg.scoptophotometry.enable
+    % Mode
+    disp('Mode -> Same-color optophotometry');
+    
     % SC Optophotometry
     fwrite(nicfg.arduino_serial, uint8([3 2]));
     
@@ -66,20 +75,34 @@ if nicfg.scoptophotometry.enable
     % Pulse width
     fwrite(nicfg.arduino_serial, uint8([13 nicfg.scoptophotometry.pulsewidth]));
     
-    % Tristate pin polarity
-    fwrite(nicfg.arduino_serial, uint8([29 nicfg.scoptophotometry.tristatepol]));
+    % Tristate pin polarity (protected)
+    % Tristate pin polarity (do not change once a box is made).
+    if isfield(nicfg.scoptophotometry, 'tristatepol')
+        fwrite(nicfg.arduino_serial, uint8([29 nicfg.scoptophotometry.tristatepol]));
+    end
 end
 
 %% Scheduler
 if nicfg.scheduler.enable
+    % Mode
+    disp('Scheduler -> On');
+    
     % Scheduler
     fwrite(nicfg.arduino_serial, uint8([15 1]));
     
     % Delay (passing time as units of 10 seconds)
     fwrite(nicfg.arduino_serial, uint8([4 nicfg.scheduler.delay / 10]));
+    if ceil(nicfg.scheduler.delay / 10) ~= (nicfg.scheduler.delay / 10)
+        % Delay is updated
+        fprintf('Delay is updated to %i instead.\n', ceil(nicfg.scheduler.delay/10)*10)
+    end
     
-    % Number of trains
-    fwrite(nicfg.arduino_serial, uint8([16 nicfg.scheduler.ntrains]));
+    % Number of trains (increments of 10)
+    fwrite(nicfg.arduino_serial, uint8([16 nicfg.scheduler.ntrains / 10]));
+    if ceil(nicfg.scheduler.ntrains / 10) ~= (nicfg.scheduler.ntrains / 10)
+        % Delay is updated
+        fprintf('The number of trains is updated to %i instead.\n', ceil(nicfg.scheduler.ntrains/10)*10)
+    end
     
     % Manual override
     fwrite(nicfg.arduino_serial, uint8([17 nicfg.scheduler.manualoverride]));
@@ -87,8 +110,11 @@ if nicfg.scheduler.enable
     % Listen mode
     fwrite(nicfg.arduino_serial, uint8([27 nicfg.scheduler.listenmode]));
     
-    % Listen mode polarity
-    fwrite(nicfg.arduino_serial, uint8([28 nicfg.scheduler.listenpol]));
+    % Listen mode polarity (protected)
+    % Listen mode polarity (true = active high, false = active low). Do not change unless you know what you are doing.
+    if isfield(nicfg.scheduler, 'listenpol')
+        fwrite(nicfg.arduino_serial, uint8([28 nicfg.scheduler.listenpol]));
+    end
     
     % Use RNG to determine if opto goes through or not
     if nicfg.scheduler.control
@@ -168,6 +194,9 @@ else
     fwrite(nicfg.arduino_serial, uint8([23 0]));
 end
 
+% Auto echo
+fwrite(nicfg.arduino_serial, uint8([43 nicfg.encoder.autoecho]));
+
 %% Audio sync
 if nicfg.audiosync.enable
     % Audio enable
@@ -177,6 +206,15 @@ if nicfg.audiosync.enable
     fwrite(nicfg.arduino_serial, uint8([26 nicfg.audiosync.freq]));
 else
     fwrite(nicfg.arduino_serial, uint8([25 0]));
+end
+
+%% Auto-echo of trial and RNG info
+if nicfg.onlineecho.enable
+    % Enable
+    fwrite(nicfg.arduino_serial, uint8([44 1]));
+    
+    % Periodicity
+    fwrite(nicfg.arduino_serial, uint8([45 nicfg.onlineecho.periodicity]));
 end
 
 end
