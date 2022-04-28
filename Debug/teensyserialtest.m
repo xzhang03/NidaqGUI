@@ -55,3 +55,27 @@ disp('Reset and closed.')
 
 %% test
 write(nicfg.arduino_serial, [255 0]); 
+
+%% Performance (speed test)
+fwrite(nicfg.arduino_serial, uint8([1 0]));
+disp('Running')
+tic;
+while toc < 15
+    d = arduinoReadQuad(nicfg.arduino_serial);
+end
+fwrite(nicfg.arduino_serial, uint8([0 0]));
+disp('Done.')
+
+d2 = [0 0 0 0];
+while d2(1) ~= 128
+    d = arduinoReadQuad(nicfg.arduino_serial);
+    if isempty(d)
+        d2 = [0 0 0 0];
+    else
+        d2 = typecast(int32(d),'uint8');
+    end
+end
+
+cycles = arduinoReadQuad(nicfg.arduino_serial);
+time = arduinoReadQuad(nicfg.arduino_serial);
+time/cycles

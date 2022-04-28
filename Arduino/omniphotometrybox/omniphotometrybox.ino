@@ -13,6 +13,7 @@
  * 8. TTL pulses for other parts of the experiment
  * 9. Audio syncing
  * 10.Hardware random number generator for opto trials
+ * 11.Online serial echo of trial and RNG infomation
  * 
  */
 
@@ -28,6 +29,17 @@
 #define debugpins false
 unsigned long ttest1 = 0;
 bool ftest1 = false;
+
+// ============ Performance check ============
+#define perfcheck false
+#if perfcheck
+  unsigned long int tnow_pc;
+  unsigned long int cycles_pc = 1000000;
+  bool pc_going = false;
+#endif
+unsigned long int ix_pc = 0;
+long tpc;
+
 
 // ============== Encoder ==============
 //#define ENCODER_DO_NOT_USE_INTERRUPTS
@@ -46,7 +58,6 @@ bool optophotommode = false; // Green + red
 bool tcpmode = true; //
 bool samecoloroptomode = false; // Green + blue (same led for photometry and opto);
 bool useencoder = true;
-bool echoencoderc = true;
 bool usefoodpulses = false; //
 bool syncaudio = false;
 bool usescheduler = false; // 
@@ -55,6 +66,7 @@ bool listenmode = false;
 bool usebuzzcue = false;
 bool useRNG = false; // RNG for opto
 bool randomiti = false; // Randomize ITI
+
 
 // =============== Pins ===============
 const byte ch1_pin = 2; // try to leave 0 1 open. 
@@ -108,8 +120,12 @@ byte m, n;
 
 // number of pulses
 long pcount = 0;
-bool autoencserial = true;
 byte echo[4] = {0, 0, 0, 0};
+bool autoencserial = true; // Auto serial relay encoder info
+bool echoencoderc = true; // Echo encoder counter at the end
+bool autoechotrialinfo = false; // Auto echo scheduler and RNG info on a slow clock
+unsigned long int cycletime_slow = 1000; // slow echo time in ms
+unsigned long int echotime_slow;
 
 // ============ Photometry ============
 // photometry time variables
@@ -301,6 +317,25 @@ void setup() {
 void loop() {
   tnow = micros();
   tnowmillis = tnow / 1000;
+
+  // Performance check code (comment out if not doing this)
+  /*
+  if (pulsing & perfcheck) {
+    if ((ipreoptopulse == 0) && !pc_going){
+      // Very first cycle during pulsing
+      ix_pc = 0;
+      tnow_pc = tnow;
+      pc_going = true;
+    }
+    else if ((ix_pc < cycles_pc) && pc_going){
+      ix_pc++;
+    }
+    else if (pc_going){
+      tpc = tnow - tnow_pc;
+      pc_going = false;
+    }
+  }
+  */
   
   if (Serial.available() >= 2){
     // Read 2 bytes
@@ -318,6 +353,9 @@ void loop() {
   if (usefoodpulses && foodttlarmed){
     foodttl();
   }
+
+  // Slow serial echo of trial and RNG ifo
+  slowserialecho();
   
   // photometry
   t1 = tnow - t0;
@@ -923,14 +961,17 @@ void parseserial(){
   // 34: Action period duration (n * 100 ms)
   // 35: Delivery period duration (n * 100 ms);
   
-  
   // ============= Encoder =============
-  // 23: encoder useage (n = 1 yes, 0 no) 
-  // 43: auto encoder serial feedback (n = 1 yes, 0 no)
+  // 23: Encoder useage (n = 1 yes, 0 no) 
+  // 43: Auto encoder serial transmission (n = 1 yes, 0 no)
 
   // ============ Audio sync ============
   // 25: Audio sync (n = 1 yes, 0 no)
   // 26: Audio sync tone frequency (n * 100 Hz)
+
+  // ========== Trial and RNG Echo ==========
+  // 44: Auto trial and rng echo (n = 1 yes, 0 no)
+  // 45: Auto trial and rng echo periodicity (n * 100 ms)
   
   
   switch (m){
@@ -1001,6 +1042,16 @@ void parseserial(){
       if (usebuzzcue){
         noTone(audiopin);
       }
+      if (perfcheck){
+        // Tag
+        echo[0] = 128;
+        echo[1] = 128;
+        echo[2] = 128;
+        echo[3] = 128;
+        Serial.write(echo, 4);
+        Serial.write((byte *) &ix_pc, 4);
+        Serial.write((byte *) &tpc, 4);
+      }
       
       if (debugmode){
         Serial.println("Cam pulse stop.");
@@ -1010,7 +1061,8 @@ void parseserial(){
     case 1:
       // Start pulsing
       pulsing = true;
-      pulsetime = micros();
+      pulsetime = tnow;
+      echotime_slow = tnowmillis;
       if (debugmode){
         Serial.println("Cam pulse start.");
       }
@@ -1547,6 +1599,24 @@ void parseserial(){
         Serial.println(autoencserial);
       }
       break;
+
+    case 44:
+      // 44: Auto trial and rng echo (n = 1 yes, 0 no)
+      autoechotrialinfo = (n == 1);
+      if (debugmode){
+        Serial.print("Auto trial and rng info serial communication (1 = yes, 0 = no): ");
+        Serial.println(autoechotrialinfo);
+      }
+      break;
+
+    case 45:
+      // 45: Auto trial and rng echo periodicity (n * 100 ms)
+      echotime_slow = n * 100;
+      if (debugmode){
+        Serial.print("Auto trial and rng info serial communication periodicity (ms): ");
+        Serial.println(echotime_slow);
+      }
+      break;
   }
 
   if (debugpins){
@@ -1740,6 +1810,48 @@ void showpara(void){
     Serial.println("============= System =============");
     Serial.print("System-wide step time (us): ");
     Serial.println(step_size);
+    Serial.print("Auto echo trial info: ");
+    Serial.println(autoechotrialinfo);
+    Serial.print("Auto echo trial periodicity (ms): ");
+    Serial.println(cycletime_slow);
+  }
+}
+
+void slowserialecho(void){
+  // Echoing back trial info on a schedule
+  // Only when pulsing
+  if (pulsing && autoechotrialinfo){
+    if ((tnowmillis - echotime_slow) >= cycletime_slow){
+      // Enters here every once a slow cycle (1s default)
+      echotime_slow = tnowmillis;
+
+      // Echo back scheduler info
+      echo[0] = 0;
+      echo[1] = 0;
+      echo[2] = 0;
+      echo[3] = 1;
+      if (!usescheduler){
+        echo[2] = 1; // Echo back [0 0 1 1] as no scheduler
+      }
+      if (inpreopto){
+        echo[2] = 2; // Echo back [0 0 2 1] as preopto
+      }
+      else if (inpostopto){
+        echo[2] = 3;; // Echo back [0 0 3 1] as postopto
+      }
+      else {
+        echo[0] = itrain;
+        echo[1] = ntrain; // first byte shows n train, second byte shows itrain
+      }
+      Serial.write(echo, 4);
+
+      // Echo back RNG info
+      echo[3] = 2;
+      echo[2] = useRNG; // Echo back [X X 0 2] as no RNG
+      echo[1] = usescheduler; // Echo back [X 0 X 2] as no RNG
+      echo[0] = trainpass;
+      Serial.write(echo, 4);
+    }
   }
 }
 
