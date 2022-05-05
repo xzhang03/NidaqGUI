@@ -1,6 +1,6 @@
 // Third Gen photometry box v3.1
 // Handle almost everything you need for photometry
-// Needs a decen number of pins
+// Needs a decent number of pins
 // Stephen Zhang
 
 /* 1. Two color photometry
@@ -514,10 +514,7 @@ void loop() {
         
         train = true;
         opto_counter = 0;
-        pulsewidth_1 = pulsewidth_1_scopto; // Change pulse width
-        digitalWrite(AOpin, HIGH);
-        digitalWrite(tristatepin, tristatepinpol); // false = active low = on.
-
+                
         if (usescheduler){
           // In scheduler and current train is on
           // This affects scopto
@@ -551,6 +548,17 @@ void loop() {
           }
         }
 
+        // RNG (only in scheduler mode and useRNG is on can RNG be considered)
+        if ((!usescheduler) || (!useRNG) || (trainpass)){
+          // schedule mode is off or not using RNG or train passed anyway
+          // In other words, this step is skipped when schedulemode = 1 && useRNG = 1 && and trainpass = 0
+          // If train pass we set analog output high
+          pulsewidth_1 = pulsewidth_1_scopto; // Change pulse width
+          digitalWrite(AOpin, HIGH);
+          digitalWrite(tristatepin, tristatepinpol); // false = active low = on.
+//          Serial.println("OPTO actually ON");
+        }
+        
         if (usefoodpulses){
           // Food ttl
           foodttlarmed = true;
@@ -600,14 +608,9 @@ void loop() {
 
       // Turn on light
       if (opto){
-        // RNG (only in scheduler mode and useRNG is on can RNG be considered)
-        if ((!usescheduler) || (!useRNG) || (trainpass)){
-          // schedule mode is off or
-          // not using RNG or
-          // train passed anyway
-          // In other words, this step is skipped when schedulemode = 1 && useRNG = 1 && and trainpass = 0
-          digitalWrite(ch1_pin, HIGH);
-        }
+        
+        digitalWrite(ch1_pin, HIGH);
+        
         ch1_on = true;
 
         opto_counter++;
@@ -833,6 +836,7 @@ void loop() {
           // train passed anyway
           // In other words, this step is skipped when schedulemode = 1 && useRNG = 1 && and trainpass = 0
           digitalWrite(ch2_pin, HIGH);
+//          Serial.println("OPTO actually ON");
         }
         ch2_on = true;
         opto_counter++;
@@ -855,7 +859,7 @@ void loop() {
 
       // debug ch2 on to ch2 off
       if (debugmode && showopto){
-        if (ftest1){
+        if (ftest1 && train){
           Serial.print("Opto ");
           Serial.print(opto_counter);
           Serial.print(". Pulse width (us): ");
@@ -867,7 +871,7 @@ void loop() {
       }
 
       
-      if ((opto_counter == train_length) && optophotommode && train){
+      if ((opto_counter >= train_length) && optophotommode && train){
         // reset opto counter
         train = false;
         

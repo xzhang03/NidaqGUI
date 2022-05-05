@@ -72,8 +72,8 @@ nicfg.optophotometry.pulsecycle2 = 135; % Pulse cycle 1 in X * 100 us. E.g., 135
 % Same-color optophotometry
 % Variable pulse width. 20 ms means always on
 nicfg.scoptophotometry.enable = true; % Default false
-nicfg.scoptophotometry.freqmod = 1; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
-nicfg.scoptophotometry.trainlength = 50; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
+nicfg.scoptophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
+nicfg.scoptophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.scoptophotometry.cycle = 5; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 nicfg.scoptophotometry.pulsewidth = 20; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10.
 
@@ -87,7 +87,7 @@ nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran t
 % Hardware Opto RNG (determines a train goes through or not)
 % (Scheduler only and does not apply to the listening mode)
 % May implement RNG values imported from Matlab in the future
-nicfg.scheduler.useRNG = true; % Default false
+nicfg.scheduler.useRNG = false; % Default false
 nicfg.scheduler.passchance = 50; % Pass chance in percentage (30 = 30% pass)
 
 % Control experiments (no stim)
