@@ -7,7 +7,7 @@
  * 2. Optophotometry (switch on)
  * 3. Sample color optophotometry (analogy input control intensity)
  * 4. Cam pulses with adjustable frequency
- * 5. Encoder at the same frequency at 4
+ * 5. Encoder at the same frequency as 4
  * 6. Preprogram experiment timescale: baseline -> opto -> postopto
  * 7. External input for scheduler (6)
  * 8. TTL pulses for other parts of the experiment
@@ -18,7 +18,7 @@
  */
 
 // ================ PCB ================
-#define PCB false
+#define PCB true
  
 // =============== Debug ===============
 #define debugmode false // Master switch for all serial debugging
@@ -388,7 +388,7 @@ void loop() {
         inpostopto = true;
       }
     }
-    else if (samecoloroptomode && ch1_on){
+    else if (samecoloroptomode && ch1_on && (inopto || !schedulerrunning)){
       // Basically you can only get in here during the stim cycles, regular photometry pulsewidths are too short
       digitalWrite(ch1_pin, LOW);
       ch1_on = false;
