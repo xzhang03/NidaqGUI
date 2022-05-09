@@ -88,11 +88,11 @@ const byte i2csda = 18; // Reserve for future i2c
 const byte i2cscl = 19; // Reserve for future i2c
 
 // ============= debugpins =============
-const byte serialpin = 14; // Parity signal for serial pin
-const byte schedulerpin = 15; // On when scheduler is used
-const byte preoptopin = 16; // preopto
-const byte inoptopin = 23; // preopto
-const byte postoptopin = 20; // preopto
+const byte serialpin = 7; // Parity signal for serial pin
+const byte schedulerpin = 8; // On when scheduler is used
+const byte preoptopin = 9; // preopto
+const byte inoptopin = 11; // preopto
+const byte postoptopin = 12; // preopto
 bool serialpinon = false;
 
 // =============== Time ===============
