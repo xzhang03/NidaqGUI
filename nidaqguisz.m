@@ -84,6 +84,10 @@ if ~isfield(nicfg, 'RecordRunning')
     nicfg.RecordRunning = false;
 end
 
+if ~isfield(nicfg, 'serverupload')
+    nicfg.serverupload = true;
+end
+
 
 
 
@@ -320,7 +324,8 @@ if nicfg.active
         end
     end
     
-    if sum(strcmpi(nicfg.serveradd(:,1), nicfg.MouseName(1:2))) > 0 % If has a registered owner
+    if (sum(strcmpi(nicfg.serveradd(:,1), nicfg.MouseName(1:2))) > 0) && nicfg.serverupload 
+        % If has a registered owner and wants to upload
         % Determine owner
         serveradd = nicfg.serveradd{strcmpi(nicfg.serveradd(:,1),...
             nicfg.MouseName(1:2)),2};

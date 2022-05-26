@@ -26,7 +26,7 @@
 #define showopto true
 #define showscheduler true
 #define showfoodttl true
-#define debugpins false
+#define debugpins true
 unsigned long ttest1 = 0;
 bool ftest1 = false;
 
@@ -159,6 +159,9 @@ unsigned int pulsewidth_1_scopto = 10000; // in micro secs (ch1)
 const unsigned long cycletime_photom_1_scopto = 20000; // in micro secs (Ch1)
 const unsigned long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrelevant
 bool tristatepinpol = false; // Polarity for the tristatepin (1 = active high, 0 = active low). Default active low.
+
+// TCP (no real opto for behavioral purpose only)
+long tcp_cycle = 30 * 50; // First number is in seconds. How often does the train come on. 
 
 // ============ Scheduler ============
 unsigned int preoptotime = 120; //in seconds (max is high because unsigned int is 32 bit for teensy)
@@ -414,48 +417,7 @@ void loop() {
       // Scheduler business here since it's not tcp
       // Manual stim
       if (manualscheduleoverride && usescheduler){
-        if ((digitalRead(switchpin) == listenpol) && !manualon){
-          stimenabled = true;
-          inpreopto = false;
-          inpostopto = false;
-          inopto = true;
-          itrain = 0;
-          ntrain = 1; // If manually triggered, it's only gonna be 1 train at a time
-          pmt_counter_for_opto = 0;
-          opto_counter = 0;
-          counter_for_train = 0; // Number of cycles
-          foodpulses_left = 0;
-          inputttl = !foodttlconditional;
-          foodttlwait = false;
-          manualon = true;
-
-          if (usebuzzcue){
-            foodttlcuewait = true;
-          }
-          
-          if (foodttlconditional){
-            foodttlactionwait = true;
-          }
-
-          if (debugpins){
-            digitalWrite(preoptopin, LOW);
-            digitalWrite(inoptopin, HIGH);
-            digitalWrite(postoptopin, LOW);
-          }
-          
-          if (debugmode && showscheduler){
-            Serial.println("External pulse detected detected.");
-          }
-        }
-        if (manualon){
-          if (digitalRead(switchpin) == !listenpol){
-            manualon = false;
-    
-            if (debugmode && showscheduler){
-              Serial.println("External pulse detected ended.");
-            }
-          }
-        }
+        externalttltrig();
       }
       
       // Enable stim
@@ -1036,6 +998,15 @@ void parseserial(){
     case 0:
       // End pulsing
       pulsing = false;
+      train = false;
+
+      if (samecoloroptomode){
+        // return analog pin to high impedence and reset pulse width
+        pulsewidth_1 = pulsewidth_1_tcp;
+        digitalWrite(AOpin, LOW);
+        digitalWrite(tristatepin, !tristatepinpol); // !false = active low = off
+      }
+      
       if (echoencoderc){
         Serial.write((byte *) &pcount, 4);
       }
@@ -1911,6 +1882,7 @@ void camerapulse(void){
   }
 }
 
+// Food TTL
 void foodttl(void){
 //  unsigned int tfooddelta = (tnowmillis - tfood0);
 //  if ((tfooddelta % 100) == 0){
@@ -2071,6 +2043,52 @@ void foodttl(void){
       if (debugmode && showfoodttl){
         Serial.print("Food delivery done at (ms): ");
         Serial.println(tnowmillis);
+      }
+    }
+  }
+}
+
+// External TTL trigger
+void externalttltrig(void){
+  if ((digitalRead(switchpin) == listenpol) && !manualon){
+    stimenabled = true;
+    inpreopto = false;
+    inpostopto = false;
+    inopto = true;
+    itrain = 0;
+    ntrain = 1; // If manually triggered, it's only gonna be 1 train at a time
+    pmt_counter_for_opto = 0;
+    opto_counter = 0;
+    counter_for_train = 0; // Number of cycles
+    foodpulses_left = 0;
+    inputttl = !foodttlconditional;
+    foodttlwait = false;
+    manualon = true;
+
+    if (usebuzzcue){
+      foodttlcuewait = true;
+    }
+    
+    if (foodttlconditional){
+      foodttlactionwait = true;
+    }
+
+    if (debugpins){
+      digitalWrite(preoptopin, LOW);
+      digitalWrite(inoptopin, HIGH);
+      digitalWrite(postoptopin, LOW);
+    }
+    
+    if (debugmode && showscheduler){
+      Serial.println("External pulse detected detected.");
+    }
+  }
+  if (manualon){
+    if (digitalRead(switchpin) == !listenpol){
+      manualon = false;
+
+      if (debugmode && showscheduler){
+        Serial.println("External pulse detected ended.");
       }
     }
   }
