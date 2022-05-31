@@ -3,10 +3,13 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <Wire.h>
+
 #define NUMPIXELS 1 // Number of LEDs in strip
 #define DATAPIN 7
 #define CLOCKPIN 8
 Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BGR);
+
 
   
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -25,93 +28,71 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 // pin
 const byte buttonpin = 3;
 
-// =============== Modes ===============
-// Photometry mode
-bool optophotommode = false; // Green + red
-bool tcpmode = true; //
-bool samecoloroptomode = false; // Green + blue (same led for photometry and opto);
-bool useencoder = true;
-bool usefoodpulses = false; //
-bool syncaudio = false;
-bool usescheduler = false; // 
-bool manualscheduleoverride = false; // Only works when using scheduler (keep false if the opto input is left floating)
-bool listenmode = false;
-bool usebuzzcue = false;
-bool useRNG = false; // RNG for opto
-bool randomiti = false; // Randomize ITI
+// What info do we want
+/*
+ * 1. First byte
+ * 1.0 Pulsing - 1 bit
+ * 1.1 Mode - 3 bits
+ * 1.2 Scheduling on/off - 1 bit
+ * 1.3 Preopto-opto-postopto - 3 bits
+ *
+ * 2. Second byte
+ * itrial
+ * 
+ * 3. Third byte
+ * ntrial
+ * 
+ * 4. Fourth byte
+ * 4.0 Using RNG - 1 bit
+ * 4.1 RNG pass - 1 bit
+ * 4.2 Food pulses - 1 bit
+ * 4.3 Food pulse conditional - 1 bit
+ * 4.4 Use cue - 1 bit
+ * 4.5 Animal got it - 1 bit
+ * 
+ */
+// =================== I2C ===================
+byte m, n, o, p;
+
+// First byte
+bool pulsing;
+bool tcpmode, optophotommode, samecoloroptomode;
+bool usescheduler;
+bool inpreopto;
+bool inopto;
+bool inpostopto;
+
+// Second byte
+byte itrain;
+
+// Third byte
+byte ntrain;
+
+// Fourth byte
+bool useRNG;
+bool trainpass;
+bool usefoodpulses;
+bool foodttlconditional;
+bool usebuzzcue;
+bool inputttl;
+
+// Screen
+bool refresh;
 
 
-// =============== Time ===============
-// General time variables
-unsigned long int tnow, tnowmillis;
-
-// ============== cam ==============
-byte freq = 30; // Pulse at 30 Hz (default)
-
-
-// ============ Photometry ============
-// tcp photometry time variables
-const int pulsewidth_1_tcp = 6000; // in micro secs (ch2)
-const int pulsewidth_2_tcp = 6000; // in micro secs (ch2)
-const unsigned long cycletime_photom_1_tcp = 10000; // in micro secs (Ch1)
-const unsigned long cycletime_photom_2_tcp = 10000; // in micro secs (Ch2)
-
-// ============ Opto ============
-// Opto varaibles
-byte opto_per = 5; // Number of photometry pulses per opto pulse (A). Can be: 1, 2, 5, 10, 25, 50. Pulse freq is 50 / A
-byte train_length = 10; // Number of opto pulses per train (B). Duration is  B / (50 / A).
-long train_cycle = 30 * 50; // First number is in seconds. How often does the train come on.
-int pulsewidth_2_opto = 10000; // in micro secs (ch2)
-unsigned long cycletime_photom_1_opto = 6500; // in micro secs (Ch1)
-unsigned long cycletime_photom_2_opto = 13500; // in micro secs (Ch2)
-
-// Same color opto variables
-byte scopto_per = 5; // Number of photometry pulses per opto pulse (AO). Can be: 1, 2, 5, 10, 25, 50. Pulse freq is 50 / AO
-byte sctrain_length = 10; // Number of photometry pulses per stim period (BO). Duration is  BO / (50 / AO).
-long sctrain_cycle = 30 * 50; // First number is in seconds. How often does the train come on. 
-unsigned int pulsewidth_1_scopto = 10000; // in micro secs (ch1)
-const unsigned long cycletime_photom_1_scopto = 20000; // in micro secs (Ch1)
-const unsigned long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrelevant
-
-// ============ Scheduler ============
-unsigned int preoptotime = 120; //in seconds (max is high because unsigned int is 32 bit for teensy)
-unsigned int npreoptopulse = preoptotime * 50; // preopto pulse number
-unsigned int ipreoptopulse = 0; // preopto pulse number
-unsigned int ntrain = 10; // Number of trains
-byte itrain = 0; // Current number of trains
-bool inpreopto = true;
-bool inopto = false;
-bool inpostopto = false;
-
-
-// ============ Hardware RNG ============
-bool trainpass = true;
-
-// Randomize ITI
-byte rng_cycle_min = 30; // Min cycle when ITI is randomized (in seconds, assuming 20 ms pulse cycle)
-byte rng_cycle_max = 40; // Max cycle when ITI is randomized (in seconds, assuming 20 ms pulse cycle)
-
-// ============ Food TTL ============
-// Food TTL (basically sync'ed with opto)
-unsigned int nfoodpulsedelay = 2000; // Time after opto pulse train onset in ms
-unsigned int foodpulse_ontime = 150; // in ms
-unsigned int foodpulse_cycletime = 300; // in ms
-byte foodpulses = 5; // Number of food ttl pulses per stim period.
-byte foodpulses_left = 0; // Try counting down this time. Probably easier to debug
-
-// ======== Food TTL Conditional ========
-bool foodttlconditional = false; //
-unsigned int buzzdelay = 2000; //
-unsigned int buzzdur = 1000; // Time for buzzer cue 
-unsigned int actiondelay = 2000;
-unsigned int actiondur = 5000;
-unsigned int deliverydur = 5000;
-
-// Flags
-bool pulsing = false;
-bool refresh = true;
+// =================== Display ===================
+/* 1. Time/STOP + Mode
+ * 2. Scheduler off / Preopto / Trial / Postopto
+ * 3. Behavior
+ * 4. RNG
+ */
+char buffer[20];
+byte minute = 12;
+byte second = 5;
 
 void setup() {
+  Wire.begin();        // join i2c bus (address optional for master)
+  
   // put your setup code here, to run once:
   // Oled Initilize
   display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS);
@@ -124,22 +105,43 @@ void setup() {
   strip.begin(); // Initialize pins for output
   strip.setBrightness(30);
   strip.show();  // Turn all LEDs off ASAP
+
+  // Force update
+  refresh = true;
+
+  // Debug
+  m = 0;
+  bitSet(m, 0);
+  bitSet(m, 3);
+  bitSet(m, 4);
+  bitSet(m, 6);
+
+  n = 39;
+  o = 50;
+
+  p = 0;
+  bitSet(p, 0);
+  bitSet(p, 1);
+  bitSet(p, 2);
+  bitSet(p, 3);
+  bitSet(p, 4);
+  bitSet(p, 5);
   
-//  ledswitch();
-  
-  display.clearDisplay();
-  display.setCursor(0, 0);
-  rowprintln("12345678901234567890", 1);
-  rowprintln("12345678901234567890", 2);
-  rowprintln("Same F&S  Fill Line", 1);
-  rowprintln("StrC StrW Clip Color", 1);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   if (refresh){
-    ledswitch();
     refresh = false;
+
+    // LED
+    ledswitch();
+
+    // LCD
+    parsei2c();
+    updatelcd();
+    
+    
   }
 }
 
@@ -178,5 +180,103 @@ void ledswitch(void){
   else{
     strip.setPixelColor(0, 0x800000);
     strip.show();  // Turn all LEDs off ASAP
+  }
+}
+
+void parsei2c(void){
+  // First byte
+  pulsing = bitRead(m, 0);
+  tcpmode = bitRead(m, 1);
+  optophotommode = bitRead(m, 2);
+  samecoloroptomode = bitRead(m, 3);
+  usescheduler = bitRead(m, 4);
+  inpreopto = bitRead(m, 5);
+  inopto = bitRead(m, 6);
+  inpostopto  = bitRead(m, 7);
+
+  // Second byte
+  itrain = n;
+
+  // Third byte
+  ntrain = o;
+
+  // Fourth byte
+  useRNG = bitRead(p, 0);
+  trainpass = bitRead(p, 1);
+  usefoodpulses = bitRead(p, 2);
+  foodttlconditional = bitRead(p, 3);
+  usebuzzcue = bitRead(p, 4);
+  inputttl = bitRead(p, 5);
+
+}
+
+void updatelcd(void){
+  display.clearDisplay();
+  display.setCursor(0, 0);
+
+  /* 1. Time/STOP + Mode
+   * 2. Scheduler off / Preopto / Trial / Postopto
+   * 3. Behavior
+   * 4. RNG
+   */
+  // First row
+  if (pulsing){
+    sprintf(buffer, "%02d:%02d", minute, second);
+    rowprint(buffer, 1);
+  }
+  else{
+    rowprint("[READY]", 1);
+  }
+  if (tcpmode){
+    rowprintln(" TCP", 1);
+  }
+  else if (optophotommode){
+    rowprintln(" OptoPhotom", 1);
+  }
+  else if (samecoloroptomode){
+    rowprintln(" SCoptoPhotom", 1);
+  }
+
+  // Second row
+  if (!usescheduler){
+    rowprintln("No Scheduler", 1);
+  }
+  else if (inpreopto){
+    rowprintln("PRE-Opto", 1);
+  }
+  else if (inpostopto){
+    rowprintln("POST-Opto", 1);
+  }
+  else {
+    sprintf(buffer, "Trial: %03d/%03d", itrain, ntrain);
+    rowprintln(buffer, 1);
+  }
+
+  // Third row
+  if (!usefoodpulses){
+    rowprintln("No Behavior", 1);
+  }
+  else if (!foodttlconditional) {
+    rowprintln("Pavlovian", 1);
+  }
+  else {
+    // Conditional
+    if (usebuzzcue){
+      rowprint("Cued Conditional: ", 1);
+    }
+    else{
+      rowprint("Conditional: ", 1);
+    }
+    sprintf(buffer, "%d", inputttl);
+    rowprintln(buffer, 1);
+  }
+
+  // Fourth row
+  if (!useRNG || !usescheduler){
+    rowprintln("No RNG", 1);
+  }
+  else{
+    sprintf(buffer, "RNG: %d", trainpass);
+    rowprint(buffer, 1);
   }
 }
