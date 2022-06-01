@@ -60,10 +60,11 @@ bool samecoloroptomode = false; // Green + blue (same led for photometry and opt
 bool useencoder = true;
 bool usefoodpulses = false; //
 bool syncaudio = false;
-bool usescheduler = false; // 
+bool usescheduler = false; //
 bool manualscheduleoverride = false; // Only works when using scheduler (keep false if the opto input is left floating)
 bool listenmode = false;
-bool usebuzzcue = false;
+bool usebuzzcue = false; //
+bool foodttlconditional = false; //
 bool useRNG = false; // RNG for opto
 bool randomiti = false; // Randomize ITI
 
@@ -161,7 +162,7 @@ const unsigned long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrel
 bool tristatepinpol = false; // Polarity for the tristatepin (1 = active high, 0 = active low). Default active low.
 
 // TCP (no real opto for behavioral purpose only)
-long tcp_cycle = 30 * 50; // First number is in seconds. How often does the train come on. 
+long tcptrain_cycle = 30 * 50; // First number is in seconds. How often does the train come on.
 
 // ============ Scheduler ============
 unsigned int preoptotime = 120; //in seconds (max is high because unsigned int is 32 bit for teensy)
@@ -221,7 +222,6 @@ bool foodttlon = false;
  *  8. potential delivery stop.
  */
 
-bool foodttlconditional = false; //
 bool foodttlcuewait = false;
 bool foodttlactionwait = false;
 unsigned int buzzdelay = 2000; //
@@ -353,7 +353,8 @@ void loop() {
   camerapulse();
 
   // Food ttl
-  if (usefoodpulses && foodttlarmed){
+  if (usefoodpulses && (foodttlarmed || cueon)){
+    // Enter when needing to finish cueue too
     foodttl();
   }
 
@@ -379,6 +380,7 @@ void loop() {
       // Serial.println(t1); Confirm only once every 20 ms
     }
 
+    // Overflow
     // optophotometry mode or scoptophotometry mode, turn off stim if the stim period is the same as the cycle (finish the previous cycle)
     if (optophotommode && ch2_on){
       digitalWrite(ch2_pin, LOW);
@@ -386,9 +388,7 @@ void loop() {
 
       // Scheduler disable
       if ((itrain >= ntrain) && stimenabled && inopto && schedulerrunning){
-        stimenabled = false;
-        inopto = false;
-        inpostopto = true;
+        schedulerdisable();
       }
     }
     else if (samecoloroptomode && ch1_on && (inopto || !schedulerrunning)){
@@ -406,51 +406,100 @@ void loop() {
 
         // Scheduler disable
         if ((itrain >= ntrain) && stimenabled && inopto && schedulerrunning){
-          stimenabled = false;
-          inopto = false;
-          inpostopto = true;
+          schedulerdisable();
         }
       }
     }
     
-    if (!tcpmode){
-      // Scheduler business here since it's not tcp
-      // Manual stim
-      if (manualscheduleoverride && usescheduler){
-        externalttltrig();
+
+    // Manual stim
+    if (manualscheduleoverride && usescheduler){
+      externalttltrig();
+    }
+
+
+    // Doing the preopto period and the transition to inopto
+    // Enable stim (now also true for tcp)
+    if ((ipreoptopulse >= npreoptopulse) && (!stimenabled) && inpreopto && schedulerrunning){
+      stimenabled = true;
+      inpreopto = false;
+      inopto = true;
+
+      if (debugpins){
+        digitalWrite(preoptopin, LOW);
+        digitalWrite(inoptopin, HIGH);
+        digitalWrite(postoptopin, LOW);
       }
       
-      // Enable stim
-      if ((ipreoptopulse >= npreoptopulse) && (!stimenabled) && inpreopto && schedulerrunning){
-        stimenabled = true;
-        inpreopto = false;
-        inopto = true;
-
-        if (debugpins){
-          digitalWrite(preoptopin, LOW);
-          digitalWrite(inoptopin, HIGH);
-          digitalWrite(postoptopin, LOW);
-        }
-        
-        if (debugmode && showscheduler){
-          Serial.println("Stim is enabled. Entering opto phase.");
+      if (debugmode && showscheduler){
+        Serial.println("Stim is enabled. Entering opto phase.");
+      }
+    }
+    // Just advance
+    else if (schedulerrunning && inpreopto && (!stimenabled) && (!listenmode)){
+      ipreoptopulse++;
+      if (debugmode && showscheduler){
+        if ((ipreoptopulse % 50) == 0){
+            Serial.print("Preopto pulse #");
+            Serial.print(ipreoptopulse);
+            Serial.print("/");
+            Serial.println(npreoptopulse);
         }
       }
-      // Just advance
-      else if (schedulerrunning && inpreopto && (!stimenabled) && (!listenmode)){
-        ipreoptopulse++;
-        if (debugmode && showscheduler){
-          if ((ipreoptopulse % 50) == 0){
-              Serial.print("Preopto pulse #");
-              Serial.print(ipreoptopulse);
-              Serial.print("/");
-              Serial.println(npreoptopulse);
+    }
+
+    // tcp mode behavioral task
+    if (tcpmode){
+      // Advance counters
+      // Scheduler allows train and opto counters to advance
+      if (stimenabled){
+        counter_for_train++; // Counting 1-1500, on 1 food task is on
+      }
+      
+      if (debugmode && showpulses){
+        Serial.print("Photometry ");
+        Serial.println(counter_for_train);
+      }
+
+      if ((counter_for_train == 1) && stimenabled){
+        // Once per train
+        if (usefoodpulses){
+          armfoodttl(); // Arm food ttl
+        }
+
+        if (schedulerrunning){
+          if (randomiti){
+            // Get randomized ITI. This affects scopto.
+            tcptrain_cycle = rngvec_ITI[itrain] * 50;
+          }
+          
+          itrain++; // Advance train count
+  
+          if (debugmode && showscheduler){
+            Serial.print("Scheduler train #");
+            Serial.print(itrain);
+            Serial.print("/");
+            Serial.println(ntrain);
+  
+            if (randomiti){
+              Serial.print("RNG says next cycle is (s): ");
+              Serial.println(tcptrain_cycle / 50);
+            }
           }
         }
       }
+
+      if (counter_for_train >= tcptrain_cycle){
+        counter_for_train= 0;
+      }
+
+      // Scheduler disable
+      if ((itrain >= ntrain) && stimenabled && inopto && schedulerrunning){
+        schedulerdisable();
+      }
     }
     
-
+    
     // scopto mode
     if (samecoloroptomode){
       // Advance counters
@@ -522,26 +571,7 @@ void loop() {
         }
         
         if (usefoodpulses){
-          // Food ttl
-          foodttlarmed = true;
-          foodttlwait = true;
-          inputttl = !foodttlconditional;
-          tfood0 = tnowmillis;
-
-          if (usebuzzcue){
-            foodttlcuewait = true;
-            cueon = false;
-          }
-          
-          if (foodttlconditional){
-            foodttlactionwait = true;
-            actionperiodon = false;
-          }
-          
-          if (debugmode && showfoodttl){
-            Serial.print("Food TTL armed at (ms): ");
-            Serial.println(tfood0);
-          }
+          armfoodttl(); // Arm food ttl
         }
         
         if (debugmode && showopto){
@@ -661,26 +691,7 @@ void loop() {
         }
 
         if (usefoodpulses){
-          // Food ttl
-          foodttlarmed = true;
-          foodttlwait = true;
-          inputttl = !foodttlconditional;
-          tfood0 = tnowmillis;
-
-          if (usebuzzcue){
-            foodttlcuewait = true;
-            cueon = false;
-          }
-          
-          if (foodttlconditional){
-            foodttlactionwait = true;
-            actionperiodon = false;
-          }
-          
-          if (debugmode && showfoodttl){
-            Serial.print("Food TTL armed at (ms): ");
-            Serial.println(tfood0);
-          }
+          armfoodttl(); // Arm food ttl
         }
         
         if (debugmode && showopto){
@@ -756,19 +767,7 @@ void loop() {
         
         // Scheduler disable
         if ((itrain >= ntrain) && stimenabled && inopto && schedulerrunning){
-          stimenabled = false;
-          inopto = false;
-          inpostopto = true;
-
-          if (debugpins){
-            digitalWrite(preoptopin, LOW);
-            digitalWrite(inoptopin, LOW);
-            digitalWrite(postoptopin, HIGH);
-          }
-          
-          if (debugmode && showscheduler){
-            Serial.println("Stim is disabled. Entering post-opto phase.");
-          }
+          schedulerdisable();
         }   
       }
     }
@@ -843,19 +842,7 @@ void loop() {
 
         // Scheduler disable
         if ((itrain >= ntrain) && stimenabled && inopto && schedulerrunning){
-          stimenabled = false;
-          inopto = false;
-          inpostopto = true;
-
-          if (debugpins){
-            digitalWrite(preoptopin, LOW);
-            digitalWrite(inoptopin, LOW);
-            digitalWrite(postoptopin, HIGH);
-          }
-          
-          if (debugmode && showscheduler){
-            Serial.println("Stim is disabled. Entering post-opto phase.");
-          }
+          schedulerdisable();
         }   
       }
     }
@@ -895,15 +882,17 @@ void parseserial(){
   // 29: Tristate pin polarity (1 = active high, 0 = active low);
   // 36: Cycle 1 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 100 us)
   // 37: Cycle 2 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 100 us)
-
+  // 47: Change tcp behavioral train cycle (train_cycle = n * 50)
+  
   // ============ Scheduler ============
   // 15: Use scheduler (n = 1 yes, 0 no) 
   // 4: Set delay (delay_cycle = n * 10 * 50, n = 1 means 10 seconds). Only relevant when scheduler is on
-  // 16: Number of trains (n * 10 of trains)
+  // 16: Number of trains (n trains)
+  // 46: Adding trains (trains = trains + n * 256)
   // 17: Enable manual scheduler override
   // 27: Listening mode on or off (n = 1 yes, 0 no). Will turn on manual override.
   // 28: Listen mode polarity (1 = active high, 0 = active low)
-
+  
   // ============ Hardware RNG ============
   // 38: use RNG or not (n = 1 yes, 0 no)
   // 39: Pass chance in percent (30 = 30% pass chance)
@@ -959,7 +948,7 @@ void parseserial(){
         if (!usescheduler){
           echo[2] = 1; // Echo back [0 0 1 1] as no scheduler
         }
-        if (inpreopto){
+        else if (inpreopto){
           echo[2] = 2; // Echo back [0 0 2 1] as preopto
         }
         else if (inpostopto){
@@ -1047,11 +1036,6 @@ void parseserial(){
         pcount = 0;  
       }
 
-      if (tcpmode){
-        usescheduler = false;
-        schedulerrunning = false;
-      }
-      
       // Scheduler reset
       if (usescheduler){
         ipreoptopulse = 0;
@@ -1098,6 +1082,7 @@ void parseserial(){
       }
       else{
         stimenabled = true;
+        inpreopto = false;
         if (debugpins){
           digitalWrite(schedulerpin, LOW);
           digitalWrite(preoptopin, LOW);
@@ -1278,7 +1263,7 @@ void parseserial(){
 
     case 16:
       // 16: Number of trains (n * 10 of trains)
-      ntrain = n * 10;
+      ntrain = n;
       itrain = 0;
       if (debugmode){
         Serial.print("Number of trains: ");
@@ -1592,6 +1577,25 @@ void parseserial(){
         Serial.println(echotime_slow);
       }
       break;
+
+    case 46:
+      // 46: Adding trains (trains = trains + n * 256)
+      ntrain = ntrain + n * 256;
+      itrain = 0;
+      if (debugmode){
+        Serial.print("Number of trains: ");
+        Serial.println(ntrain);
+      }
+      break;
+
+    case 47:
+      // 47: Change tcp behavioral train cycle (train_cycle = n * 50)
+      tcptrain_cycle = n * 50;
+      if (debugmode){
+        Serial.print("New tcp train cycle (s): ");
+        Serial.println(tcptrain_cycle / 50);
+      }
+      break;
   }
 
   if (debugpins){
@@ -1628,17 +1632,6 @@ void modeswitch(void){
     cycletime_photom_2 = cycletime_photom_2_tcp; // in micro secs (Ch2)
     digitalWrite(tristatepin, tristatepinpol); // Let ch2 go through; Write false if active low (false)
     
-    // Disbale scheduler
-    stimenabled = false;
-    usescheduler = false;
-    schedulerrunning = false;
-    if (debugpins){
-      digitalWrite(schedulerpin, LOW);
-      digitalWrite(preoptopin, LOW);
-      digitalWrite(inoptopin, LOW);
-      digitalWrite(postoptopin, LOW);
-    }
-    
     if (debugmode){
       Serial.println("Two-color photometry mode.");
       Serial.println("Scheduler is disabled");
@@ -1650,6 +1643,7 @@ void modeswitch(void){
     pulsewidth_2 = pulsewidth_2_tcp; // Switch out the parameters
     cycletime_photom_1 = cycletime_photom_1_scopto; // in micro secs (Ch1)
     cycletime_photom_2 = cycletime_photom_2_scopto; // in micro secs (Ch2)
+    digitalWrite(AOpin, LOW);
     digitalWrite(tristatepin, !tristatepinpol); // DC Ch2. Write true if active low (false)
     
     if (debugmode){
@@ -1697,6 +1691,10 @@ void showpara(void){
     Serial.println(sctrain_length / (50/scopto_per));
     Serial.print("Polarity for tristate enable (1 = active high, 0 = active low): ");
     Serial.println(tristatepinpol); // Polarity for the tristatepin (1 = active high, 0 = active low). Default active low.)
+    Serial.print("Same-color opto train cycle (s): ");
+    Serial.println(sctrain_cycle / 50);
+    Serial.print("TCP behavior train cycle (s): ");
+    Serial.println(tcptrain_cycle / 50);
 
     // Scheduler
     Serial.println("============== Scheduler ==============");
@@ -1809,9 +1807,13 @@ void slowserialecho(void){
         echo[2] = 1; // Echo back [0 0 1 1] as no scheduler
       }
       if (inpreopto){
+        echo[0] = itrain;
+        echo[1] = ntrain; // first byte shows n train, second byte shows itrain
         echo[2] = 2; // Echo back [0 0 2 1] as preopto
       }
       else if (inpostopto){
+        echo[0] = itrain;
+        echo[1] = ntrain; // first byte shows n train, second byte shows itrain
         echo[2] = 3;; // Echo back [0 0 3 1] as postopto
       }
       else {
@@ -1882,6 +1884,30 @@ void camerapulse(void){
   }
 }
 
+// Arm foodttl
+void armfoodttl(void){
+  // Food ttl
+  foodttlarmed = true;
+  foodttlwait = true;
+  inputttl = !foodttlconditional;
+  tfood0 = tnowmillis;
+
+  if (usebuzzcue){
+    foodttlcuewait = true;
+    cueon = false;
+  }
+  
+  if (foodttlconditional){
+    foodttlactionwait = true;
+    actionperiodon = false;
+  }
+  
+  if (debugmode && showfoodttl){
+    Serial.print("Food TTL armed at (ms): ");
+    Serial.println(tfood0);
+  }
+}
+
 // Food TTL
 void foodttl(void){
 //  unsigned int tfooddelta = (tnowmillis - tfood0);
@@ -1898,7 +1924,7 @@ void foodttl(void){
         foodttlcuewait = false;
         tone(audiopin, audiofreq);
         cueon = true;
-
+        
         if (debugmode && showfoodttl){
           Serial.print("Cue on at (ms): ");
           Serial.println(tnowmillis);
@@ -2036,10 +2062,11 @@ void foodttl(void){
         }
       }
     }
-    else{
+    else if (foodttlon){
       // No pulses left
       foodttlarmed = false;
       foodttlon = false;
+
       if (debugmode && showfoodttl){
         Serial.print("Food delivery done at (ms): ");
         Serial.println(tnowmillis);
@@ -2091,6 +2118,23 @@ void externalttltrig(void){
         Serial.println("External pulse detected ended.");
       }
     }
+  }
+}
+
+// Scheduler disable
+void schedulerdisable(void){
+  stimenabled = false;
+  inopto = false;
+  inpostopto = true;
+
+  if (debugpins){
+    digitalWrite(preoptopin, LOW);
+    digitalWrite(inoptopin, LOW);
+    digitalWrite(postoptopin, HIGH);
+  }
+  
+  if (debugmode && showscheduler){
+    Serial.println("Stim is disabled. Entering post-opto phase.");
   }
 }
 

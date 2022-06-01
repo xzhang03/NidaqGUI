@@ -24,6 +24,9 @@ if nicfg.tcp.enable
     % TCP
     fwrite(nicfg.arduino_serial, uint8([3 0]));
     
+    % TCP behavioral cycle
+    fwrite(nicfg.arduino_serial, uint8([47 nicfg.tcp.behaviorcycle]));
+    
     % Disp
     disp('Mode -> TCP');
 end
@@ -94,15 +97,14 @@ if nicfg.scheduler.enable
     fwrite(nicfg.arduino_serial, uint8([4 nicfg.scheduler.delay / 10]));
     if ceil(nicfg.scheduler.delay / 10) ~= (nicfg.scheduler.delay / 10)
         % Delay is updated
-        fprintf('Delay is updated to %i instead.\n', ceil(nicfg.scheduler.delay/10)*10)
+        fprintf('Delay is updated to %i instead.\n', floor(nicfg.scheduler.delay/10)*10)
     end
     
     % Number of trains (increments of 10)
-    fwrite(nicfg.arduino_serial, uint8([16 nicfg.scheduler.ntrains / 10]));
-    if ceil(nicfg.scheduler.ntrains / 10) ~= (nicfg.scheduler.ntrains / 10)
-        % Delay is updated
-        fprintf('The number of trains is updated to %i instead.\n', ceil(nicfg.scheduler.ntrains/10)*10)
-    end
+    b = floor(nicfg.scheduler.ntrains / 256);
+    a = nicfg.scheduler.ntrains - b * 256;
+    fwrite(nicfg.arduino_serial, uint8([16 a]));
+    fwrite(nicfg.arduino_serial, uint8([46 b]));
     
     % Manual override
     fwrite(nicfg.arduino_serial, uint8([17 nicfg.scheduler.manualoverride]));
@@ -143,6 +145,7 @@ if nicfg.scheduler.enable
 else
     % No Scheduler
     fwrite(nicfg.arduino_serial, uint8([15 0]));
+    disp('Scheduler -> Off');
 end
 
 %% Opto locked TTL

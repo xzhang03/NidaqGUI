@@ -259,7 +259,7 @@ if nicfg.active
             [nicfg.arduino_data, pind, schedulerinfo, rnginfo, updateui] = ...
                 omniserialparse(d, nicfg.arduino_data, pind, schedulerinfo, rnginfo);
             
-            % Live update (once every second)
+            % Live update (once every second, hardware timed)
             if updateui
                 % Update omnibox info
                 str = omniliveupdate(schedulerinfo, rnginfo);
