@@ -37,9 +37,9 @@ PCB for IR encoder: [EasyEDA](https://github.com/xzhang03/NidaqGUI/blob/master/P
 
 PCB for buzzer: [EasyEDA](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/EasyEDA_PCB_Buzzer_2022-04-13.json), [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Schematic_Buzzer_2022-04-13.png), and [Gerber files](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/Gerber_PCB_Buzzer_2022-04-13.zip).
 
-Containment for PCB box: [Github](https://github.com/xzhang03/Half_breadboard_box/blob/main/half%20breadboard%20box%20PCB.ai);
+Containment for PCB box: [Github](https://github.com/xzhang03/Half_breadboard_box/blob/main/half%20breadboard%20box%20PCB.ai).
 
-Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/omnibox_half_breadboard.png)
+Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/omnibox_half_breadboard.png).
     
 ## Hardware
 
