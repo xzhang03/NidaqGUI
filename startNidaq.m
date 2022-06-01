@@ -1,10 +1,14 @@
-function open_daq = startNidaq(path, frequency, nchannels, digitalchannelstr, ndigital, daqname)
+function open_daq = startNidaq(path, frequency, nchannels, digitalchannelstr, ndigital, daqname, RecordingMode)
 %UNTITLED11 Summary of this function goes here
 %   Detailed explanation goes here
-
+    
+    modes = {'Differential', 'SingleEnded', 'SingleEndedNonReferenced'};
+    
     if nargin < 2, frequency = 2000; end
     if nargin < 3, nchannels = 6; end
     if nargin < 6, daqname = 'Dev1'; end
+    if nargin < 7, RecordingMode = modes{2}; end
+    
         
     [basepath, file, ~] = fileparts(path);
     logpath = fullfile(basepath, [file '-log.bin']);
@@ -17,7 +21,7 @@ function open_daq = startNidaq(path, frequency, nchannels, digitalchannelstr, nd
     ai = daq_connection.addAnalogInputChannel(daqname, 0:(nchannels-1) , 'Voltage'); 
     for i = 1:nchannels
         ai(i).Range = [-10 10];
-        ai(i).TerminalConfig = 'SingleEnded';
+        ai(i).TerminalConfig = RecordingMode;
     end
     
     if ndigital > 0
