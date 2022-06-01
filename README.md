@@ -78,7 +78,7 @@ The same digital output controls the timing of both photometry and opto (same co
 Parameters in mMtlab and serial communicated to microcontrollers. Pulsing starts when user clicks START on the GUI and stops when user clicks STOP.
 
 ## Rotary encoder
-Microcontroller sends encoder position on demand as requested by Matlab.
+Microcontroller sends encoder position periodically to Matlab. Total numbers of positions sent and received are both saved.
 
 ## Scheduler
 It's a automated mode to schedule optogenetic stimulation. The general structure is:
@@ -89,11 +89,11 @@ It's a automated mode to schedule optogenetic stimulation. The general structure
  4. **Post-optogenetic period**.
 
 ## Manually triggered scheduler (Listenmode; Scheduler mode required)
-In this mode, the pre-stim. period is infinitely long until the external trigger is fed in. One trigger pulse gives one train.
+In this mode, the pre-stim. period is infinitely long until the external trigger is fed in. One trigger pulse gives one train, and the number of triggers can be as many as needed.
 
 ## Stim.-delayed TTL output (Unconditional behavioral reward)
-A different train is generated after the offset of an opto. Train delay, pulse width, pulse cycle, and train lengths are specified in Matlab. This can be used to e.g., unconditionally deliver reward after an optogenetic stimulation train.
+A different train is generated after the offset of an opto. Train delay, pulse width, pulse cycle, and train lengths are specified in Matlab with reference to opto starts of each trial. This can be used to e.g., unconditionally deliver reward after an optogenetic stimulation train.
 
 ## Conditional stim.-delayed TTL output (Conditional behavioral task)
-The generation of stimulation-delayed train is condition to a TTL input (e.g., licking) during the response period. An audio cue may be used to signal the onset of the response period.
+The generation of stimulation-delayed train is condition to a TTL input (e.g., licking) during the response period. An audio cue or an LED cue may be used to signal the onset of the response period.
 
