@@ -85,7 +85,7 @@ nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 m
 nicfg.scheduler.enable = true; % Default false
 nicfg.scheduler.delay = 10; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 2550s.
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
-nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
+nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default false (don't leave floating if true).
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
 
 % Hardware Opto RNG (determines a train goes through or not)

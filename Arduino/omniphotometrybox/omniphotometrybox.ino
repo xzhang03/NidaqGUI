@@ -26,7 +26,7 @@
 #define showopto true
 #define showscheduler true
 #define showfoodttl true
-#define debugpins true
+#define debugpins false
 unsigned long ttest1 = 0;
 bool ftest1 = false;
 
