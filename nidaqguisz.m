@@ -294,8 +294,8 @@ if nicfg.active
                 omniserialparse(d, nicfg.arduino_data, pind, schedulerinfo, rnginfo);
         end
         
-        pcount = nicfg.arduino_data(pind);
-        pind = pind - 1;
+        pcount = nicfg.arduino_data(pind); % Number of encoder pulses sent by teensy
+        pind = pind - 1; % Number of encoder pulses picked up by MATLAB
         nicfg.arduino_data = nicfg.arduino_data(1:pind);
         
     end
