@@ -19,6 +19,7 @@
 
 // ================ PCB ================
 #define PCB true
+#define TeensyTester false
  
 // =============== Debug ===============
 #define debugmode false // Master switch for all serial debugging
@@ -74,22 +75,31 @@ const byte ch1_pin = 2; // try to leave 0 1 open.
 const byte ch2_pin = 3; // 405 nm or red opto
 const byte AOpin = 3; // Use same pin as ch2 until true analog outputs are used in the future
 const byte tristatepin = 4; // Use to control tristate transceivers (AO (used as digital here), 0, or disconnected). Default active low
-const byte cam_pin = 21; // Cam pulses
-#if PCB
+#if TeensyTester
+  const byte cam_pin = 5; // Cam pulses
+#else
+  const byte cam_pin = 21; // Cam pulses
+#endif
+
+#if TeensyTester
+  const byte switchpin = 20; // Use if not in PCB mode
+  const byte foodTTLpin = 7; // output TTL to trigger food etc
+#elif PCB
   const byte switchpin = 10; // External toggle to start a train (default active high). Usually used in listenmode
   const byte foodTTLpin = 15; // output TTL to trigger food etc
 #else
-  const byte switchpin = 17; // Use if in PCB mode
+  const byte switchpin = 17; // Use if not in PCB mode
   const byte foodTTLpin = 9; // output TTL to trigger food etc
 #endif
 const byte foodTTLinput = 22; // input TTL for conditional food pulses (active high, 3.3 V only!!)
 const byte led_pin = 13; // onboard led
 const byte audiopin = 6; // Pin for audio signal
+
 const byte i2csda = 18; // Reserve for future i2c
 const byte i2cscl = 19; // Reserve for future i2c
 
 // ============= debugpins =============
-const byte serialpin = 7; // Parity signal for serial pin
+const byte serialpin = 24; // Parity signal for serial pin
 const byte schedulerpin = 8; // On when scheduler is used
 const byte preoptopin = 9; // preopto
 const byte inoptopin = 11; // preopto
