@@ -18,7 +18,7 @@
  */
 
 // ================ PCB ================
-#define PCB true
+#define PCB false
 #define TeensyTester false
  
 // =============== Debug ===============
