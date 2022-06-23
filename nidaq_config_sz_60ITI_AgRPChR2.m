@@ -50,12 +50,12 @@ nicfg.omnibox.enable = true;
 nicfg.tcp.enable = false; % Default true.
 
 % Optophotometry (two colors)
-% Variable pulse width. Variable pulse cycle (only use for pure optomode)
+% Pulse width is fixed at 10 ms
 nicfg.optophotometry.enable = false; % Default false
 nicfg.optophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
 nicfg.optophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.optophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
-nicfg.optophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
+nicfg.optophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10.
 
 % Change pulse cycles (CAUTION)
 % Generally only change these values for pure optomode
@@ -72,23 +72,23 @@ nicfg.optophotometry.pulsecycle2 = 135; % Pulse cycle 1 in X * 100 us. E.g., 135
 % Same-color optophotometry
 % Variable pulse width. 20 ms means always on
 nicfg.scoptophotometry.enable = true; % Default false
-nicfg.scoptophotometry.freqmod = 1; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
-nicfg.scoptophotometry.trainlength = 50; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
+nicfg.scoptophotometry.freqmod = 2; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
+nicfg.scoptophotometry.trainlength = 200; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.scoptophotometry.cycle = 60; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
-nicfg.scoptophotometry.pulsewidth = 20; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
+nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10.
 
 % Scheduler
 nicfg.scheduler.enable = true; % Default false
-nicfg.scheduler.delay = 3; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 2550s.
-nicfg.scheduler.ntrains = 20; % Number of trains. Default 10.
+nicfg.scheduler.delay = 300; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
+nicfg.scheduler.ntrains = 50; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
 
 % Hardware Opto RNG (determines a train goes through or not)
 % (Scheduler only and does not apply to the listening mode)
 % May implement RNG values imported from Matlab in the future
-nicfg.scheduler.useRNG = false; % Default false
-nicfg.scheduler.passchance = 30; % Pass chance in percentage (30 = 30% pass)
+nicfg.scheduler.useRNG = true; % Default false
+nicfg.scheduler.passchance = 50; % Pass chance in percentage (30 = 30% pass)
 
 % Control experiments (no stim)
 % Basically sets RNG mode and pass chance = 0
@@ -98,15 +98,15 @@ nicfg.scheduler.control = false;
 % (Scheduler only and does not apply to the listening mode)
 % May implement RNG values imported from Matlab in the future
 nicfg.scheduler.randomITI = false; % Default false
-nicfg.scheduler.randomITI_min = 30; % Lowest value of ITI (inclusive, in seconds). Applies to both optophotometry and scoptophotometry
+nicfg.scheduler.randomITI_min = 20; % Lowest value of ITI (inclusive, in seconds). Applies to both optophotometry and scoptophotometry
 nicfg.scheduler.randomITI_max = 40; % Highest value of ITI (exclusive, in seconds). Applies to both optophotometry and scoptophotometry
 
 % Opto-delayed TTL
 % TTL pulses that happen X seconds after each opto train onset (for food
 % delivery or synchronizing).
 % Delivery (unconditional): Opto start => delivery delay => delivery
-nicfg.optodelayTTL.enable = false; % Default false
-nicfg.optodelayTTL.delay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
+nicfg.optodelayTTL.enable = true; % Default false
+nicfg.optodelayTTL.delay = 0; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.pulsewidth = 15; % Pulsewidth in X * 10 ms. E.g., 15 means 150 ms pulses. Default is 15 (150 ms).
 nicfg.optodelayTTL.cycle = 30; % Pulse cycle in X * 10 ms. E.g., 30 means 300 ms pulses. Default is 30 (300 ms).
 nicfg.optodelayTTL.trainlength = 5; % Pulse train length. E.g., 5 means 5 pulses. Default is 5.
@@ -114,15 +114,15 @@ nicfg.optodelayTTL.trainlength = 5; % Pulse train length. E.g., 5 means 5 pulses
 % Opto-delayed TTL buzzer
 % Cue: Opto start => buzzer delay => buzzer duration
 nicfg.optodelayTTL.buzzerenable = false; % Buzzer or not (default false)
-nicfg.optodelayTTL.buzzerdelay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
+nicfg.optodelayTTL.buzzerdelay = 50; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.buzzerdur = 10; % Delay in 100 ms. E.g., 10 means 1 seconds. Default 10 (1s)
 
 % Action: Opto start => action delay => action window
 % Delivery (conditional): Opto start => delivery delay => delivery window start => delivery (if action) => timeout (if no delivery)
 % If action and devliveries have the same delay, that means food devlivery happens as soon as a lick
-nicfg.optodelayTTL.conditional = false; % TTL delivery is conditional or not. If so, pin 10 must be hooked up with an active-high input. Input comes during the delay window will allow for subsequent pulse output.
-nicfg.optodelayTTL.actiondelay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
-nicfg.optodelayTTL.actiondur = 50; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
+nicfg.optodelayTTL.conditional = false; %true TTL delivery is conditional or not. If so, pin 10 must be hooked up with an active-high input. Input comes during the delay window will allow for subsequent pulse output.
+nicfg.optodelayTTL.actiondelay = 50; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
+nicfg.optodelayTTL.actiondur = 20; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 nicfg.optodelayTTL.deliverydur = 50; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 
 % Encoder

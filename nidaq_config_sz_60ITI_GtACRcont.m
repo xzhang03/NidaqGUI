@@ -27,6 +27,7 @@ nicfg.DigitalChannelNames = { ...
                          };
 nicfg.serveradd = {...
     'SZ', '\\anastasia\data\photometry';...
+    'PZ', '\\anastasia\data\photometry';...
     'AL', '\\sweetness\Fiber Photometry';...
     'KF', '\\sweetness\Fiber Photometry';...
     'JR', '\\atlas\NIDAQ_run_LFP_etc\Ephys_Data';...
@@ -79,7 +80,7 @@ nicfg.scoptophotometry.pulsewidth = 20; % Pulth width in ms. E.g., 10 means 10 m
 
 % Scheduler
 nicfg.scheduler.enable = true; % Default false
-nicfg.scheduler.delay = 3; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 2550s.
+nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 2550s.
 nicfg.scheduler.ntrains = 20; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
@@ -92,7 +93,7 @@ nicfg.scheduler.passchance = 30; % Pass chance in percentage (30 = 30% pass)
 
 % Control experiments (no stim)
 % Basically sets RNG mode and pass chance = 0
-nicfg.scheduler.control = false;
+nicfg.scheduler.control = true;
 
 % Randomized ITI
 % (Scheduler only and does not apply to the listening mode)

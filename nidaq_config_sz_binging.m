@@ -1,34 +1,30 @@
 global nicfg
 
 % Set the up the nidaq recording
-nicfg.BasePath         = 'C:\Users\andermannlab\Documents\MATLAB\temp\';       % Set the path in which data will be saved
-% nicfg.BasePath         = 'C:\Users\steph\OneDrive\Documents\MATLAB\temp';       % Set the path in which data will be saved
-nicfg.ArduinoCOM       = 21;%5;             % Set the COM port for the Arduino, < 0 means off
+nicfg.BasePath         = 'C:\Users\andermannlab\Documents\MATLAB\Photometry_data';       % Set the path in which data will be saved
+nicfg.ArduinoCOM       = 12;             % Set the COM port for the Arduino, < 0 means off
 nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
-nicfg.NidaqDevice      = 'Dev1';        % Device name
+nicfg.NidaqDevice      = 'Dev2';        % Device name
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
-nicfg.NidaqChannels    = 0;%4;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
-nicfg.NidaqDigitalChannels = 1;         % Set the number of digital channels on Port0 to record, starting at Line0
+nicfg.NidaqChannels    = 8;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
+nicfg.NidaqDigitalChannels = 0;         % Set the number of digital channels on Port0 to record, starting at Line0
 nicfg.NidaqFrequency   = 2500;          % Set the recording frequency for the nidaq
 nicfg.RunningFrequency = 30;         % Set the frequency at which running is recorded
 nicfg.DigitalString    = 'Port0/Line'; % Set a digital channel to be recorded, blank means no digital channels
-nicfg.AImode           = 'SingleEnded'; % 'Differential', 'SingleEnded', 'SingleEndedNonReferenced'
 nicfg.ChannelNames     = { ...
                             'PD1', 1, ...
                             'Ch1in', 2, ...
                             'camera', 3, ...
                             'ensure', 4, ...
-                            'PD2Reserve', 5, ...
-                            'lick', 6,...
-                            'Ch2in', 7,...
-                            'Buzz', 8
-                         };              % Set the names of each channel to be saved
+                            'PD2', 5, ...
+                            'lick', 6 ...
+                            'Ch2in', 7 ...
+                            'Buzz', 8 ...
+                         };             % Set the names of each channel to be saved
                                         % Incremented by 1 relative to Nidaq board because Nidaq is 0-indexed
 nicfg.DigitalChannelNames = { ...
                          };
-
-nicfg.serverupload = true;
 nicfg.serveradd = {...
     'SZ', '\\anastasia\data\photometry';...
     'AL', '\\sweetness\Fiber Photometry';...
@@ -52,7 +48,6 @@ nicfg.omnibox.enable = true;
 % Modes
 % Two-color photometry
 nicfg.tcp.enable = false; % Default true.
-nicfg.tcp.behaviorcycle = 5; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 
 % Optophotometry (two colors)
 % Variable pulse width. Variable pulse cycle (only use for pure optomode)
@@ -83,11 +78,10 @@ nicfg.scoptophotometry.cycle = 2; % Train cycle in seconds. E.g., 30 means 30 se
 nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
 
 % Scheduler
-nicfg.scheduler.enable = true; % Default false
-nicfg.scheduler.delay = 10; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 2550s.
-nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
-nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default false (don't leave floating if true).
-nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
+nicfg.scheduler.enable = false; % Default false
+nicfg.scheduler.delay = 10; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
+nicfg.scheduler.ntrains = 250; % Number of trains. Default 10.
+nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 
 % Hardware Opto RNG (determines a train goes through or not)
 % (Scheduler only and does not apply to the listening mode)
