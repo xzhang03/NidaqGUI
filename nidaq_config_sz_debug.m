@@ -50,7 +50,7 @@ nicfg.omnibox.enable = true;
 % Modes
 % Two-color photometry
 nicfg.tcp.enable = false; % Default true.
-nicfg.tcp.behaviorcycle = 5; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
+nicfg.tcp.behaviorcycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 
 % Optophotometry (two colors)
 % Pulse width is fixed at 10 ms
