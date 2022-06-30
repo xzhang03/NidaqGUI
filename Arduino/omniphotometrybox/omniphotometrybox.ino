@@ -18,8 +18,8 @@
  */
 
 // ================ PCB ================
-#define PCB false
-#define TeensyTester false
+#define PCB true
+#define TeensyTester false //
  
 // =============== Debug ===============
 #define debugmode false // Master switch for all serial debugging
@@ -27,7 +27,7 @@
 #define showopto true
 #define showscheduler true
 #define showfoodttl true
-#define debugpins false
+#define debugpins false //
 unsigned long ttest1 = 0;
 bool ftest1 = false;
 
@@ -61,7 +61,7 @@ bool samecoloroptomode = false; // Green + blue (same led for photometry and opt
 bool useencoder = true;
 bool usefoodpulses = false; //
 bool syncaudio = false;
-bool usescheduler = false; //
+bool usescheduler = false; //false
 bool manualscheduleoverride = false; // Only works when using scheduler (keep false if the opto input is left floating)
 bool listenmode = false;
 bool usebuzzcue = false; //
@@ -76,34 +76,44 @@ const byte ch2_pin = 3; // 405 nm or red opto
 const byte AOpin = 3; // Use same pin as ch2 until true analog outputs are used in the future
 const byte tristatepin = 4; // Use to control tristate transceivers (AO (used as digital here), 0, or disconnected). Default active low
 #if TeensyTester
-  const byte cam_pin = 5; // Cam pulses
+  const byte cam_pin = 25; // Cam pulses
 #else
   const byte cam_pin = 21; // Cam pulses
 #endif
 
 #if TeensyTester
   const byte switchpin = 20; // Use if not in PCB mode
-  const byte foodTTLpin = 7; // output TTL to trigger food etc
+  const byte foodTTLpin = 6; // output TTL to trigger food etc
+  const byte audiopin = 5; // Pin for audio signal
 #elif PCB
   const byte switchpin = 10; // External toggle to start a train (default active high). Usually used in listenmode
   const byte foodTTLpin = 15; // output TTL to trigger food etc
+  const byte audiopin = 6; // Pin for audio signal
 #else
   const byte switchpin = 17; // Use if not in PCB mode
   const byte foodTTLpin = 9; // output TTL to trigger food etc
+  const byte audiopin = 6; // Pin for audio signal
 #endif
 const byte foodTTLinput = 22; // input TTL for conditional food pulses (active high, 3.3 V only!!)
 const byte led_pin = 13; // onboard led
-const byte audiopin = 6; // Pin for audio signal
+
 
 const byte i2csda = 18; // Reserve for future i2c
 const byte i2cscl = 19; // Reserve for future i2c
 
 // ============= debugpins =============
 const byte serialpin = 24; // Parity signal for serial pin
-const byte schedulerpin = 8; // On when scheduler is used
-const byte preoptopin = 9; // preopto
-const byte inoptopin = 11; // preopto
-const byte postoptopin = 12; // preopto
+#if TeensyTester
+  const byte schedulerpin = 26; // On when scheduler is used
+  const byte preoptopin = 7; // preopto
+  const byte inoptopin = 8; // preopto
+  const byte postoptopin = 9; // preopto
+#else
+  const byte schedulerpin = 7; // On when scheduler is used
+  const byte preoptopin = 8; // preopto
+  const byte inoptopin = 11; // preopto
+  const byte postoptopin = 12; // preopto
+#endif
 bool serialpinon = false;
 
 // =============== Time ===============
@@ -142,8 +152,8 @@ unsigned long int echotime_slow;
 // photometry time variables
 unsigned long int t0; // When each cycle begins
 unsigned long int t1; // Time in each cycle
-int pulsewidth_1 = 6000; // in micro secs (ch1)
-int pulsewidth_2 = 6000; // in micro secs (ch2)
+unsigned int pulsewidth_1 = 6000; // in micro secs (ch1)
+unsigned int pulsewidth_2 = 6000; // in micro secs (ch2)
 unsigned long cycletime_photom_1; // in micro secs (Ch1)
 unsigned long cycletime_photom_2; // in micro secs (Ch2)
 
@@ -157,7 +167,7 @@ const unsigned long cycletime_photom_2_tcp = 10000; // in micro secs (Ch2)
 // Opto varaibles
 byte opto_per = 5; // Number of photometry pulses per opto pulse (A). Can be: 1, 2, 5, 10, 25, 50. Pulse freq is 50 / A
 byte train_length = 10; // Number of opto pulses per train (B). Duration is  B / (50 / A).
-long train_cycle = 30 * 50; // First number is in seconds. How often does the train come on.
+unsigned long train_cycle = 30 * 50; // First number is in seconds. How often does the train come on.
 int pulsewidth_2_opto = 10000; // in micro secs (ch2)
 unsigned long cycletime_photom_1_opto = 6500; // in micro secs (Ch1)
 unsigned long cycletime_photom_2_opto = 13500; // in micro secs (Ch2)
@@ -165,14 +175,14 @@ unsigned long cycletime_photom_2_opto = 13500; // in micro secs (Ch2)
 // Same color opto variables
 byte scopto_per = 5; // Number of photometry pulses per opto pulse (AO). Can be: 1, 2, 5, 10, 25, 50. Pulse freq is 50 / AO
 byte sctrain_length = 10; // Number of photometry pulses per stim period (BO). Duration is  BO / (50 / AO).
-long sctrain_cycle = 30 * 50; // First number is in seconds. How often does the train come on. 
+unsigned long sctrain_cycle = 30 * 50; // First number is in seconds. How often does the train come on. 
 unsigned int pulsewidth_1_scopto = 10000; // in micro secs (ch1)
 const unsigned long cycletime_photom_1_scopto = 20000; // in micro secs (Ch1)
 const unsigned long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrelevant
 bool tristatepinpol = false; // Polarity for the tristatepin (1 = active high, 0 = active low). Default active low.
 
 // TCP (no real opto for behavioral purpose only)
-long tcptrain_cycle = 30 * 50; // First number is in seconds. How often does the train come on.
+unsigned long tcptrain_cycle = 30 * 50; // First number is in seconds. How often does the train come on.
 
 // ============ Scheduler ============
 unsigned int preoptotime = 120; //in seconds (max is high because unsigned int is 32 bit for teensy)
@@ -206,12 +216,14 @@ byte rngvec_ITI[maxrngind]; // Initialize array for RNG ITI
 
 // ============ Food TTL ============
 // Food TTL (basically sync'ed with opto)
-unsigned int nfoodpulsedelay = 2000; // Time after opto pulse train onset in ms
+unsigned int nfoodpulsedelay = 2000; // Time after opto pulse train onset in ms (applies to both opto-then-food and food-then-opto)
 unsigned int foodpulse_ontime = 150; // in ms
 unsigned int foodpulse_cycletime = 300; // in ms
+unsigned int nfoodpulsedelay_complement = 4 * 50; // Pulses before pulse train onset in ms (applies to food-then-opto). Note this shifts early the time0 of when foodttl arming happens
 byte foodpulses = 5; // Number of food ttl pulses per stim period.
 byte foodpulses_left = 0; // Try counting down this time. Probably easier to debug
 unsigned long tfood0, tfood1;
+bool optothenfood = true; // Set false is foodthenopto
 bool inputttl = false;
 bool foodttlarmed = false;
 bool foodttlwait = false; // In waiting for delivery
@@ -255,7 +267,8 @@ bool lastpulseopto = false; // Last pulse coming up
 // Counters
 byte pmt_counter_for_opto = 0;
 byte opto_counter = 0;
-long counter_for_train = 0; // Number of cycles
+unsigned long counter_for_train = 0; // Number of cycles
+unsigned long counter_for_train_complement = 0;
 
 void setup() {
   // Serial
@@ -448,6 +461,10 @@ void loop() {
     // Just advance
     else if (schedulerrunning && inpreopto && (!stimenabled) && (!listenmode)){
       ipreoptopulse++;
+
+      // For food -> opto experiments, counting down to when the first foodttlarm comes out (first trains starts at 0);
+      counter_for_train_complement = npreoptopulse - ipreoptopulse;
+      
       if (debugmode && showscheduler){
         if ((ipreoptopulse % 50) == 0){
             Serial.print("Preopto pulse #");
@@ -458,11 +475,26 @@ void loop() {
       }
     }
 
+    // Arm foodTTL in the food-then-opto mode (TCP/Opto/scopto). Scheduler or not. 
+    if ((!optothenfood) && (usefoodpulses) && (pulsing) && (counter_for_train_complement == nfoodpulsedelay_complement)){
+      // Only applies to food-then-opto mode here
+      armfoodttl(); // Arm food ttl
+    }
+    /*
+    else if ((debugmode) && (showfoodttl) && (!optothenfood) && (usefoodpulses) && (pulsing)){
+      if ((counter_for_train_complement % 50) == 0){
+        Serial.print(counter_for_train_complement);
+        Serial.println(" pulses until food arming.");
+      }
+    }
+    */
+
     // tcp mode behavioral task
     if (tcpmode){
       // Advance counters
       // Scheduler allows train and opto counters to advance
       if (stimenabled){
+        counter_for_train_complement = tcptrain_cycle - counter_for_train; // Counting 1499-0. 0 when train starts
         counter_for_train++; // Counting 1-1500, on 1 food task is on
       }
       
@@ -473,7 +505,8 @@ void loop() {
 
       if ((counter_for_train == 1) && stimenabled){
         // Once per train
-        if (usefoodpulses){
+        if (usefoodpulses && optothenfood && pulsing){
+          // Only applies to opto-then-food here
           armfoodttl(); // Arm food ttl
         }
 
@@ -500,7 +533,7 @@ void loop() {
       }
 
       if (counter_for_train >= tcptrain_cycle){
-        counter_for_train= 0;
+        counter_for_train = 0;
       }
 
       // Scheduler disable
@@ -515,6 +548,7 @@ void loop() {
       // Advance counters
       // Scheduler allows train and opto counters to advance
       if (stimenabled){
+        counter_for_train_complement = sctrain_cycle - counter_for_train; // Counting 1499-0. 0 when train starts
         pmt_counter_for_opto++; // Counting 1-5, on 1 opto is on
         counter_for_train++; // Counting 1-1500, on 1 train is on
       }
@@ -580,7 +614,8 @@ void loop() {
 //          Serial.println("OPTO actually ON");
         }
         
-        if (usefoodpulses){
+        if (usefoodpulses && optothenfood && pulsing){
+          // Only applies to opto-then-food here
           armfoodttl(); // Arm food ttl
         }
         
@@ -640,7 +675,7 @@ void loop() {
       // Serial.println(counter_for_train);
       // reset train counter
       if (counter_for_train >= sctrain_cycle){
-        counter_for_train= 0;
+        counter_for_train = 0;
       }
     }
 
@@ -648,6 +683,7 @@ void loop() {
     if (optophotommode){
       // Advance counters (not using scheduler or stim is enabled)
       if (stimenabled){
+        counter_for_train_complement = train_cycle - counter_for_train; // Counting 1499-0. 0 when train starts
         pmt_counter_for_opto++; // Counting 1-5, on 1 opto is on
         counter_for_train++; // Counting 1-1500, on 1 train is on
       }
@@ -700,7 +736,8 @@ void loop() {
           }
         }
 
-        if (usefoodpulses){
+        if (usefoodpulses && optothenfood && pulsing){
+          // Only applies to opto-then-food here
           armfoodttl(); // Arm food ttl
         }
         
@@ -728,7 +765,7 @@ void loop() {
       // Serial.println(counter_for_train);
       // reset train counter
       if (counter_for_train >= train_cycle){
-        counter_for_train= 0;
+        counter_for_train = 0;
       }
     }
   }
@@ -919,6 +956,8 @@ void parseserial(){
   // 30: Use buzzer cue or not (n = 1 yes, 0 no)
   // 31: Buzzer delay (n * 100 ms)
   // 32: Buzzer duration (n * 100 ms)
+  // 48: Opto then Food (n = 1 yes, 0 no)
+  // 49: Complement delay time before opto (n * 100 ms)
 
   // ====== Food TTL Conditional ======
   // 22: Conditional or not (n = 1 yes, 0 no) 
@@ -1037,6 +1076,26 @@ void parseserial(){
       pulsing = true;
       pulsetime = tnow;
       echotime_slow = tnowmillis;
+
+      // Train/opto related variables (relavant with or without scheduler)
+      pmt_counter_for_opto = 0;
+      opto_counter = 0;
+      counter_for_train = 0; // Number of cycles
+
+      // Food TTL related variables (relavant with or without scheduler)
+      foodpulses_left = 0;
+      inputttl = !foodttlconditional;
+      foodttlarmed = false;
+      foodttlwait = false;
+      foodttlon = false;
+
+      if (foodttlconditional){
+        foodttlcuewait = false;
+        foodttlactionwait = false;
+        cueon = false;
+        actionperiodon = false;
+      }
+      
       if (debugmode){
         Serial.println("Cam pulse start.");
       }
@@ -1050,20 +1109,13 @@ void parseserial(){
       if (usescheduler){
         ipreoptopulse = 0;
         itrain = 0;
-        pmt_counter_for_opto = 0;
-        opto_counter = 0;
-        counter_for_train = 0; // Number of cycles
-        foodpulses_left = 0;
-        inputttl = !foodttlconditional;
-        foodttlarmed = false;
-        foodttlwait = false;
-        foodttlon = false;
         inpreopto = true;
         inopto = false;
         inpostopto = false;
         stimenabled = false;
         schedulerrunning = true;
-
+        counter_for_train_complement = npreoptopulse;
+        
         // Opto RNG
         if (useRNG){
           // Generate array
@@ -1076,13 +1128,6 @@ void parseserial(){
           rng(rngvec_ITI, rng_cycle_max , rng_cycle_min, maxrngind);
         }
         
-        if (foodttlconditional){
-          foodttlcuewait = false;
-          foodttlactionwait = false;
-          cueon = false;
-          actionperiodon = false;
-        }
-
         if (debugpins){
           digitalWrite(schedulerpin, HIGH);
           digitalWrite(preoptopin, HIGH);
@@ -1093,6 +1138,19 @@ void parseserial(){
       else{
         stimenabled = true;
         inpreopto = false;
+
+        // Complement counter (no scheduler)
+        if (tcpmode){
+          counter_for_train_complement = tcptrain_cycle;
+        }
+        else if (samecoloroptomode){
+          counter_for_train_complement = sctrain_cycle;
+        }
+        else if(optophotommode){
+          counter_for_train_complement = train_cycle;
+        }
+        
+        
         if (debugpins){
           digitalWrite(schedulerpin, LOW);
           digitalWrite(preoptopin, LOW);
@@ -1606,6 +1664,24 @@ void parseserial(){
         Serial.println(tcptrain_cycle / 50);
       }
       break;
+
+    case 48:
+      // 48: Opto then Food (n = 1 yes, 0 no)
+      optothenfood = (n == 1);
+      if (debugmode){
+        Serial.print("Opto then Food (1 = yes, 0 = no): ");
+        Serial.println(optothenfood);
+      }
+      break;
+
+    case 49:
+      // 49: Complement delay time before opto (n s)
+      nfoodpulsedelay_complement = n * 50;
+      if (debugmode){
+        Serial.print("Complement delay time ebfore opto (s): ");
+        Serial.println(nfoodpulsedelay_complement/50);
+      }
+      break;
   }
 
   if (debugpins){
@@ -1768,6 +1844,10 @@ void showpara(void){
     Serial.println(foodpulses);
     Serial.print("Food TTL trains: ");
     Serial.println("Same as opto");
+    Serial.print("Opto then food TTLs: ");
+    Serial.println(optothenfood);
+    Serial.print("Complement delay before the opto start (s): ");
+    Serial.println(nfoodpulsedelay_complement / 50);
 
     // Food TTL Buzzer
     Serial.println("========== Food TTL Buzzer ========");
