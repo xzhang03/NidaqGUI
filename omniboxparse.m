@@ -97,7 +97,7 @@ if nicfg.scheduler.enable
     fwrite(nicfg.arduino_serial, uint8([4 nicfg.scheduler.delay / 10]));
     if ceil(nicfg.scheduler.delay / 10) ~= (nicfg.scheduler.delay / 10)
         % Delay is updated
-        fprintf('Delay is updated to %i instead.\n', floor(nicfg.scheduler.delay/10)*10)
+        fprintf('Delay is updated to %i instead.\n', floor(nicfg.scheduler.delay/10)*10);
     end
     
     % Number of trains (increments of 10)
@@ -111,6 +111,11 @@ if nicfg.scheduler.enable
     
     % Listen mode
     fwrite(nicfg.arduino_serial, uint8([27 nicfg.scheduler.listenmode]));
+    if (nicfg.scheduler.listenmode && ~nicfg.optodelayTTL.optothenTTL)
+        % Trying to do listen mode and food->opto
+        nicfg.optodelayTTL.optothenTTL = true;
+        fprintf('Listen mode forces the seuqnce of opto -> TTL.\n');
+    end
     
     % Listen mode polarity (protected)
     % Listen mode polarity (true = active high, false = active low). Do not change unless you know what you are doing.
@@ -185,6 +190,19 @@ if nicfg.optodelayTTL.enable
     
     % Delivery period duration
     fwrite(nicfg.arduino_serial, uint8([35 nicfg.optodelayTTL.deliverydur]));
+    
+    % Sequence of opto and TTL (default: opto-> TTL)
+    if isfield(nicfg.optodelayTTL, 'optothenTTL')
+        fwrite(nicfg.arduino_serial, uint8([48 nicfg.optodelayTTL.optothenTTL])); % True: opto->TTL, TTL->opto
+        
+        if (~nicfg.optodelayTTL.optothenTTL)
+            % Lead
+            % How many seconds is the food TTL armed before an opto train.
+            % The other delays above still stands. This just sets when the
+            % sequence of cue/action/reward starts.
+            fwrite(nicfg.arduino_serial, uint8([49 nicfg.optodelayTTL.lead])); 
+        end
+    end
 else
     fwrite(nicfg.arduino_serial, uint8([24 0]));
 end

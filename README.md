@@ -1,6 +1,7 @@
-# NidaqGUI
+# Nanosec Photometry (original name: NidaqGUI)
 GUI for photometry (modified from Arthur's work)
 Please find the original depository at https://github.com/asugden/nidaqgui
+Renaming in progress.
 
 ## Basic Idea
 A Matlab UI is used to designate filename and start/stop, as well as to specify experiment modes and structures to a microcontroller (see below). The microcontroller takes care the actual operation of the experiment.
