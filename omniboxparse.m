@@ -21,12 +21,13 @@ end
 
 %% TCP
 if nicfg.tcp.enable
-    % TCP
-    fwrite(nicfg.arduino_serial, uint8([3 0]));
-    
     % TCP behavioral cycle
     fwrite(nicfg.arduino_serial, uint8([47 nicfg.tcp.behaviorcycle]));
     
+    % TCP mode switch (do this at the end to modeswitch to correct
+    % timings)
+    fwrite(nicfg.arduino_serial, uint8([3 0]));
+
     % Disp
     disp('Mode -> TCP');
 end
@@ -35,9 +36,6 @@ end
 if nicfg.optophotometry.enable
     % Mode
     disp('Mode -> Optophotometry');
-    
-    % Optophotometry
-    fwrite(nicfg.arduino_serial, uint8([3 1]));
     
     % Frequency
     fwrite(nicfg.arduino_serial, uint8([6 nicfg.optophotometry.freqmod]));
@@ -56,15 +54,16 @@ if nicfg.optophotometry.enable
     
     % Pulse cycle 2
     fwrite(nicfg.arduino_serial, uint8([37 nicfg.optophotometry.pulsecycle2]));
+
+    % Optophotometry mode switch (do this at the end to modeswitch to correct
+    % timings)
+    fwrite(nicfg.arduino_serial, uint8([3 1]));
 end
 
 %% Same-color optophotometry
 if nicfg.scoptophotometry.enable
     % Mode
     disp('Mode -> Same-color optophotometry');
-    
-    % SC Optophotometry
-    fwrite(nicfg.arduino_serial, uint8([3 2]));
     
     % Frequency
     fwrite(nicfg.arduino_serial, uint8([10 nicfg.scoptophotometry.freqmod]));
@@ -83,6 +82,10 @@ if nicfg.scoptophotometry.enable
     if isfield(nicfg.scoptophotometry, 'tristatepol')
         fwrite(nicfg.arduino_serial, uint8([29 nicfg.scoptophotometry.tristatepol]));
     end
+
+    % SC Optophotometry mode switch (do this at the end to modeswitch to correct
+    % timings)
+    fwrite(nicfg.arduino_serial, uint8([3 2]));
 end
 
 %% Scheduler

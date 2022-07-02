@@ -9,6 +9,18 @@ disp('Opened.')
 nidaq_config_sz_debug;
 omniboxparse(nicfg)
 
+%% Get summary (run serial debug after)
+fwrite(nicfg.arduino_serial, uint8([9 0]));
+
+%% Serial debug
+vec = [];
+ind = 0;
+while nicfg.arduino_serial.BytesAvailable > 0
+    ind = ind + 1;
+    vec(ind) = fread(nicfg.arduino_serial, 1, 'uint8');
+end
+char(vec)
+
 %% Bytes
 nicfg.arduino_serial.BytesAvailable
 
