@@ -1,13 +1,13 @@
 global nicfg
 
 % Set the up the nidaq recording
-nicfg.BasePath         = 'C:\Users\steph\OneDrive\Documents\MATLAB\temp';       % Set the path in which data will be saved
-nicfg.ArduinoCOM       = 36;%5;             % Set the COM port for the Arduino, < 0 means off
+nicfg.BasePath         = 'C:\Users\andermannlab\Documents\MATLAB\Photometry_data';       % Set the path in which data will be saved
+nicfg.ArduinoCOM       = 12;             % Set the COM port for the Arduino, < 0 means off
 nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev2';        % Device name
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
-nicfg.NidaqChannels    = 0;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
+nicfg.NidaqChannels    = 8;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
 nicfg.NidaqDigitalChannels = 0;         % Set the number of digital channels on Port0 to record, starting at Line0
 nicfg.NidaqFrequency   = 2500;          % Set the recording frequency for the nidaq
 nicfg.RunningFrequency = 30;         % Set the frequency at which running is recorded
@@ -19,15 +19,13 @@ nicfg.ChannelNames     = { ...
                             'camera', 3, ...
                             'ensure', 4, ...
                             'PD2', 5, ...
-                            'lick', 6,...
-                            'Ch2in', 7,...
-                            'Buzz', 8
-                         };              % Set the names of each channel to be saved
+                            'lick', 6 ...
+                            'Ch2in', 7 ...
+                            'Buzz', 8 ...
+                         };             % Set the names of each channel to be saved
                                         % Incremented by 1 relative to Nidaq board because Nidaq is 0-indexed
 nicfg.DigitalChannelNames = { ...
                          };
-
-nicfg.serverupload = false;
 nicfg.serveradd = {...
     'SZ', '\\anastasia\data\photometry';...
     'AL', '\\sweetness\Fiber Photometry';...
@@ -51,15 +49,15 @@ nicfg.omnibox.enable = true;
 % Modes
 % Two-color photometry
 nicfg.tcp.enable = false; % Default true.
-nicfg.tcp.behaviorcycle = 60; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
+nicfg.tcp.behaviorcycle = 60;
 
 % Optophotometry (two colors)
 % Variable pulse width. Variable pulse cycle (only use for pure optomode)
 nicfg.optophotometry.enable = true; % Default false
 nicfg.optophotometry.freqmod = 1; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
 nicfg.optophotometry.trainlength = 50; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
-nicfg.optophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
-nicfg.optophotometry.pulsewidth = 20; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
+nicfg.optophotometry.cycle = 60; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
+nicfg.optophotometry.pulsewidth = 14; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
 
 % Change pulse cycles (CAUTION)
 % Generally only change these values for pure optomode
@@ -83,8 +81,8 @@ nicfg.scoptophotometry.pulsewidth = 20; % Pulth width in ms. E.g., 10 means 10 m
 
 % Scheduler
 nicfg.scheduler.enable = true; % Default false
-nicfg.scheduler.delay = 30; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 65535s.
-nicfg.scheduler.ntrains = 20; % Number of trains. Default 10.
+nicfg.scheduler.delay = 300; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 2550s.
+nicfg.scheduler.ntrains = 50; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
 
@@ -96,7 +94,7 @@ nicfg.scheduler.passchance = 30; % Pass chance in percentage (30 = 30% pass)
 
 % Control experiments (no stim)
 % Basically sets RNG mode and pass chance = 0
-nicfg.scheduler.control = false;
+nicfg.scheduler.control = true;
 
 % Randomized ITI
 % (Scheduler only and does not apply to the listening mode)
@@ -110,25 +108,23 @@ nicfg.scheduler.randomITI_max = 40; % Highest value of ITI (exclusive, in second
 % delivery or synchronizing).
 % Delivery (unconditional): Opto start => delivery delay => delivery
 nicfg.optodelayTTL.enable = true; % Default false
-nicfg.optodelayTTL.delay = 0; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s). Max 65535 (6553.5s).
+nicfg.optodelayTTL.delay = 60; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.pulsewidth = 15; % Pulsewidth in X * 10 ms. E.g., 15 means 150 ms pulses. Default is 15 (150 ms).
 nicfg.optodelayTTL.cycle = 30; % Pulse cycle in X * 10 ms. E.g., 30 means 300 ms pulses. Default is 30 (300 ms).
-nicfg.optodelayTTL.trainlength = 5; % Pulse train length. E.g., 5 means 5 pulses. Default is 5.
-nicfg.optodelayTTL.optothenTTL = false; % Sets the sequence: opto->food or food->opto. Has to be true in listen mode. Default true (opto => food).
-nicfg.optodelayTTL.lead = 20; % How many seconds is the food TTL armed before an opto train. This does not affect the cue/actoin/reward delays above. Default 4s. Max 65535s.
+nicfg.optodelayTTL.trainlength = 10; % Pulse train length. E.g., 5 means 5 pulses. Default is 5.
 
 % Opto-delayed TTL buzzer
 % Cue: Opto start => buzzer delay => buzzer duration
-nicfg.optodelayTTL.buzzerenable = false; % Buzzer or not (default false)
-nicfg.optodelayTTL.buzzerdelay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
+nicfg.optodelayTTL.buzzerenable = true; % Buzzer or not (default false)
+nicfg.optodelayTTL.buzzerdelay = 50; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.buzzerdur = 10; % Delay in 100 ms. E.g., 10 means 1 seconds. Default 10 (1s)
 
 % Action: Opto start => action delay => action window
 % Delivery (conditional): Opto start => delivery delay => delivery window start => delivery (if action) => timeout (if no delivery)
 % If action and devliveries have the same delay, that means food devlivery happens as soon as a lick
-nicfg.optodelayTTL.conditional = false; % TTL delivery is conditional or not. If so, pin 10 must be hooked up with an active-high input. Input comes during the delay window will allow for subsequent pulse output.
-nicfg.optodelayTTL.actiondelay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
-nicfg.optodelayTTL.actiondur = 50; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
+nicfg.optodelayTTL.conditional = true; % TTL delivery is conditional or not. If so, pin 10 must be hooked up with an active-high input. Input comes during the delay window will allow for subsequent pulse output.
+nicfg.optodelayTTL.actiondelay = 50; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
+nicfg.optodelayTTL.actiondur = 10; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 nicfg.optodelayTTL.deliverydur = 50; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 
 % Encoder
