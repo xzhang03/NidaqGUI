@@ -68,10 +68,10 @@ global nicfg
 % Can't load if omnibox is not on
 if nicfg.omnibox.enable
     handles.togglebutton2.Enable = 'on';
-    handles.settinguploaded.String = 'Omnibox enabled';
+    handles.settinguploaded.String = 'Nanosec box enabled';
 else
     handles.togglebutton2.Enable = 'off';
-    handles.settinguploaded.String = 'Omnibox disabled';
+    handles.settinguploaded.String = 'Nanosec box disabled';
 end
 
 handles.MouseName.String = nicfg.MouseName;
@@ -408,7 +408,7 @@ function loadconfig_Callback(hObject, eventdata, handles)
 % hObject    handle to loadconfig (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[fn, fp] = uigetfile({'nidaq_config*.m';'*.m';'*.*'}, 'Select Config File');
+[fn, fp] = uigetfile({'nidaq_config*.m'; 'ns_config*.m'; '*.m'; '*.*'}, 'Select Config File');
 [~, handles.loadconfig.UserData.fn, ~] = fileparts(fn);
 handles.loadconfig.UserData.fp = fullfile(fp, fn);
 handles.configname.Text = sprintf('[%s]', handles.loadconfig.UserData.fn);
