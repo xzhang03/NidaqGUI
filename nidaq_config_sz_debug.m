@@ -2,7 +2,7 @@ global nicfg
 
 % Set the up the nidaq recording
 nicfg.BasePath         = 'C:\Users\steph\OneDrive\Documents\MATLAB\temp';       % Set the path in which data will be saved
-nicfg.ArduinoCOM       = 25;%5;             % Set the COM port for the Arduino, < 0 means off
+nicfg.ArduinoCOM       = 36;%5;             % Set the COM port for the Arduino, < 0 means off
 nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev2';        % Device name
@@ -41,9 +41,6 @@ nicfg.serveradd = {...
 % =========================================================================
 nicfg.MouseName = 'SZ00';
 
-% =========================================================================
-nicfg.MouseName = 'SZ00';
-
 %% Version 3 Omnibox
 % optophotometry, same-color-optophotometry, encoder-setup, Scheduler, opto-delayed TTL
 % Values must be integers 0-255:
@@ -61,7 +58,7 @@ nicfg.tcp.behaviorcycle = 60;
 nicfg.optophotometry.enable = true; % Default false
 nicfg.optophotometry.freqmod = 1; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
 nicfg.optophotometry.trainlength = 50; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
-nicfg.optophotometry.cycle = 10; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
+nicfg.optophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 nicfg.optophotometry.pulsewidth = 20; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
 
 % Change pulse cycles (CAUTION)
@@ -86,7 +83,7 @@ nicfg.scoptophotometry.pulsewidth = 20; % Pulth width in ms. E.g., 10 means 10 m
 
 % Scheduler
 nicfg.scheduler.enable = true; % Default false
-nicfg.scheduler.delay = 10; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 2550s.
+nicfg.scheduler.delay = 30; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 65535s.
 nicfg.scheduler.ntrains = 20; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
@@ -112,11 +109,13 @@ nicfg.scheduler.randomITI_max = 40; % Highest value of ITI (exclusive, in second
 % TTL pulses that happen X seconds after each opto train onset (for food
 % delivery or synchronizing).
 % Delivery (unconditional): Opto start => delivery delay => delivery
-nicfg.optodelayTTL.enable = false; % Default false
-nicfg.optodelayTTL.delay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
+nicfg.optodelayTTL.enable = true; % Default false
+nicfg.optodelayTTL.delay = 0; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s). Max 65535 (6553.5s).
 nicfg.optodelayTTL.pulsewidth = 15; % Pulsewidth in X * 10 ms. E.g., 15 means 150 ms pulses. Default is 15 (150 ms).
 nicfg.optodelayTTL.cycle = 30; % Pulse cycle in X * 10 ms. E.g., 30 means 300 ms pulses. Default is 30 (300 ms).
 nicfg.optodelayTTL.trainlength = 5; % Pulse train length. E.g., 5 means 5 pulses. Default is 5.
+nicfg.optodelayTTL.optothenTTL = false; % Sets the sequence: opto->food or food->opto. Has to be true in listen mode. Default true (opto => food).
+nicfg.optodelayTTL.lead = 20; % How many seconds is the food TTL armed before an opto train. This does not affect the cue/actoin/reward delays above. Default 4s. Max 65535s.
 
 % Opto-delayed TTL buzzer
 % Cue: Opto start => buzzer delay => buzzer duration

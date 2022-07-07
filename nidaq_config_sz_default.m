@@ -18,7 +18,7 @@ nicfg.ChannelNames     = { ...
                             'Ch1in', 2, ...
                             'camera', 3, ...
                             'ensure', 4, ...
-                            'PD2Reserve', 5, ...
+                            'PD2', 5, ...
                             'lick', 6,...
                             'Ch2in', 7,...
                             'Buzz', 8
@@ -83,7 +83,7 @@ nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 m
 
 % Scheduler
 nicfg.scheduler.enable = false; % Default false
-nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 2550s.
+nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 65535s.
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default false (don't leave floating if true).
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
@@ -110,10 +110,12 @@ nicfg.scheduler.randomITI_max = 40; % Highest value of ITI (exclusive, in second
 % delivery or synchronizing).
 % Delivery (unconditional): Opto start => delivery delay => delivery
 nicfg.optodelayTTL.enable = false; % Default false
-nicfg.optodelayTTL.delay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
+nicfg.optodelayTTL.delay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s). Max 65535 (6553.5s).
 nicfg.optodelayTTL.pulsewidth = 15; % Pulsewidth in X * 10 ms. E.g., 15 means 150 ms pulses. Default is 15 (150 ms).
 nicfg.optodelayTTL.cycle = 30; % Pulse cycle in X * 10 ms. E.g., 30 means 300 ms pulses. Default is 30 (300 ms).
 nicfg.optodelayTTL.trainlength = 5; % Pulse train length. E.g., 5 means 5 pulses. Default is 5.
+nicfg.optodelayTTL.optothenTTL = false; % Sets the sequence: opto->food or food->opto. Has to be true in listen mode. Default true (opto => food).
+nicfg.optodelayTTL.lead = 4; % How many seconds is the food TTL armed before an opto train. This does not affect the cue/actoin/reward delays above. Default 4s. Max 65535s.
 
 % Opto-delayed TTL buzzer
 % Cue: Opto start => buzzer delay => buzzer duration

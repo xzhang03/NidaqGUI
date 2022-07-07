@@ -1,4 +1,4 @@
-// Third Gen photometry box v3.1
+// Third Gen photometry box v3.2
 // Handle almost everything you need for photometry
 // Needs a decent number of pins
 // Stephen Zhang
@@ -945,7 +945,8 @@ void parseserial(){
   
   // ============ Scheduler ============
   // 15: Use scheduler (n = 1 yes, 0 no) 
-  // 4: Set delay (delay_cycle = n * 10 * 50, n = 1 means 10 seconds). Only relevant when scheduler is on
+  // 4: Set delay (delay_cycle = n * 50, n = 1 means 1 second). Only relevant when scheduler is on
+  // 52: Adding delay (n * 256 * 50, n = 1 means 256 second). Only relevant when scheduler is on
   // 16: Number of trains (n trains)
   // 46: Adding trains (trains = trains + n * 256)
   // 17: Enable manual scheduler override
@@ -962,6 +963,7 @@ void parseserial(){
   // ============ Food TTL ============
   // 24: Use Food TTL or not (n = 1 yes, 0 no) 
   // 18: Delay time after opto (n * 100 ms)
+  // 50: Adding delay time after opto (n * 256 * 100 ms)
   // 19: Pulse on time (n * 10 ms)
   // 20: Pulse cycle time (n * 10 ms)
   // 21: Pulses per train (n)
@@ -969,7 +971,8 @@ void parseserial(){
   // 31: Buzzer delay (n * 100 ms)
   // 32: Buzzer duration (n * 100 ms)
   // 48: Opto then Food (n = 1 yes, 0 no)
-  // 49: Complement delay time before opto (n * 100 ms)
+  // 49: Lead time before opto (n s)
+  // 51: Adding lead time before opto (+ n * 256 s) 
 
   // ====== Food TTL Conditional ======
   // 22: Conditional or not (n = 1 yes, 0 no) 
@@ -1209,8 +1212,8 @@ void parseserial(){
       break;
 
     case 4:
-      // 4: Set delay (delay_cycle = n * 10 * 50, n = 1 means 10 seconds). Only relevant when scheduler is on
-      preoptotime = n * 10; // in seconds (max is high because npreoptopulse is unsigned int which is 32 bits)
+      // 4: Set delay (delay_cycle = n * 50, n = 1 means 1 seconds). Only relevant when scheduler is on
+      preoptotime = n; // in seconds (max is high because npreoptopulse is unsigned int which is 32 bits)
       npreoptopulse = preoptotime * 50; // preopto pulse number
       ipreoptopulse = 0;
       itrain = 0;
@@ -1693,6 +1696,32 @@ void parseserial(){
         Serial.print("Complement delay time ebfore opto (s): ");
         Serial.println(nfoodpulsedelay_complement/50);
       }
+      break;
+
+    case 50:
+      // 50: Adding delay time after opto (+ n * 256 * 100 ms)
+      nfoodpulsedelay = nfoodpulsedelay + n * 256 * 100;
+      if (debugmode){
+        Serial.print("Delay time after opto (ms): ");
+        Serial.println(nfoodpulsedelay);
+      }
+      break;
+
+    case 51:
+      // 51: Adding lead time before opto (+ n * 256 s) 
+      nfoodpulsedelay_complement = nfoodpulsedelay_complement + n * 256 * 50;
+      if (debugmode){
+        Serial.print("Complement delay time ebfore opto (s): ");
+        Serial.println(nfoodpulsedelay_complement/50);
+      }
+      break;
+
+    case 52:
+      // 52: Adding delay (+ n * 256 * 50, n = 1 means 256 second). Only relevant when scheduler is on
+      preoptotime = preoptotime + n * 256; // in seconds (max is high because npreoptopulse is unsigned int which is 32 bits)
+      npreoptopulse = preoptotime * 50; // preopto pulse number
+      ipreoptopulse = 0;
+      itrain = 0;
       break;
   }
 

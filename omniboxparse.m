@@ -96,12 +96,11 @@ if nicfg.scheduler.enable
     % Scheduler
     fwrite(nicfg.arduino_serial, uint8([15 1]));
     
-    % Delay (passing time as units of 10 seconds)
-    fwrite(nicfg.arduino_serial, uint8([4 nicfg.scheduler.delay / 10]));
-    if ceil(nicfg.scheduler.delay / 10) ~= (nicfg.scheduler.delay / 10)
-        % Delay is updated
-        fprintf('Delay is updated to %i instead.\n', floor(nicfg.scheduler.delay/10)*10);
-    end
+    % Delay (passing time in seconds)
+    b = floor(nicfg.scheduler.delay / 256);
+    a = nicfg.scheduler.delay - b * 256;
+    fwrite(nicfg.arduino_serial, uint8([4 a]));
+    fwrite(nicfg.arduino_serial, uint8([52 b]));
     
     % Number of trains (increments of 10)
     b = floor(nicfg.scheduler.ntrains / 256);
@@ -162,7 +161,10 @@ if nicfg.optodelayTTL.enable
     fwrite(nicfg.arduino_serial, uint8([24 1]));
     
     % Delay after opto train onsets
-    fwrite(nicfg.arduino_serial, uint8([18 nicfg.optodelayTTL.delay]));
+    b = floor(nicfg.optodelayTTL.delay / 256);
+    a = nicfg.optodelayTTL.delay - b * 256;
+    fwrite(nicfg.arduino_serial, uint8([18 a]));
+    fwrite(nicfg.arduino_serial, uint8([50 b]));
     
     % Pulse width
     fwrite(nicfg.arduino_serial, uint8([19 nicfg.optodelayTTL.pulsewidth]));
@@ -203,7 +205,10 @@ if nicfg.optodelayTTL.enable
             % How many seconds is the food TTL armed before an opto train.
             % The other delays above still stands. This just sets when the
             % sequence of cue/action/reward starts.
-            fwrite(nicfg.arduino_serial, uint8([49 nicfg.optodelayTTL.lead])); 
+            b = floor(nicfg.optodelayTTL.lead / 256);
+            a = nicfg.optodelayTTL.lead - b * 256;
+            fwrite(nicfg.arduino_serial, uint8([49 a]));
+            fwrite(nicfg.arduino_serial, uint8([51 b]));
         end
     end
 else
