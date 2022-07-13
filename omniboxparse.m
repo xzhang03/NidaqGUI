@@ -199,7 +199,7 @@ if nicfg.optodelayTTL.enable
     % Sequence of opto and TTL (default: opto-> TTL)
     if isfield(nicfg.optodelayTTL, 'optothenTTL')
         fwrite(nicfg.arduino_serial, uint8([48 nicfg.optodelayTTL.optothenTTL])); % True: opto->TTL, TTL->opto
-        
+
         if (~nicfg.optodelayTTL.optothenTTL)
             % Lead
             % How many seconds is the food TTL armed before an opto train.
@@ -210,6 +210,9 @@ if nicfg.optodelayTTL.enable
             fwrite(nicfg.arduino_serial, uint8([49 a]));
             fwrite(nicfg.arduino_serial, uint8([51 b]));
         end
+    else
+        nicfg.optodelayTTL.optothenTTL = true;
+        fwrite(nicfg.arduino_serial, uint8([48 nicfg.optodelayTTL.optothenTTL])); % True: opto->TTL, TTL->opto
     end
 else
     fwrite(nicfg.arduino_serial, uint8([24 0]));
