@@ -37,6 +37,12 @@ if nicfg.optophotometry.enable
     % Mode
     disp('Mode -> Optophotometry');
     
+    % Pulse cycle 1
+    fwrite(nicfg.arduino_serial, uint8([36 nicfg.optophotometry.pulsecycle1]));
+    
+    % Pulse cycle 2
+    fwrite(nicfg.arduino_serial, uint8([37 nicfg.optophotometry.pulsecycle2]));
+    
     % Frequency
     fwrite(nicfg.arduino_serial, uint8([6 nicfg.optophotometry.freqmod]));
     
@@ -49,12 +55,6 @@ if nicfg.optophotometry.enable
     % Pulse width
     fwrite(nicfg.arduino_serial, uint8([14 nicfg.optophotometry.pulsewidth]));
     
-    % Pulse cycle 1
-    fwrite(nicfg.arduino_serial, uint8([36 nicfg.optophotometry.pulsecycle1]));
-    
-    % Pulse cycle 2
-    fwrite(nicfg.arduino_serial, uint8([37 nicfg.optophotometry.pulsecycle2]));
-
     % Optophotometry mode switch (do this at the end to modeswitch to correct
     % timings)
     fwrite(nicfg.arduino_serial, uint8([3 1]));

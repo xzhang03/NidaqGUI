@@ -158,12 +158,13 @@ unsigned int pulsewidth_1 = 6000; // in micro secs (ch1)
 unsigned int pulsewidth_2 = 6000; // in micro secs (ch2)
 unsigned long cycletime_photom_1; // in micro secs (Ch1)
 unsigned long cycletime_photom_2; // in micro secs (Ch2)
+unsigned int fps = 50; // Points per second (just say fps colloquially)
 
 // tcp photometry time variables
 const int pulsewidth_1_tcp = 6000; // in micro secs (ch2)
 const int pulsewidth_2_tcp = 6000; // in micro secs (ch2)
-const unsigned long cycletime_photom_1_tcp = 10000; // in micro secs (Ch1)
-const unsigned long cycletime_photom_2_tcp = 10000; // in micro secs (Ch2)
+unsigned long cycletime_photom_1_tcp = 10000; // in micro secs (Ch1)
+unsigned long cycletime_photom_2_tcp = 10000; // in micro secs (Ch2)
 
 // ============ Opto ============
 // Opto varaibles
@@ -525,7 +526,7 @@ void loop() {
         if (schedulerrunning){
           if (randomiti){
             // Get randomized ITI. This affects scopto.
-            tcptrain_cycle = rngvec_ITI[itrain] * 50;
+            tcptrain_cycle = rngvec_ITI[itrain] * fps;
           }
           
           itrain++; // Advance train count
@@ -538,7 +539,7 @@ void loop() {
   
             if (randomiti){
               Serial.print("RNG says next cycle is (s): ");
-              Serial.println(tcptrain_cycle / 50);
+              Serial.println(tcptrain_cycle / fps);
             }
           }
         }
@@ -592,7 +593,7 @@ void loop() {
 
           if (randomiti){
             // Get randomized ITI. This affects scopto.
-            sctrain_cycle = rngvec_ITI[itrain] * 50;
+            sctrain_cycle = rngvec_ITI[itrain] * fps;
           }
           
           itrain++; // Advance train count
@@ -610,7 +611,7 @@ void loop() {
 
             if (randomiti){
               Serial.print("RNG says next cycle is (s): ");
-              Serial.println(sctrain_cycle / 50);
+              Serial.println(sctrain_cycle / fps);
             }
           }
         }
@@ -725,7 +726,7 @@ void loop() {
 
           if (randomiti){
             // Get randomized ITI. This affects scopto.
-            train_cycle = rngvec_ITI[itrain] * 50;
+            train_cycle = rngvec_ITI[itrain] * fps;
           }
           
           itrain++; // Advance train count
@@ -743,7 +744,7 @@ void loop() {
 
             if (randomiti){
               Serial.print("RNG says next cycle is (s): ");
-              Serial.println(train_cycle / 50);
+              Serial.println(train_cycle / fps);
             }
           }
         }
@@ -941,6 +942,8 @@ void parseserial(){
   // 29: Tristate pin polarity (1 = active high, 0 = active low);
   // 36: Cycle 1 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 100 us)
   // 37: Cycle 2 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 100 us)
+  // 53: Cycle 1 for TCP (only changed for pure TCP experiments; cycle = n * 100 us)
+  // 54: Cycle 2 for TCP (only changed for pure TCP experiments; cycle = n * 100 us)
   // 47: Change tcp behavioral train cycle (train_cycle = n * 50)
   
   // ============ Scheduler ============
@@ -1214,7 +1217,7 @@ void parseserial(){
     case 4:
       // 4: Set delay (delay_cycle = n * 50, n = 1 means 1 seconds). Only relevant when scheduler is on
       preoptotime = n; // in seconds (max is high because npreoptopulse is unsigned int which is 32 bits)
-      npreoptopulse = preoptotime * 50; // preopto pulse number
+      npreoptopulse = preoptotime * fps; // preopto pulse number
       ipreoptopulse = 0;
       itrain = 0;
       break;
@@ -1239,7 +1242,7 @@ void parseserial(){
 
       if (debugmode){
         Serial.print("New opto freq (Hz): ");
-        Serial.println(50 / opto_per);
+        Serial.println(fps / opto_per);
       }
       break;
       
@@ -1254,10 +1257,10 @@ void parseserial(){
       
     case 8:
       // 8: Change opto train cycle (train_cycle = n * 50)
-      train_cycle = n * 50;
+      train_cycle = n * fps;
       if (debugmode){
         Serial.print("New opto train cycle (s): ");
-        Serial.println(train_cycle / 50);
+        Serial.println(train_cycle / fps);
       }
       break;
 
@@ -1272,16 +1275,16 @@ void parseserial(){
 
       if (debugmode){
         Serial.print("New scopto freq (Hz): ");
-        Serial.println(50 / opto_per);
+        Serial.println(fps / opto_per);
       }
       break;
 
     case 11:
       // 11: Change scopto train cycle (train_cycle = n * 50)
-      sctrain_cycle = n * 50;
+      sctrain_cycle = n * fps;
       if (debugmode){
         Serial.print("New scopto train cycle (s): ");
-        Serial.println(sctrain_cycle / 50);
+        Serial.println(sctrain_cycle / fps);
       }
       break;
 
@@ -1565,9 +1568,10 @@ void parseserial(){
       break;
 
     case 36:
-      // 36: Cycle 1 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 500 us)
+      // 36: Cycle 1 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 100 us)
       cycletime_photom_1_opto = n * 100;
       cycletime_photom_1 = cycletime_photom_1_opto; // in micro secs (Ch1)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
       if (debugmode){
         Serial.print("New opto cycle 1 (us): ");
         Serial.println(cycletime_photom_1_opto);
@@ -1575,9 +1579,10 @@ void parseserial(){
       break;
 
    case 37:
-      // 37: Cycle 2 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 500 us)
+      // 37: Cycle 2 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 100 us)
       cycletime_photom_2_opto = n * 100;
       cycletime_photom_2 = cycletime_photom_2_opto; // in micro secs (Ch1)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
       if (debugmode){
         Serial.print("New opto cycle 2 (us): ");
         Serial.println(cycletime_photom_2_opto);
@@ -1673,10 +1678,10 @@ void parseserial(){
 
     case 47:
       // 47: Change tcp behavioral train cycle (train_cycle = n * 50)
-      tcptrain_cycle = n * 50;
+      tcptrain_cycle = n * fps;
       if (debugmode){
         Serial.print("New tcp train cycle (s): ");
-        Serial.println(tcptrain_cycle / 50);
+        Serial.println(tcptrain_cycle / fps);
       }
       break;
 
@@ -1691,10 +1696,10 @@ void parseserial(){
 
     case 49:
       // 49: Complement delay time before opto (n s)
-      nfoodpulsedelay_complement = n * 50;
+      nfoodpulsedelay_complement = n * fps;
       if (debugmode){
         Serial.print("Complement delay time ebfore opto (s): ");
-        Serial.println(nfoodpulsedelay_complement/50);
+        Serial.println(nfoodpulsedelay_complement / fps);
       }
       break;
 
@@ -1709,19 +1714,43 @@ void parseserial(){
 
     case 51:
       // 51: Adding lead time before opto (+ n * 256 s) 
-      nfoodpulsedelay_complement = nfoodpulsedelay_complement + n * 256 * 50;
+      nfoodpulsedelay_complement = nfoodpulsedelay_complement + n * 256 * fps;
       if (debugmode){
         Serial.print("Complement delay time ebfore opto (s): ");
-        Serial.println(nfoodpulsedelay_complement/50);
+        Serial.println(nfoodpulsedelay_complement / fps);
       }
       break;
 
     case 52:
       // 52: Adding delay (+ n * 256 * 50, n = 1 means 256 second). Only relevant when scheduler is on
       preoptotime = preoptotime + n * 256; // in seconds (max is high because npreoptopulse is unsigned int which is 32 bits)
-      npreoptopulse = preoptotime * 50; // preopto pulse number
+      npreoptopulse = preoptotime * fps; // preopto pulse number
       ipreoptopulse = 0;
       itrain = 0;
+      break;
+
+    case 53:
+      // 53: Cycle 1 for TCP (only changed for pure TCP experiments; cycle = n * 100 us)
+      cycletime_photom_1_tcp = n * 100;
+      cycletime_photom_1 = cycletime_photom_1_tcp; // in micro secs (Ch1)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
+      
+      if (debugmode){
+        Serial.print("New tcp cycle 1 (us): ");
+        Serial.println(cycletime_photom_1_tcp);
+      }
+      break;
+      
+    case 54:
+      // 54: Cycle 2 for TCP (only changed for pure TCP experiments; cycle = n * 100 us)
+      cycletime_photom_2_tcp = n * 100;
+      cycletime_photom_2 = cycletime_photom_2_tcp; // in micro secs (Ch2)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
+      
+      if (debugmode){
+        Serial.print("New tcp cycle 2 (us): ");
+        Serial.println(cycletime_photom_2_tcp);
+      }
       break;
   }
 
@@ -1777,6 +1806,9 @@ void modeswitch(void){
       Serial.println("Same-color optophotometry mode.");
     }
   }
+  
+  // Update fps
+  fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
 }
 
 // Show all parameters
@@ -1814,29 +1846,29 @@ void showpara(void){
   // Opto
   Serial.println("============== Optophoto ==============");
   Serial.print("Opto freq (Hz): ");
-  Serial.println(50 / opto_per);
+  Serial.println(fps / opto_per);
   Serial.print("Opto pulses per train: ");
   Serial.println(train_length);
   Serial.print("Opto train cycle (s): ");
-  Serial.println(train_cycle / 50);
+  Serial.println(train_cycle / fps);
   Serial.print("Pulse width (ms): ");
   Serial.println(pulsewidth_2_opto/1000);
 
   // Same color opto
   Serial.println("============== SCoptophoto ==============");
   Serial.print("Same-color opto freq (Hz): ");
-  Serial.println(50 / scopto_per);
+  Serial.println(fps / scopto_per);
   Serial.print("Same-color opto train length (s): ");
-  Serial.println(sctrain_length / (50/scopto_per));
+  Serial.println(sctrain_length / (fps/scopto_per));
   Serial.print("Polarity for tristate enable (1 = active high, 0 = active low): ");
   Serial.println(tristatepinpol); // Polarity for the tristatepin (1 = active high, 0 = active low). Default active low.)
   Serial.print("Same-color opto train cycle (s): ");
-  Serial.println(sctrain_cycle / 50);
+  Serial.println(sctrain_cycle / fps);
   Serial.print("Pulse width (ms): ");
   Serial.println(pulsewidth_1_scopto/1000);
   
   Serial.print("TCP behavior train cycle (s): ");
-  Serial.println(tcptrain_cycle / 50);
+  Serial.println(tcptrain_cycle / fps);
 
   // Scheduler
   Serial.println("============== Scheduler ==============");
@@ -1903,7 +1935,7 @@ void showpara(void){
   Serial.print("Opto then food TTLs: ");
   Serial.println(optothenfood);
   Serial.print("Complement delay before the opto start (s): ");
-  Serial.println(nfoodpulsedelay_complement / 50);
+  Serial.println(nfoodpulsedelay_complement / fps);
 
   // Food TTL Buzzer
   Serial.println("========== Food TTL Buzzer ========");
