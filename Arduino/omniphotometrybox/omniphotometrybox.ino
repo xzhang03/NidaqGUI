@@ -1,19 +1,20 @@
-// Third Gen photometry box v3.2
+// Third Gen photometry box: Nanosec v3.2
 // Handle almost everything you need for photometry
 // Needs a decent number of pins
 // Stephen Zhang
 
 /* 1. Two color photometry
  * 2. Optophotometry (switch on)
- * 3. Sample color optophotometry (analogy input control intensity)
- * 4. Cam pulses with adjustable frequency
- * 5. Encoder at the same frequency as 4
- * 6. Preprogram experiment timescale: baseline -> opto -> postopto
- * 7. External input for scheduler (6)
- * 8. TTL pulses for other parts of the experiment
- * 9. Audio syncing
- * 10.Hardware random number generator for opto trials
- * 11.Online serial echo of trial and RNG infomation
+ * 3. Same-color optophotometry (analogy input control intensity)
+ * 4. Arbitrary photometry and optogenetic frequency
+ * 5. Cam pulses with adjustable frequency
+ * 6. Encoder at the same frequency as 4
+ * 7. Preprogram experiment timescale: baseline -> opto -> postopto
+ * 8. External input for scheduler (6)
+ * 9. TTL pulses for other parts of the experiment
+ * 10. Audio syncing
+ * 11.Hardware random number generator for opto trials
+ * 12.Online serial echo of trial and RNG infomation
  * 
  */
 
@@ -158,7 +159,7 @@ unsigned int pulsewidth_1 = 6000; // in micro secs (ch1)
 unsigned int pulsewidth_2 = 6000; // in micro secs (ch2)
 unsigned long cycletime_photom_1; // in micro secs (Ch1)
 unsigned long cycletime_photom_2; // in micro secs (Ch2)
-unsigned int fps = 50; // Points per second (just say fps colloquially)
+float fps = 50; // Points per second (just say fps colloquially)
 
 // tcp photometry time variables
 const int pulsewidth_1_tcp = 6000; // in micro secs (ch2)
@@ -940,11 +941,16 @@ void parseserial(){
   // 13: Change scopto pulse width (n * 1000 us)
   // 14: Change Opto pulse width (n * 1000 us)
   // 29: Tristate pin polarity (1 = active high, 0 = active low);
+  // 47: Change tcp behavioral train cycle (train_cycle = n * 50)
   // 36: Cycle 1 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 100 us)
   // 37: Cycle 2 for optophotometry (only changed for pure optogenetic experiments; cycle = n * 100 us)
+  // 55: Add Cycle 1 for optophotometry (cycle = cycle + n * 256 * 100 us);
+  // 56: Add Cycle 2 for optophotometry (cycle = cycle + n * 256 * 100 us);
   // 53: Cycle 1 for TCP (only changed for pure TCP experiments; cycle = n * 100 us)
   // 54: Cycle 2 for TCP (only changed for pure TCP experiments; cycle = n * 100 us)
-  // 47: Change tcp behavioral train cycle (train_cycle = n * 50)
+  // 57: Add Cycle 1 for TCP (cycle = cycle + n * 256 * 100 us);
+  // 58: Add Cycle 2 for TCP (cycle = cycle + n * 256 * 100 us);
+  
   
   // ============ Scheduler ============
   // 15: Use scheduler (n = 1 yes, 0 no) 
@@ -1744,6 +1750,52 @@ void parseserial(){
     case 54:
       // 54: Cycle 2 for TCP (only changed for pure TCP experiments; cycle = n * 100 us)
       cycletime_photom_2_tcp = n * 100;
+      cycletime_photom_2 = cycletime_photom_2_tcp; // in micro secs (Ch2)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
+      
+      if (debugmode){
+        Serial.print("New tcp cycle 2 (us): ");
+        Serial.println(cycletime_photom_2_tcp);
+      }
+      break;
+
+    case 55:
+      // 55: Add Cycle 1 for optophotometry (cycle = cycle + n * 256 * 100 us);
+      cycletime_photom_1_opto = cycletime_photom_1_opto + n * 100 * 256;
+      cycletime_photom_1 = cycletime_photom_1_opto; // in micro secs (Ch1)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
+      if (debugmode){
+        Serial.print("New opto cycle 1 (us): ");
+        Serial.println(cycletime_photom_1_opto);
+      }
+      break;
+
+    case 56:
+      // 56: Add Cycle 2 for optophotometry (cycle = cycle + n * 256 * 100 us);
+      cycletime_photom_2_opto = cycletime_photom_2_opto + n * 100 * 256;
+      cycletime_photom_2 = cycletime_photom_2_opto; // in micro secs (Ch1)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
+      if (debugmode){
+        Serial.print("New opto cycle 2 (us): ");
+        Serial.println(cycletime_photom_2_opto);
+      }
+      break;
+
+    case 57:
+      // 57: Add Cycle 1 for TCP (cycle = cycle + n * 256 * 100 us);
+      cycletime_photom_1_tcp = cycletime_photom_1_tcp + n * 100 * 256;
+      cycletime_photom_1 = cycletime_photom_1_tcp; // in micro secs (Ch1)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
+      
+      if (debugmode){
+        Serial.print("New tcp cycle 1 (us): ");
+        Serial.println(cycletime_photom_1_tcp);
+      }
+      break;
+
+    case 58:
+      // 58: Add Cycle 2 for TCP (cycle = cycle + n * 256 * 100 us);
+      cycletime_photom_2_tcp = cycletime_photom_2_tcp + n * 100 * 256;
       cycletime_photom_2 = cycletime_photom_2_tcp; // in micro secs (Ch2)
       fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
       
