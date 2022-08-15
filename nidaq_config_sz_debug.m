@@ -50,7 +50,12 @@ nicfg.omnibox.enable = true;
 
 % Modes
 % Two-color photometry
-nicfg.tcp.enable = false; % Default true.
+nicfg.tcp.enable = true; % Default true.
+nicfg.tcp.behaviorcycle = 10; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
+
+% Change pulse cycles (CAUTION)
+nicfg.tcp.pulsecycle1 = 5000; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
+nicfg.tcp.pulsecycle2 = 5000; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
 
 % Optophotometry (two colors)
 % Pulse width is fixed at 10 ms
@@ -67,14 +72,12 @@ nicfg.optophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms 
 % that matters.
 % 2. The final pulse frequency is determined by these values as well as freq
 % mod above
-% 3. Changing these values will also affect the train cycle (which assumes
-% each full cycle is 20 ms).
 nicfg.optophotometry.pulsecycle1 = 65; % Pulse cycle 1 in X * 100 us. E.g., 65 means 6.5 ms. Default 65 (6.5 ms)
 nicfg.optophotometry.pulsecycle2 = 135; % Pulse cycle 1 in X * 100 us. E.g., 135 means 13.5 ms. Default 135 (13.5 ms)
 
 % Same-color optophotometry
 % Variable pulse width. 20 ms means always on
-nicfg.scoptophotometry.enable = true; % Default false
+nicfg.scoptophotometry.enable = false; % Default false
 nicfg.scoptophotometry.freqmod = 2; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
 nicfg.scoptophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.scoptophotometry.cycle = 10; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
@@ -90,7 +93,7 @@ nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran t
 % Hardware Opto RNG (determines a train goes through or not)
 % (Scheduler only and does not apply to the listening mode)
 % May implement RNG values imported from Matlab in the future
-nicfg.scheduler.useRNG = true; % Default false
+nicfg.scheduler.useRNG = false; % Default false
 nicfg.scheduler.passchance = 50; % Pass chance in percentage (30 = 30% pass)
 
 % Control experiments (no stim)
@@ -129,6 +132,7 @@ nicfg.optodelayTTL.conditional = false; %true TTL delivery is conditional or not
 nicfg.optodelayTTL.actiondelay = 50; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.actiondur = 20; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 nicfg.optodelayTTL.deliverydur = 50; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
+
 % Encoder
 nicfg.encoder.enable = true;
 nicfg.encoder.autoecho = true; % Using auto echo (turn off for debugging)
