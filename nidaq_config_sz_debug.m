@@ -54,8 +54,8 @@ nicfg.tcp.enable = true; % Default true.
 nicfg.tcp.behaviorcycle = 10; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 
 % Change pulse cycles (CAUTION)
-nicfg.tcp.pulsecycle1 = 5000; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
-nicfg.tcp.pulsecycle2 = 5000; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
+nicfg.tcp.pulsecycle1 = 500; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
+nicfg.tcp.pulsecycle2 = 500; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
 
 % Optophotometry (two colors)
 % Pulse width is fixed at 10 ms
