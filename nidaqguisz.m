@@ -197,7 +197,7 @@ if nicfg.active
     % nicfg
     
     % Reset arduino
-    if nicfg.ArduinoCOM > -1 && ~isfield(nicfg, 'arduino_serial')
+    if (ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1) && ~isfield(nicfg, 'arduino_serial')
         disp('Starting Arduino...');
         nicfg.arduino_data = zeros(1, 2000); % Initialize for 2000
         nicfg.arduino_serial = arduinoOpen(nicfg.ArduinoCOM, nicfg.baumrate);
@@ -239,7 +239,7 @@ if nicfg.active
     timeconv = [0 0 86400 3600 60 1]';
     
     % Start camera pulsing
-    if nicfg.ArduinoCOM > -1
+    if ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1
         fwrite(nicfg.arduino_serial, [1 0]);
     end
     
@@ -251,7 +251,7 @@ if nicfg.active
     while get(hObject, 'Value') == 1
         drawnow();
         
-        if nicfg.RecordRunning && nicfg.ArduinoCOM > -1            
+        if nicfg.RecordRunning && (ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1)
             % Read serial if serial is avalable
             d = arduinoReadQuad(nicfg.arduino_serial);
             
@@ -280,7 +280,7 @@ if nicfg.active
 %     disp(nicfg.arduino_serial.BytesAvailable);
     
     % Stop camera pulsing
-    if nicfg.ArduinoCOM > -1
+    if ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1
         fwrite(nicfg.arduino_serial, [0 0]);
 
         pause(1);
@@ -302,7 +302,7 @@ if nicfg.active
     
     disp('Saving...');
     
-    if nicfg.ArduinoCOM > -1
+    if ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1
         fclose(nicfg.arduino_serial);
         nicfg = rmfield(nicfg, 'arduino_serial');
         if nicfg.RecordRunning
@@ -366,7 +366,7 @@ if nicfg.active
         end
 
         % Copy arduino file if does not exist
-        if nicfg.RecordRunning && (nicfg.ArduinoCOM > -1)
+        if nicfg.RecordRunning && (ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1)
             if ~exist(arduinopath_server, 'file')
                 copyfile(arduinopath, arduinopath_server);
             elseif input('Running file already exist. Overwrite? (1 = Yes, 0 = No): ') == 1

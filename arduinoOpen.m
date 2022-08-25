@@ -6,8 +6,12 @@ function open_serial = arduinoOpen(com, baumrate)
     if nargin < 2
         baumrate = 9600;
     end
+    
+    if ~ischar(com)
+        com = sprintf('COM%i', com);
+    end
 
-    open_serial = serial(sprintf('COM%i', com), 'Terminator', '', 'BaudRate', baumrate);
+    open_serial = serial(com, 'Terminator', '', 'BaudRate', baumrate);
     fopen(open_serial);
 
 end

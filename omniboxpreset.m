@@ -3,7 +3,13 @@ function omniboxpreset(nicfg)
 
 %% Open
 % Set serial and open
-nicfg.arduino_serial = serial(sprintf('COM%i', nicfg.ArduinoCOM), 'BaudRate', nicfg.baumrate);
+if ischar(nicfg.ArduinoCOM)
+    com = nicfg.ArduinoCOM;
+else
+    com = sprintf('COM%i', nicfg.ArduinoCOM);
+end
+
+nicfg.arduino_serial = serial(com, 'BaudRate', nicfg.baumrate);
 fopen(nicfg.arduino_serial);
 
 % Wait
