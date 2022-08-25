@@ -65,6 +65,10 @@ run(handles.loadconfig.UserData.fp);
 handles.configname.Text = sprintf('[%s]', handles.loadconfig.UserData.fn);
 global nicfg
 
+% Serial port
+fprintf('Serial ports detected: ');
+disp(seriallist);
+
 % Can't load if omnibox is not on
 if nicfg.omnibox.enable
     handles.togglebutton2.Enable = 'on';
