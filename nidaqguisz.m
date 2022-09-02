@@ -314,7 +314,8 @@ if nicfg.active
             
             position = nicfg.arduino_data;
             speed = runningSpeed(position, nicfg.RunningFrequency);
-            save(arduinopath, 'position', 'speed', 'pcount', 'pind');
+            configfp = handles.loadconfig.UserData.fp;
+            save(arduinopath, 'position', 'speed', 'pcount', 'pind', 'configfp');
         end
     end
     
@@ -324,7 +325,7 @@ if nicfg.active
         else
             omnisetting = nicfg;
             omnisetting = rmfield(omnisetting, 'nidaq_session');
-            stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames, omnisetting);
+            stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames, omnisetting, configfp);
         end
     end
     

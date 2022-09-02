@@ -1,8 +1,11 @@
-function stopNidaq(open_daq, channelnames, omniboxsetting)
+function stopNidaq(open_daq, channelnames, omniboxsetting, configfp)
 %UNTITLED12 Summary of this function goes here
 %   Detailed explanation goes here
-    if nargin < 3
-        omniboxsetting = [];
+    if nargin < 4
+        configfp = '';
+        if nargin < 3
+            omniboxsetting = [];
+        end
     end
     
     open_daq.daq_connection.stop;
@@ -18,7 +21,7 @@ function stopNidaq(open_daq, channelnames, omniboxsetting)
     
     Fs = open_daq.frequency;
     frequency = open_daq.frequency;
-    save(open_daq.path, 'data', 'Fs', 'frequency', 'timestamps', 'channelnames', 'omniboxsetting');
+    save(open_daq.path, 'data', 'Fs', 'frequency', 'timestamps', 'channelnames', 'omniboxsetting', 'configfp');
     
     delete(open_daq.logpath);
 end
