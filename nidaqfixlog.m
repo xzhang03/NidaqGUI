@@ -3,7 +3,7 @@ function nidaqfixlog(defaultpath, recordingmode)
 % nidaqfixlog(defaultpath, recordingmode)
 % *recordingmode could be 'lab' or 'sz'
 if nargin < 2
-    recordingmode = 'lab';
+    recordingmode = 'sz';
     if nargin < 1
         defaultpath = '\\anastasia\data\photometry\';
     end
@@ -14,7 +14,9 @@ switch recordingmode
     case 'lab'
         nidaq_config;
     case 'sz'
-        nidaq_config_sz;
+        [fn_config, fp_config] = uigetfile(fullfile(defaultpath,'.m'), 'Select config file.');
+        configfp = fullfile(fp_config,fn_config);
+        run(configfp);
 end
 
 % Get file
@@ -36,14 +38,20 @@ data = data(2:end, :);
 Fs = nicfg.NidaqFrequency;
 frequency = nicfg.NidaqFrequency;
 channelnames = nicfg.ChannelNames;
+omnisetting = nicfg;
+
 
 % Save
 disp('Saving...');
-if ~exist(fullfile(fp,fn_out), 'file')
-    save(fullfile(fp,fn_out), 'data', 'Fs', 'frequency', 'timestamps', 'channelnames');
-    saved = true;
-elseif input('Nidaq file already exist. Overwrite? (1 = Yes, 0 = No): ') == 1
-    save(fullfile(fp,fn_out), 'data', 'Fs', 'frequency', 'timestamps', 'channelnames');
+if ~exist(fullfile(fp,fn_out), 'file') || ...
+        input('Nidaq file already exist. Overwrite? (1 = Yes, 0 = No): ') == 1
+    
+    switch recordingmode
+        case 'lab'
+            save(fullfile(fp,fn_out), 'data', 'Fs', 'frequency', 'timestamps', 'channelnames');
+        case 'sz'
+            save(fullfile(fp,fn_out), 'data', 'Fs', 'frequency', 'timestamps', 'channelnames', 'omnisetting', 'configfp');
+    end
     saved = true;
 else
     saved = false;
