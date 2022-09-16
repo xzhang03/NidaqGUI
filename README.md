@@ -51,8 +51,8 @@ Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/
   3. **Same-color optophotometry mode only**: a tri-state buffer such as [74AHCT125](https://www.adafruit.com/product/1787). I also use the buffer as a unidirectional logic level shifter since Teensy4.0 cannot take 5V logic inputs. An opamp is preferred for true analog buffer.
   
 ## How to order
-1. Use one of the PCB printing services (e.g., [JLCPCB](https://jlcpcb.com/), [PCBWAY](https://www.pcbway.com/), [OSHPARK](https://oshpark.com/), [etc](https://pcbshopper.com/)). Upload the zip Gerber files from [here](https://github.com/xzhang03/NidaqGUI/tree/master/PCB_omni). The sizes are pre-set so just choose your quantity, color, etc... You are good to go.
-2. Upload the [bill of materials excel files](https://github.com/xzhang03/NidaqGUI/tree/master/PCB_omni) to [Digikey](https://www.digikey.com/en/mylists/). Please feel free to ask me about replacements.
+1. Use one of the PCB printing services (e.g., [JLCPCB](https://jlcpcb.com/), [PCBWAY](https://www.pcbway.com/), [OSHPARK](https://oshpark.com/), [etc](https://pcbshopper.com/)). Upload the zip Gerber files from [here](https://github.com/xzhang03/NidaqGUI/tree/master/PCB_omni). The sizes are pre-set so just choose your quantity, color, etc... You are good to go with PCBs
+2. Upload the [bill of materials excel files](https://github.com/xzhang03/NidaqGUI/tree/master/PCB_omni) to [Digikey](https://www.digikey.com/en/mylists/). The quantities are for 1 unit. For resisters, trimmers, and header pins, you are better off using bulk kits from Amazon/Ebay. Please feel free to ask me about replacements.
 
 ## Modes
 
