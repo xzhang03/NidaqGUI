@@ -49,6 +49,10 @@ Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/
     a. **Legacy mode**: any microscontroller with serial communication will do (e.g., Arduino UNO, Trinket m0, etc).  
     b. **Omnibox mode**: I recommend [Teensy 4.0](https://www.pjrc.com/store/teensy40.html). It's fast, easy to program, and cheap. It also has many pins. **IT CANNOT HANDLE 5V LOGIC.** The drawback is the lack of true analog output for future ramp experiments.
   3. **Same-color optophotometry mode only**: a tri-state buffer such as [74AHCT125](https://www.adafruit.com/product/1787). I also use the buffer as a unidirectional logic level shifter since Teensy4.0 cannot take 5V logic inputs. An opamp is preferred for true analog buffer.
+  
+## How to order
+1. Use one of the PCB printing services (e.g., [JLCPCB](https://jlcpcb.com/), [PCBWAY](https://www.pcbway.com/), [OSHPARK](https://oshpark.com/), [etc](https://pcbshopper.com/)). Upload the zip Gerber files from [here](https://github.com/xzhang03/NidaqGUI/tree/master/PCB_omni). The sizes are pre-set so just choose your quantity, color, etc... You are good to go.
+2. Upload the [bill of materials excel files](https://github.com/xzhang03/NidaqGUI/tree/master/PCB_omni) to [Digikey](https://www.digikey.com/en/mylists/). Please feel free to ask me about replacements.
 
 ## Modes
 
