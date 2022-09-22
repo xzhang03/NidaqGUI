@@ -1,6 +1,7 @@
 function open_daq = startNidaq(path, frequency, nchannels, digitalchannelstr, ndigital, daqname, RecordingMode)
 %UNTITLED11 Summary of this function goes here
 %   Detailed explanation goes here
+% Consider addTriggerConnection in the future
     
     modes = {'Differential', 'SingleEnded', 'SingleEndedNonReferenced'};
     
