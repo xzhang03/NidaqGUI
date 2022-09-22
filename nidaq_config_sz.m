@@ -60,6 +60,7 @@ nicfg.optophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 10
 nicfg.optophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.optophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 nicfg.optophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
+nicfg.optophotometry.overlap = false; % If overlap is true, opto and photometry pulses start at the same time with no offset. Pulsewidth is now pulsewidth + pulsecycle1
 
 % Change pulse cycles (CAUTION)
 % Generally only change these values for pure optomode

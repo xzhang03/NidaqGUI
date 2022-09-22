@@ -89,6 +89,11 @@ if nicfg.optophotometry.enable
     % Pulse width
     fwrite(nicfg.arduino_serial, uint8([14 nicfg.optophotometry.pulsewidth]));
     
+    % Overlap
+    if isfield(nicfg.optophotometry, 'overlap')
+        fwrite(nicfg.arduino_serial, uint8([59 nicfg.optophotometry.overlap]));
+    end
+    
     % Optophotometry mode switch (do this at the end to modeswitch to correct
     % timings)
     fwrite(nicfg.arduino_serial, uint8([3 1]));

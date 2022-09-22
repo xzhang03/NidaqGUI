@@ -175,6 +175,7 @@ unsigned long train_cycle = 30 * 50; // First number is in seconds. How often do
 int pulsewidth_2_opto = 10000; // in micro secs (ch2)
 unsigned long cycletime_photom_1_opto = 6500; // in micro secs (Ch1)
 unsigned long cycletime_photom_2_opto = 13500; // in micro secs (Ch2)
+bool optophotooverlap = false; // When optophotooverlap is on, opto pulse and photometry pulse start at the same time, otherwise, opto pulse starts after cycl1time_photom_1_opto.
 
 // Same color opto variables
 byte scopto_per = 5; // Number of photometry pulses per opto pulse (AO). Can be: 1, 2, 5, 10, 25, 50. Pulse freq is 50 / AO
@@ -503,7 +504,7 @@ void loop() {
     }
     */
 
-    // tcp mode behavioral task
+    // ***tcp mode behavioral task***
     if (tcpmode){
       // Advance counters
       // Scheduler allows train and opto counters to advance
@@ -557,7 +558,7 @@ void loop() {
     }
     
     
-    // scopto mode
+    // ***scopto mode***
     if (samecoloroptomode){
       // Advance counters
       // Scheduler allows train and opto counters to advance
@@ -659,11 +660,10 @@ void loop() {
 
       // Turn on light
       if (opto){
-        
+//        Serial.println("OPTO actually ON");
         digitalWrite(ch1_pin, HIGH);
         
         ch1_on = true;
-
         opto_counter++;
         opto = false;
 
@@ -693,7 +693,7 @@ void loop() {
       }
     }
 
-    // Optophotometry
+    // ***Optophotometry***
     if (optophotommode){
       // Advance counters (not using scheduler or stim is enabled)
       if (stimenabled){
@@ -781,6 +781,23 @@ void loop() {
       if (counter_for_train >= train_cycle){
         counter_for_train = 0;
       }
+
+      // Overlap mode (sending opto pulse now)
+      if ((optophotooverlap) && (opto) && (!ch2_on)){
+        // RNG (only in scheduler mode and useRNG is on can RNG be considered)
+        if ((!usescheduler) || (!useRNG) || (trainpass)){
+          // schedule mode is off or not using RNG or train passed anyway
+          // In other words, this step is skipped when schedulemode = 1 && useRNG = 1 && and trainpass = 0
+          digitalWrite(ch2_pin, HIGH);
+        }
+        ch2_on = true;
+        opto_counter++;
+        opto = false;
+        if ((debugmode || serialdebug) && showopto){
+          ttest1 = tnow;
+          ftest1 = true;
+        }
+      }
     }
   }
   
@@ -848,14 +865,12 @@ void loop() {
       }
     }
     // Opto photometry
-    else if (optophotommode){
-      // optophotometry
+    else if (optophotommode && (!optophotooverlap)){
+      // optophotometry and not-overlap mode (overlapping means the opto pulse is sent earlier with photometry pulse)
       if ((opto) && (!ch2_on)){
         // RNG (only in scheduler mode and useRNG is on can RNG be considered)
         if ((!usescheduler) || (!useRNG) || (trainpass)){
-          // schedule mode is off or
-          // not using RNG or
-          // train passed anyway
+          // schedule mode is off or not using RNG or train passed anyway
           // In other words, this step is skipped when schedulemode = 1 && useRNG = 1 && and trainpass = 0
           digitalWrite(ch2_pin, HIGH);
 //          Serial.println("OPTO actually ON");
@@ -935,6 +950,7 @@ void parseserial(){
   // 6: Change opto frequency (opto_per = n, f = 50/n)
   // 7: Change opto pulse per train (train_length = n)
   // 8: Change opto train cycle (train_cycle = n * 50, n in seconds)
+  // 59: Opto-photometry overlap (n = 1 yes, 0 no)
   // 10: Change scopto frequency (scopto_per = n, f = 50/n)
   // 11: Change scopto train cycle (train_cycle = n * 50)
   // 12: Change scopto pulse per train (train_length = n)
@@ -1804,6 +1820,15 @@ void parseserial(){
         Serial.println(cycletime_photom_2_tcp);
       }
       break;
+
+    case 59:
+      // 59: Opto-photometry overlap (n = 1 yes, 0 no)
+      optophotooverlap = (n == 1);
+      if (debugmode){
+        Serial.print("Opto-photometry overlap: ");
+        Serial.println(optophotooverlap);
+      }
+      break;
   }
 
   if (debugpins){
@@ -1905,6 +1930,8 @@ void showpara(void){
   Serial.println(train_cycle / fps);
   Serial.print("Pulse width (ms): ");
   Serial.println(pulsewidth_2_opto/1000);
+  Serial.print("Opto-photometry overlap: ");
+  Serial.println(optophotooverlap);
 
   // Same color opto
   Serial.println("============== SCoptophoto ==============");
