@@ -9,6 +9,7 @@ disp('Opened.')
 nidaq_config_sz_debug;
 omniboxparse(nicfg)
 
+
 %% Get summary (run serial debug after)
 fwrite(nicfg.arduino_serial, uint8([9 0]));
 
