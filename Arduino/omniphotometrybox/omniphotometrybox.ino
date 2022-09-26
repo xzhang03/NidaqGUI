@@ -19,7 +19,7 @@
  */
 
 // ================ PCB ================
-#define PCB true
+#define PCB false
 #define TeensyTester false //
  
 // =============== Debug ===============
@@ -258,6 +258,16 @@ unsigned int actiondur = 5000;
 unsigned int deliverydur = 5000;
 bool cueon = false;
 bool actionperiodon = false;
+
+
+// ============== I2c ==============
+bool usei2c = false;
+
+// Shifter
+#include<Wire.h>
+#define shifteradd 0x11
+byte ch1_shift = 2;
+byte ch2_shift = 2;
 
 
 // ============ Switches ============
