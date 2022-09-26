@@ -4,6 +4,7 @@
 #define debug false
 
 // I2c
+#define usei2c false
 #define i2caddress 0x11
 byte m, mecho;
 
@@ -17,7 +18,7 @@ const byte ch2_output[4] = {6, 7, 8, 9};
 const byte ledpin = 25;
 
 // Def pin to set maxes
-#define useDefpin true
+#define useDefpin false
 const byte defpin1 = 10; // Channel 1 high bit
 const byte defpin2 = 11; // Channel 1 low bit
 const byte defpin3 = 12; // Channel 2 high bit
@@ -28,8 +29,8 @@ const byte max_ch = 4;
 volatile byte ch1, ch2;
 volatile byte ch1_ind = 0;
 volatile byte ch2_ind = 0;
-volatile byte ch1_max = 4; // 4 means 0 - 3
-volatile byte ch2_max = 4;
+volatile byte ch1_max = 2; // 4 means 0 - 3
+volatile byte ch2_max = 2;
 
 // flags
 volatile bool checktimer = true;
@@ -106,12 +107,14 @@ void setup1(){
   }
   
   // Wire
-  Wire.setSDA(0);
-  Wire.setSCL(1);
-  Wire.begin(i2caddress);
-  Wire.onReceive(updatemax);
-  Wire.onRequest(echomax);
-
+  if (usei2c){
+    Wire.setSDA(0);
+    Wire.setSCL(1);
+    Wire.begin(i2caddress);
+    Wire.onReceive(updatemax);
+    Wire.onRequest(echomax);
+  }
+  
   pinMode(ledpin, OUTPUT);
 }
 
