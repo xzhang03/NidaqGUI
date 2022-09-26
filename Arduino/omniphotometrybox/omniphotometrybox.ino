@@ -19,7 +19,7 @@
  */
 
 // ================ PCB ================
-#define PCB false
+#define PCB true
 #define TeensyTester false //
  
 // =============== Debug ===============
@@ -262,13 +262,6 @@ bool actionperiodon = false;
 
 // ============== I2c ==============
 bool usei2c = false;
-
-// Shifter
-#include<Wire.h>
-#define shifteradd 0x11
-byte ch1_shift = 2;
-byte ch2_shift = 2;
-
 
 // ============ Switches ============
 // photometry and optophotometry switches
