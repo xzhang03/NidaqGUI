@@ -2232,7 +2232,7 @@ void foodttl(void){
         }
       }
       // Trying to end action period
-      if ((tnowmillis - tfood0) >= (buzzdelay + actiondur)){
+      if ((tnowmillis - tfood0) >= (actiondelay + actiondur)){
         // Action period long enough
         actionperiodon = false;
 
