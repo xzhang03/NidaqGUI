@@ -8,6 +8,9 @@
 #define i2caddress 0x11
 byte m, mecho;
 
+// Dip switches
+#define useDefpin false // if set false here go to below to change ch1_max and ch2_max
+
 // Pins
 const byte ch1_input = 18;
 const byte ch1_input2 = 19;
@@ -17,8 +20,7 @@ const byte ch1_output[4] = {2, 3, 4, 5};
 const byte ch2_output[4] = {6, 7, 8, 9};
 const byte ledpin = 25;
 
-// Def pin to set maxes
-#define useDefpin false
+// Def pin to set maxes (dip switches)
 const byte defpin1 = 10; // Channel 1 high bit
 const byte defpin2 = 11; // Channel 1 low bit
 const byte defpin3 = 12; // Channel 2 high bit
@@ -29,8 +31,8 @@ const byte max_ch = 4;
 volatile byte ch1, ch2;
 volatile byte ch1_ind = 0;
 volatile byte ch2_ind = 0;
-volatile byte ch1_max = 2; // 4 means 0 - 3
-volatile byte ch2_max = 2;
+volatile byte ch1_max = 2; // 4 means 0 - 3 (ABCDABCD shift)
+volatile byte ch2_max = 2; // 4 means 0 - 3 (ABCDABCD shift)
 
 // flags
 volatile bool checktimer = true;
