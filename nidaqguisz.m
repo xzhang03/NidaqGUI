@@ -192,13 +192,9 @@ if nicfg.active
     else
         daqreset;
     end
-    
-    % Live update
-    updatecounter = 0;
-    
+       
     nicfg.MouseName = get(handles.MouseName, 'String'); % returns contents of Enter_ROI as a double
     nicfg.Run = str2double(get(handles.Runs, 'String')); % returns contents of Enter_ROI as a double
-    % nicfg
     
     % Reset arduino
     if (ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1) && ~isfield(nicfg, 'arduino_serial')
@@ -325,6 +321,7 @@ if nicfg.active
         else
             omnisetting = nicfg;
             omnisetting = rmfield(omnisetting, 'nidaq_session');
+            configfp = handles.loadconfig.UserData.fp;
             stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames, omnisetting, configfp);
         end
     end

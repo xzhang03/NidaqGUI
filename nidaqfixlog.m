@@ -17,6 +17,13 @@ switch recordingmode
         [fn_config, fp_config] = uigetfile(fullfile(defaultpath,'.m'), 'Select config file.');
         configfp = fullfile(fp_config,fn_config);
         run(configfp);
+        
+        % Mixed channels
+        if iscell(nicfg.AImode)
+            nanalogch = size(nicfg.AImode,1);
+        else
+            nanalogch = nicfg.NidaqChannels;
+        end
 end
 
 % Get file
@@ -27,8 +34,9 @@ fn_out = sprintf('%s.mat',fn(1:end-8));
 
 % Read file
 f1 = fopen(fullfile(fp,fn), 'r');
-[data, ~] = fread(f1, [(nicfg.NidaqChannels + nicfg.NidaqDigitalChannels +1), inf], 'double'); %#ok<ASGLU>
+[data, ~] = fread(f1, [(nanalogch + nicfg.NidaqDigitalChannels +1), inf], 'double'); %#ok<ASGLU>
 fclose(f1);
+
 
 % Restructure data
 timestamps = data(1, :);

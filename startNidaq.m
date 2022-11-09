@@ -9,7 +9,12 @@ function open_daq = startNidaq(path, frequency, nchannels, digitalchannelstr, nd
     if nargin < 3, nchannels = 6; end
     if nargin < 6, daqname = 'Dev1'; end
     if nargin < 7, RecordingMode = modes{2}; end
-    
+    if iscell(RecordingMode)
+        mixedch = true;
+        chvec = cell2mat(RecordingMode(:,1));
+    else
+        mixedch = false;
+    end
         
     [basepath, file, ~] = fileparts(path);
     logpath = fullfile(basepath, [file '-log.bin']);
@@ -18,11 +23,24 @@ function open_daq = startNidaq(path, frequency, nchannels, digitalchannelstr, nd
     daq_connection = daq.createSession('ni'); %create a session in 64 bit
     daq_connection.Rate = frequency; 
     daq_connection.IsContinuous = true;
-
-    ai = daq_connection.addAnalogInputChannel(daqname, 0:(nchannels-1) , 'Voltage'); 
+    
+    if mixedch
+        ai = daq_connection.addAnalogInputChannel(daqname, chvec , 'Voltage'); % 0 indexed here
+    else
+        ai = daq_connection.addAnalogInputChannel(daqname, 0:(nchannels-1) , 'Voltage'); % 0 indexed here
+    end
     for i = 1:nchannels
-        ai(i).Range = [-10 10];
-        ai(i).TerminalConfig = RecordingMode;
+        % Setting up channel range and modes
+        if mixedch
+            j = chvec == (i - 1);
+            if any(j)
+                ai(j).Range = [-10 10];
+                ai(j).TerminalConfig = RecordingMode{j,2};
+            end
+        else
+            ai(i).Range = [-10 10];
+            ai(i).TerminalConfig = RecordingMode;
+        end
     end
     
     if ndigital > 0

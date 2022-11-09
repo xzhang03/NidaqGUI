@@ -12,8 +12,15 @@ function stopNidaq(open_daq, channelnames, omniboxsetting, configfp)
     delete(open_daq.listener);
     fclose(open_daq.logfile);
     
+    % Mixed channels
+    if ~isempty(omniboxsetting) && iscell(omniboxsetting.AImode)
+        nanalogch = size(omniboxsetting.AImode,1);
+    else
+        nanalogch = open_daq.nchannels;
+    end
+            
     fp = fopen(open_daq.logpath, 'r');
-    [data, ~] = fread(fp, [(open_daq.nchannels + open_daq.ndigitals +1), inf], 'double'); %#ok<ASGLU>
+    [data, ~] = fread(fp, [(nanalogch + open_daq.ndigitals +1), inf], 'double'); %#ok<ASGLU>
     fclose(fp);
     
     timestamps = data(1, :);
