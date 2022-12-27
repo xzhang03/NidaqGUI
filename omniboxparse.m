@@ -10,6 +10,16 @@ else
     end
 end
 
+%% Firmware version
+fwrite(nicfg.arduino_serial, uint8([254 0]));
+pause(0.1);
+if nicfg.arduino_serial.BytesAvailable > 3
+    ver = fread(nicfg.arduino_serial, 4, 'uint8');
+end
+fprintf('Nanosec firmware version: %s\n', char(ver'));
+
+
+
 %% Check conflict
 if (nicfg.tcp.enable + nicfg.optophotometry.enable + nicfg.scoptophotometry.enable) ~= 1
     msgbox('Must select 1 and only 1 from Tcp, Optophotometry, and Same-color optophotometry modes.')
