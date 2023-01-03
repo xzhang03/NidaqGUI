@@ -6,7 +6,7 @@ Renaming in progress.
 ## A. Basic Idea
 A Matlab UI is used to designate filename and start/stop, as well as to specify experiment modes and structures to a microcontroller (see below). The microcontroller takes care the actual operation of the experiment.
 
-###### Functions:
+##### Functions:
   **Legacy**: UI specifies the start and the end of the camera-sync pulses, and camera pulse rate. Everything else is hard-coded. This is the simple version
     
     To run legacy: 
@@ -32,11 +32,21 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
     Microcontroller uses /Arduino/omniphotometrybox.ino
     Matlab uses nidaqguisz.m and nidaq_config_sz.m
     
-PCB for Omniphotometrybox: [EasyEDA](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/EasyEDA_PCB_Omnibox%20v3.json), [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Schematic_Omnibox%20v3_2022-04-08.png), and [Gerber files](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/Gerber_PCB_Omnibox%20v3.zip). Parts numbers on Digikey: WM5514-ND (BNC), CP-435107RS-ND (4-cond Audio/I2C jack).
+PCB for Nanosec/Omniphotometrybox: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/Nanosec). Parts numbers on Digikey: WM5514-ND (BNC), CP-435107RS-ND (4-cond Audio/I2C jack).
 
-PCB for IR encoder: [EasyEDA](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/EasyEDA_PCB_IR%20rotary%20encoder%20v1.json), [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Schematic_IR%20rotary%20encoder%20v1_2022-04-13.png), and [Gerber files](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/Gerber_PCB_IR%20rotary%20encoder%20v1_2022-04-13.zip).
+PCB for IR encoder: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/Rotary%20Encoder).
 
-PCB for buzzer: [EasyEDA](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/EasyEDA_PCB_Buzzer_2022-04-13.json), [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Schematic_Buzzer_2022-04-13.png), and [Gerber files](https://github.com/xzhang03/NidaqGUI/blob/master/PCB_omni/Gerber_PCB_Buzzer_2022-04-13.zip).
+PCB for buzzer: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/Buzzer).
+
+PCB for LED cue: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/LED%20cue).
+
+PCB for I2C-based LED cue: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/LED%20cue%20i2c)
+
+PCB for shifter: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/Shifter).
+
+PCB for I2C repeater: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/I2C%20repeater).
+
+PCB for I2C-based digital IO expander: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander).
 
 Containment for PCB box: [Github](https://github.com/xzhang03/Half_breadboard_box/blob/main/half%20breadboard%20box%20PCB.ai).
 
@@ -51,8 +61,8 @@ Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/
   3. **Same-color optophotometry mode only**: a tri-state buffer such as [74AHCT125](https://www.adafruit.com/product/1787). I also use the buffer as a unidirectional logic level shifter since Teensy4.0 cannot take 5V logic inputs. An opamp is preferred for true analog buffer.
   
 ## How to order
-1. Use one of the PCB printing services (e.g., [JLCPCB](https://jlcpcb.com/), [PCBWAY](https://www.pcbway.com/), [OSHPARK](https://oshpark.com/), [etc](https://pcbshopper.com/)). Upload the zip Gerber files from [here](https://github.com/xzhang03/NidaqGUI/tree/master/PCB_omni). The sizes are pre-set so just choose your quantity, color, etc... You are good to go with PCBs
-2. Upload the [bill of materials excel files](https://github.com/xzhang03/NidaqGUI/tree/master/PCB_omni) to [Digikey](https://www.digikey.com/en/mylists/). The quantities are for 1 unit. For resisters, trimmers, and header pins, you are better off using bulk kits from Amazon/Ebay. Please feel free to ask me about replacements.
+1. Use one of the PCB printing services (e.g., [JLCPCB](https://jlcpcb.com/), [PCBWAY](https://www.pcbway.com/), [OSHPARK](https://oshpark.com/), [etc](https://pcbshopper.com/)). Upload the zip Gerber files from [here for example](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/Nanosec/Gerber_PCB_Omnibox%20v3.zip). The sizes are pre-set so just choose your quantity, color, etc... You are good to go with PCBs
+2. Upload the bill of materials excel files, [this one for example](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/Nanosec/Nanosec%20Photometry%20BOM.xlsx), to [Digikey](https://www.digikey.com/en/mylists/). The quantities are for 1 unit. For resisters, trimmers, and header pins, you are better off using bulk kits from Amazon/Ebay. Please feel free to ask me about replacements.
 
 ## C. Modes
 
