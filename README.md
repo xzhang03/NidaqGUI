@@ -32,6 +32,18 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
     Microcontroller uses /Arduino/omniphotometrybox.ino
     Matlab uses nidaqguisz.m and nidaq_config_sz.m
     
+## B. Hardware
+
+  1. **LED driver**: I wrote the code for [PLEXON single channel driver](https://plexon.com/wp-content/uploads/2017/06/PlexBright-LD-1-Single-Channel-Driver-User-Guide.pdf), but any driver with **digital input** can do TCP and optophotometry modes. **Analog input** is required to do the same-color optophotometry mode.
+  2. **Microcontroller**:
+    a. **Legacy mode**: any microscontroller with serial communication will do (e.g., Arduino UNO, Trinket m0, etc).  
+    b. **Omnibox mode**: I recommend [Teensy 4.0](https://www.pjrc.com/store/teensy40.html). It's fast, easy to program, and cheap. It also has many pins. **IT CANNOT HANDLE 5V LOGIC.** The drawback is the lack of true analog output for future ramp experiments.
+  3. **Same-color optophotometry mode only**: a tri-state buffer such as [74AHCT125](https://www.adafruit.com/product/1787). I also use the buffer as a unidirectional logic level shifter since Teensy4.0 cannot take 5V logic inputs. An opamp is preferred for true analog buffer.
+  
+## C. How to order
+1. Use one of the PCB printing services (e.g., [JLCPCB](https://jlcpcb.com/), [PCBWAY](https://www.pcbway.com/), [OSHPARK](https://oshpark.com/), [etc](https://pcbshopper.com/)). Upload the zip Gerber files from [here for example](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/Nanosec/Gerber_PCB_Omnibox%20v3.zip). The sizes are pre-set so just choose your quantity, color, etc... You are good to go with PCBs
+2. Upload the bill of materials excel files, [this one for example](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/Nanosec/Nanosec%20Photometry%20BOM.xlsx), to [Digikey](https://www.digikey.com/en/mylists/). The quantities are for 1 unit. For resisters, trimmers, and header pins, you are better off using bulk kits from Amazon/Ebay. Please feel free to ask me about replacements.
+
 PCB for Nanosec/Omniphotometrybox: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/Nanosec). Parts numbers on Digikey: WM5514-ND (BNC), CP-435107RS-ND (4-cond Audio/I2C jack).
 
 PCB for IR encoder: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/Rotary%20Encoder).
@@ -51,20 +63,8 @@ PCB for I2C-based digital IO expander: [EasyEDA](https://github.com/xzhang03/Nid
 Containment for PCB box: [Github](https://github.com/xzhang03/Half_breadboard_box/blob/main/half%20breadboard%20box%20PCB.ai).
 
 Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/omnibox_half_breadboard.png).
-    
-## B. Hardware
 
-  1. **LED driver**: I wrote the code for [PLEXON single channel driver](https://plexon.com/wp-content/uploads/2017/06/PlexBright-LD-1-Single-Channel-Driver-User-Guide.pdf), but any driver with **digital input** can do TCP and optophotometry modes. **Analog input** is required to do the same-color optophotometry mode.
-  2. **Microcontroller**:
-    a. **Legacy mode**: any microscontroller with serial communication will do (e.g., Arduino UNO, Trinket m0, etc).  
-    b. **Omnibox mode**: I recommend [Teensy 4.0](https://www.pjrc.com/store/teensy40.html). It's fast, easy to program, and cheap. It also has many pins. **IT CANNOT HANDLE 5V LOGIC.** The drawback is the lack of true analog output for future ramp experiments.
-  3. **Same-color optophotometry mode only**: a tri-state buffer such as [74AHCT125](https://www.adafruit.com/product/1787). I also use the buffer as a unidirectional logic level shifter since Teensy4.0 cannot take 5V logic inputs. An opamp is preferred for true analog buffer.
-  
-## How to order
-1. Use one of the PCB printing services (e.g., [JLCPCB](https://jlcpcb.com/), [PCBWAY](https://www.pcbway.com/), [OSHPARK](https://oshpark.com/), [etc](https://pcbshopper.com/)). Upload the zip Gerber files from [here for example](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/Nanosec/Gerber_PCB_Omnibox%20v3.zip). The sizes are pre-set so just choose your quantity, color, etc... You are good to go with PCBs
-2. Upload the bill of materials excel files, [this one for example](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/Nanosec/Nanosec%20Photometry%20BOM.xlsx), to [Digikey](https://www.digikey.com/en/mylists/). The quantities are for 1 unit. For resisters, trimmers, and header pins, you are better off using bulk kits from Amazon/Ebay. Please feel free to ask me about replacements.
-
-## C. Modes
+## D. Modes
 
 **Two-color photometry**
 ![TCP](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/TCP.png)
@@ -89,13 +89,13 @@ You can use channel 2 for pure optogenetic stimulations. Pulse widths are adjust
 ![Scoptophotometry](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/SCoptophotometry.png)
 The same digital output controls the timing of both photometry and opto (same color). Photometry parameters are changeable in arduino (T1, T2, TPeriod1). Opto parameters are changeable in Matlab throug serial communicaiton (T3, T4, TPeriod2). TPeriod2 must be an integer multiplier of TPeriod1. Opto train lengths and train periods are also adjustable in terms of number of pulses. The second output sets the intensity of the LED during the opto period, and when it's in the photometry period, the output level is not LOW but **OPEN**. OPEN means the driver uses its own current limiting resistor (potentiometer) to set the intensity of the photometry pulses and uses the microcontroller defined intensty only during opto stims.
 
-## D. Camera/microphone synchronization pulses
+## E. Camera/microphone synchronization pulses
 Parameters in mMtlab and serial communicated to microcontrollers. Pulsing starts when user clicks START on the GUI and stops when user clicks STOP.
 
-## E. Rotary encoder
+## F. Rotary encoder
 Microcontroller sends encoder position periodically to Matlab. Total numbers of positions sent and received are both saved.
 
-## F. Scheduler
+## G. Scheduler
 It's a automated mode to schedule optogenetic stimulation. The general structure is:
 
  1. **Pre-optogenetic period**. Specifify time since the start of user clicking START on the Matlab GUI.
@@ -103,10 +103,10 @@ It's a automated mode to schedule optogenetic stimulation. The general structure
     RNG can be implemented to randomize whether opto stim is given or not. Inter-trial interval can also be hardware randomized within the specified range.
  4. **Post-optogenetic period**.
 
-## G. Manually triggered scheduler (Listenmode; Scheduler mode required)
+## H. Manually triggered scheduler (Listenmode; Scheduler mode required)
 In this mode, the pre-stim. period is infinitely long until the external trigger is fed in. One trigger pulse gives one train, and the number of triggers can be as many as needed.
 
-## H. Food TTL output (Unconditional behavioral reward)
+## I. Food TTL output (Unconditional behavioral reward)
 A food pulse train is generated in timelock with optogenetic stims or periodically in pure photometry experiments. Train delay, pulse width, pulse cycle, and train lengths are specified in Matlab with reference to opto starts of each trial. This can be used to e.g., unconditionally deliver reward after an optogenetic stimulation train.
 
 ### 1. Unconditional Opto-then-food
@@ -120,7 +120,7 @@ This is the timing of unconditional reward delivery system in which food is deli
 ![unconditiona_food-then-opto](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/unconditional%20foodthenopto.png)
 
 
-## I. Conditional stim.-delayed TTL output (Conditional behavioral task)
+## J. Conditional stim.-delayed TTL output (Conditional behavioral task)
 The generation of stimulation-delayed train is condition to a TTL input (e.g., licking) during the response period. An audio cue or an LED cue may be used to signal the onset of the response period.
 
 ### 1. Conditional Opto-then-food
