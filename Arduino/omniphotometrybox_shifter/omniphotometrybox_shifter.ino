@@ -3,13 +3,13 @@
 // Debug
 #define debug false
 
-// I2c
+// I2c (doesn't work with interrupt apparently)
 #define usei2c false
 #define i2caddress 0x11
 byte m, mecho;
 
 // Dip switches
-#define useDefpin false // if set false here go to below to change ch1_max and ch2_max
+#define useDefpin true // if set false here go to below to change ch1_max and ch2_max
 
 // Pins
 const byte ch1_input = 18;

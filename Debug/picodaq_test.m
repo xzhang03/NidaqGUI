@@ -1,7 +1,7 @@
 %% Open
 clear
 picodaq_serial = serial(sprintf('COM%i', 9), 'BaudRate', 500000);
-picodaq_serial.InputBufferSize = 2 ^ 20;
+picodaq_serial.InputBufferSize = 2 ^ 20; % 1 MB buffer
 fopen(picodaq_serial);
 disp('Opened.')
 
