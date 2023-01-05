@@ -1,7 +1,7 @@
 # Code
 
 ## Structure
-Starting at version v3.3, this code is split up into parts. The main code is nanosec.ino. The rest are split as such:
+Starting at version v3.3, this code is split up into parts. The main code is nanosec.ino. The rest are split as below. If you open any of them in arduino IDE, the rest will show up as tabs in alphabetical order. Arduino will concatenate them before compiling (hence the numbers). The splitting is done lazily right now and will be updated into proper .cpp and .h files in the future<sup>TM</sup>.
 
 * nanosec:	Modes, time, channel switches, debug
 * 0_pins: 	Pin and encoder variables
