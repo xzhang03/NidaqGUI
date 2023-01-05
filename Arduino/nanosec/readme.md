@@ -90,5 +90,5 @@ You can use the debug flags to ender debug mode if you feel advanturous. :)
 
 #### You can do a performance check to see how fast each cycle of code is running. You don't need to be in debug mode but the results will be read out by software (e.g., MATLAB) in the serial port.
 ```C
-#define perfcheck false // Checking cycle time. Independent of debugmode/serialdebug
+#define perfcheck true // Checking cycle time. Independent of debugmode/serialdebug
 ```
