@@ -60,7 +60,7 @@ extern "C" uint32_t set_arm_clock(uint32_t frequency);
 #define showopto true // Dependent on debugmode or serialdebug to be true
 #define showscheduler true // Dependent on debugmode or serialdebug to be true
 #define showfoodttl true // Dependent on debugmode or serialdebug to be true
-#define debugpins TeensyTester // This is independent of debugmode/serialdebug
+#define debugpins TeensyTester // This is set to follow TeensyTester. It is independent of debugmode/serialdebug
 #define perfcheck false // Checking cycle time. Independent of debugmode/serialdebug
 unsigned long ttest1 = 0;
 bool ftest1 = false;
