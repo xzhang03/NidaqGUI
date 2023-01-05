@@ -1,4 +1,4 @@
-This board expands the digital capability of nanosec. It uses the I2C DIO chip MCP 23008, which uses I2C at a default address of (0x20). More bits can be written on the address with the 3-bit DIP switch.
+This board expands the digital capability of nanosec. It uses the I2C DIO chip MCP 23008, which uses I2C at a default address of (0x20). More bits can be written on the address with the 3-bit DIP switch. Because the digital IO is commanded through I2C, it's not quite as fast but probably still has micro-seconds precision.
 
 ## No vreg mode
 Bridge the NOVREG pads to use voltage inputs from nanosec. Please before that the nanosec output voltage is 3.3V before doing this as the logic level of MCP23008 is whatever its input voltage is. No need to solder on the Vreg, power barrel, C1, and C2 if you do this.
