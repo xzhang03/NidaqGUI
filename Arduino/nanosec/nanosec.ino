@@ -43,7 +43,7 @@
 #define nsver "v3.3"
 
 // =============== Hardware ===============
-// Now running teensy 4.0 at 500 Mhz (2 ns step)
+// Now running teensy 4.0 at 450 Mhz (2.2 ns step)
 #if defined(__IMXRT1062__)
 extern "C" uint32_t set_arm_clock(uint32_t frequency);
 #define cpu_speed 450000000
@@ -56,12 +56,12 @@ extern "C" uint32_t set_arm_clock(uint32_t frequency);
 // =============== Debug ===============
 #define debugmode false // Master switch for all serial debugging
 #define serialdebug false // This is the same as above but for MATLAB serial debugging
-#define showpulses false // Extremely verbose
-#define showopto true
-#define showscheduler true
-#define showfoodttl true
-#define debugpins TeensyTester // This is independent of debugmode
-#define perfcheck false
+#define showpulses false // Extremely verbose. Dependent on debugmode or serialdebug to be true
+#define showopto true // Dependent on debugmode or serialdebug to be true
+#define showscheduler true // Dependent on debugmode or serialdebug to be true
+#define showfoodttl true // Dependent on debugmode or serialdebug to be true
+#define debugpins TeensyTester // This is independent of debugmode/serialdebug
+#define perfcheck false // Checking cycle time. Independent of debugmode/serialdebug
 unsigned long ttest1 = 0;
 bool ftest1 = false;
 
