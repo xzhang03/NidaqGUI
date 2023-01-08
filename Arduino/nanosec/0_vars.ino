@@ -95,12 +95,17 @@ byte foodpulses = 5; // Number of food ttl pulses per stim period.
 byte foodpulses_left = 0; // Try counting down this time. Probably easier to debug
 unsigned long tfood0, tfood1;
 bool optothenfood = true; // Set false is foodthenopto
-bool inputttl = false;
+bool inputttl = false; // Animal licked
 bool foodttlwait = false; // In waiting for delivery
 bool foodttlon = false;
 
+// Multiple trial types
+byte trialtype = 1; // type of trial
+byte cuetype = 1; // type of cue
+byte foodtype = 1; // type of food
+
 // ======== Food TTL Conditional ========
-// Cue: Opto start => buzzer delay => buzzer duration
+// Cue: Opto start => cue delay => cue duration
 // Action: Opto start => action delay => action window
 // Delivery: Opto start => delivery delay => delivery
 // Example: 
@@ -116,8 +121,8 @@ bool foodttlon = false;
 
 bool foodttlcuewait = false;
 bool foodttlactionwait = false;
-unsigned int buzzdelay = 2000; //
-unsigned int buzzdur = 1000; // Time for buzzer cue 
+unsigned int cuedelay = 2000; //
+unsigned int cuedur = 1000; // Time for food cue 
 unsigned int actiondelay = 2000;
 unsigned int actiondur = 5000;
 unsigned int deliverydur = 5000;

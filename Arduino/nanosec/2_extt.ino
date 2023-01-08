@@ -16,7 +16,7 @@ void externalttltrig(void){
     foodttlwait = false;
     manualon = true;
 
-    if (usebuzzcue){
+    if (usecue){
       foodttlcuewait = true;
     }
     

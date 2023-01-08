@@ -40,7 +40,7 @@
 //
 
 // =============== Version ===============
-#define nsver "v3.3"
+#define nsver "v3.35"
 
 // =============== Hardware ===============
 // Now running teensy 4.0 at 450 Mhz (2.2 ns step)
@@ -76,7 +76,7 @@ bool syncaudio = false;
 bool usescheduler = false; //false
 bool manualscheduleoverride = false; // Only works when using scheduler (keep false if the opto input is left floating)
 bool listenmode = false;
-bool usebuzzcue = false; //
+bool usecue = false; //
 bool foodttlconditional = false; //
 bool useRNG = false; // RNG for opto
 bool randomiti = false; // Randomize ITI

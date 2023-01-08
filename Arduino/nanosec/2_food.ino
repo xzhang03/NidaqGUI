@@ -24,9 +24,15 @@ void armfoodttl(void){
   inputttl = !foodttlconditional;
   tfood0 = tnowmillis;
 
-  if (usebuzzcue){
+  if (usecue){
     foodttlcuewait = true;
     cueon = false;
+
+    // Determine the trial type
+    trialtype = gettrialtype();
+    
+    // Determine cue type for this trial
+    cuetype = getcuetype(trialtype);
   }
   
   if (foodttlconditional){
@@ -53,14 +59,14 @@ void foodttl(void){
   }
       
   // 1. Cue
-  if (usebuzzcue){
+  if (usecue){
     if (foodttlcuewait){
       // In waiting
-      if ((tnowmillis - tfood0) >= buzzdelay){
-        // First time trying to get out of the buzz delay
+      if ((tnowmillis - tfood0) >= cuedelay){
+        // First time trying to get out of the cue delay
         foodttlcuewait = false;
-        tone(audiopin, audiofreq);
-        cueon = true;
+        docueon(cuetype); // Cue on default type 1
+        
         
         if ((debugmode || serialdebug) && showfoodttl){
           Serial.print("Cue on at (ms): ");
@@ -70,10 +76,10 @@ void foodttl(void){
     }
     else if (cueon){
       // After waiting and cue is on
-      if ((tnowmillis - tfood0) >= (buzzdelay + buzzdur)){
-        // Cue long enough
-        cueon = false;
-        noTone(audiopin);
+      if ((tnowmillis - tfood0) >= (cuedelay + cuedur)){
+        // Cue long enough and time to turn off (default type 1)
+        docueoff(cuetype);
+        
         if ((debugmode || serialdebug) && showfoodttl){
           Serial.print("Cue off at (ms): ");
           Serial.println(tnowmillis);
@@ -100,7 +106,7 @@ void foodttl(void){
     else if (actionperiodon){
       if(!inputttl){
         // In action perdio until getting a pulse
-        inputttl = digitalRead(foodTTLinput); // active high
+        inputttl = checklicks(1); // Check licks (type 1)
 
         if ((debugmode || serialdebug) && showfoodttl){
           if (inputttl){
@@ -122,16 +128,18 @@ void foodttl(void){
     }
   }
   
-  // 3. Delivery
+  // 3. Delivery (waiting period)
   // In the waiting period for delivery
   if (foodttlwait){
     // In waiting
     if (((tnowmillis - tfood0) >= nfoodpulsedelay) && ((tnowmillis - tfood0) < (nfoodpulsedelay + deliverydur))){
+      // After minimal food pulse delay (in terms of pulses) but before time out
       // Trying to get out of the waiting period
       if (foodttlconditional){
         // Trying to get out of the waiting period (happens when detection or time out (below)
         if (inputttl){
           foodpulses_left = foodpulses;
+          foodtype = getfoodtype(trialtype);
           foodttlwait = false;
           foodttlon = false;
           tfood1 = tfood0; // % Setup cycle time for the actual delivery
@@ -146,6 +154,7 @@ void foodttl(void){
       else{
         // Unconditional
         foodpulses_left = foodpulses;
+        foodtype = getfoodtype(trialtype);
         foodttlwait = false;
         foodttlon = false;
         tfood1 = tfood0; // % Setup cycle time for the actual delivery
@@ -170,16 +179,15 @@ void foodttl(void){
     }
   }
 
-  // Out of the waiting period
+  // 4. Delivery (Out of the waiting period)
   else{
     if (foodpulses_left > 0){
       // Still pulses left
       if (((tnowmillis - tfood1) >= (foodpulse_cycletime)) && !foodttlon){
         // Beginning of each cycle
         tfood1 = tnowmillis;
-        foodttlon = true;
-        digitalWrite(foodTTLpin, HIGH);
-//        digitalWrite(led_pin, HIGH);
+        dofoodon(foodtype); // Food delivery on - default type 1
+        
         if ((debugmode || serialdebug) && showfoodttl){
           Serial.print("Food pulse on at (ms): ");
           Serial.print(tnowmillis);
@@ -187,9 +195,8 @@ void foodttl(void){
       }
       else if (((tnowmillis - tfood1) >= (foodpulse_ontime)) && foodttlon){
         // Turn off
-        foodttlon = false;
-        digitalWrite(foodTTLpin, LOW);
-//        digitalWrite(led_pin, LOW);
+        dofoodoff(foodtype); // Food delivery off - default type 1
+        
         foodpulses_left--;
         if ((debugmode || serialdebug) && showfoodttl){
           Serial.print("-");
@@ -210,4 +217,91 @@ void foodttl(void){
       }
     }
   }
+}
+
+// Get trial type
+byte gettrialtype(void){
+  byte trialtypenow = 1;
+  return trialtype;
+}
+
+// Get cue type
+byte getcuetype(byte trialtype){
+  byte cuetypenow = 1;
+  switch (trialtype){
+    case 1:
+      cuetypenow = 1;
+      break;
+  }
+  return cuetypenow;
+}
+
+// Cue on
+// Type 1: tone PWM
+void docueon(byte cuetype){
+  switch (cuetype){
+    case 1:
+      tone(audiopin, audiofreq);
+      cueon = true;
+      break;
+  }
+}
+
+// Cue off
+// Type 1: tone PWM
+void docueoff(byte cuetype){
+  switch (cuetype){
+    case 1:
+      noTone(audiopin);
+      cueon = false;
+      break;
+  }
+}
+
+// Get food type
+// Type 1 pulse trains
+byte getfoodtype(byte trialtype){
+  byte foodtypenow = 1;
+  switch (trialtype){
+    case 1:
+      foodtypenow = 1;
+      break;
+  }
+  return foodtypenow;
+}
+
+// food on (also includes other reactions)
+// Type 1: direct digital pin write
+void dofoodon(byte foodtype){
+  switch (foodtype){
+    case 1:
+      foodttlon = true;
+      digitalWrite(foodTTLpin, HIGH);
+//      digitalWrite(led_pin, HIGH);
+      break;
+  }
+}
+
+// food off (also includes other reactions)
+// Type 1: direct digital pin write
+void dofoodoff(byte foodtype){
+  switch (foodtype){
+    case 1:
+      foodttlon = false;
+      digitalWrite(foodTTLpin, LOW);
+//      digitalWrite(led_pin, LOW);
+      break;
+  }
+}
+
+// Check licks
+// Type 1: digital read of food TTL pin
+bool checklicks(byte licktype){
+  bool lickout = false;
+  switch (licktype){
+    case 1:
+      lickout = digitalRead(foodTTLinput); // active high 
+      break;
+  }
+  return lickout;
 }

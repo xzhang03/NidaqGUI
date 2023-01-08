@@ -68,15 +68,30 @@ void parseserial(){
      break;
 
     case 254:
-      Serial.write(nsver, 4);
-      #if debugmode
-        Serial.print("Picodaq version: ");
-        Serial.println(nsver);
-        Serial.print("Compiled on: ");
-        Serial.print(__DATE__);
-        Serial.print(" ");
-        Serial.println(__TIME__);
+      Serial.print(nsver);
+      #if TeensyTester // Tester - T, PCB - P, hand soldered - H
+        Serial.print("T");
+      #elif PCB
+        Serial.print("P");
+      #else
+        Serial.print("H");
       #endif
+      
+      #if debugmode // Debug
+        Serial.print("D");
+      #elif serialdebug
+        Serial.print("S");
+      #else
+        Serial.print("A");
+      #endif
+
+      Serial.print(F_CPU_ACTUAL/1000000);
+      Serial.print(" ");
+      Serial.print(__DATE__);
+      Serial.print(" ");
+      Serial.print(__TIME__);
+      Serial.print(".");
+      
       break;
      
     case 253:
@@ -105,7 +120,7 @@ void parseserial(){
         stimenabled = false;
         schedulerrunning = false;
       }
-      if (usebuzzcue){
+      if (usecue){
         noTone(audiopin);
       }
       #if perfcheck
@@ -546,32 +561,32 @@ void parseserial(){
       break;
 
     case 30:
-      // 30: Use buzzer cue or not (n = 1 yes, 0 no)
-      usebuzzcue = (n == 1);
-      if (!usebuzzcue){
+      // 30: Use cue or not for food (n = 1 yes, 0 no)
+      usecue = (n == 1);
+      if (!usecue){
         noTone(audiopin);
       }
       if (debugmode){
-        Serial.print("Use buzzer (1 = yes, 0 = no): ");
-        Serial.println(usebuzzcue);
+        Serial.print("Use cue (1 = yes, 0 = no): ");
+        Serial.println(usecue);
       }
       break;
 
     case 31:
-      // 31: Buzzer delay (n * 100 ms)
-      buzzdelay = n * 100;
+      // 31: Cue delay (n * 100 ms)
+      cuedelay = n * 100;
       if (debugmode){
-        Serial.print("New buzzer delay (ms): ");
-        Serial.println(buzzdelay);
+        Serial.print("New cue delay (ms): ");
+        Serial.println(cuedelay);
       }
       break;
 
     case 32:
-      // 32: Buzzer duration (n * 100 ms)
-      buzzdur = n * 100;
+      // 32: Cue duration (n * 100 ms)
+      cuedur = n * 100;
       if (debugmode){
-        Serial.print("New buzzer duration (ms): ");
-        Serial.println(buzzdur);
+        Serial.print("New cue duration (ms): ");
+        Serial.println(cuedur);
       }
       break;
 
@@ -984,14 +999,14 @@ void showpara(void){
   Serial.print("Complement delay before the opto start (s): ");
   Serial.println(nfoodpulsedelay_complement / fps);
 
-  // Food TTL Buzzer
-  Serial.println("========== Food TTL Buzzer ========");
-  Serial.print("Food TTL Buzzer: ");
-  Serial.println(usebuzzcue);
-  Serial.print("Food TTL Buzzer delay (ms): ");
-  Serial.println(buzzdelay);
-  Serial.print("Food TTL Buzzer duration (ms): ");
-  Serial.println(buzzdur);
+  // Food TTL Cue
+  Serial.println("========== Food TTL Cue ========");
+  Serial.print("Food TTL cue: ");
+  Serial.println(usecue);
+  Serial.print("Food TTL cue delay (ms): ");
+  Serial.println(cuedelay);
+  Serial.print("Food TTL cue duration (ms): ");
+  Serial.println(cuedur);
 
   // Food TTL Conditional
   Serial.println("====== Food TTL Conditional ======");
