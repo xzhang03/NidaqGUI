@@ -222,7 +222,7 @@ void foodttl(void){
 // Get trial type
 byte gettrialtype(void){
   byte trialtypenow = 1;
-  return trialtype;
+  return trialtypenow;
 }
 
 // Get cue type

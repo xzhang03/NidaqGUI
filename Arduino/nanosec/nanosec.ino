@@ -1,4 +1,4 @@
-// Third Gen photometry box: Nanosec v3.3
+// Third Gen photometry box: Nanosec v3.35
 // Handle almost everything you need for photometry
 // Needs a decent number of pins
 // Ongoing attempt to split up the code for better maintenance
@@ -13,9 +13,10 @@
  * 7. Preprogram experiment timescale: baseline -> opto -> postopto
  * 8. External input for scheduler (6)
  * 9. TTL pulses for other parts of the experiment
- * 10. Audio syncing
+ * 10.Audio syncing
  * 11.Hardware random number generator for opto trials
  * 12.Online serial echo of trial and RNG infomation
+ * 13.Multiple behavioral trial types switchable online
  * 
  */
 
