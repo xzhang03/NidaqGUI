@@ -3,7 +3,7 @@
 
 // What to include
 // PCA9685 PWM driver
-#define usePCA9685 true
+#define usePCA9685 false
 #define PCA9685add 0x40
 #if usePCA9685
   #include <Adafruit_PWMServoDriver.h>
@@ -12,8 +12,10 @@
 
 
 void i2c_init(void){
-  Wire.begin();
 
+  Wire.begin();
+//  Wire.setClock(100000);
+  
   #if usePCA9685
     pwm.begin();
     pwm.setPWMFreq(1600);  // This is the maximum PWM frequency
@@ -24,8 +26,10 @@ void i2c_init(void){
 void testPCA9685(void){
   for (byte iled = 0; iled < 3; iled++){
     for (byte iint = 1; iint < 17; iint++){
-      pwm.setPin(iled, 4096 - 256 * iint, false);
-      delay(30);
+      #if usePCA9685
+        pwm.setPin(iled, 4096 - 256 * iint, false);
+        delay(30);
+      #endif
     }
   }
 }
