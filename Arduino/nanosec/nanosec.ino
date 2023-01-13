@@ -128,6 +128,9 @@ void setup() {
 
   // Load up the variables
   modeswitch();
+
+  // Initialize i2c
+  i2c_init();
   
   if (debugmode){
     Serial.println("Experiment start.");  

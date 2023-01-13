@@ -857,6 +857,17 @@ void parseserial(){
         Serial.println(optophotooverlap);
       }
       break;
+
+    case 60:
+      // 60: Scan i2c addresses [l]
+      i2c_scan();
+      break;
+
+    case 61:
+      // 61: Test PCA9685 [m]
+      testPCA9685();
+      break;
+      
   }
 
   if (debugpins){
