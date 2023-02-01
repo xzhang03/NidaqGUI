@@ -20,7 +20,7 @@ function stopNidaq(open_daq, channelnames, omniboxsetting, configfp)
     end
             
     fp = fopen(open_daq.logpath, 'r');
-    [data, ~] = fread(fp, [(nanalogch + open_daq.ndigitals +1), inf], 'double'); %#ok<ASGLU>
+    [data, ~] = fread(fp, [(nanalogch + open_daq.ndigitals)*open_daq.ndevs + 1, inf], 'double'); %#ok<ASGLU>
     fclose(fp);
     
     timestamps = data(1, :);
