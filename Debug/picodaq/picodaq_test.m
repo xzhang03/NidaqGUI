@@ -1,6 +1,6 @@
 %% Open
 clear
-picodaq_serial = serial(sprintf('COM%i', 9), 'BaudRate', 500000);
+picodaq_serial = serial(sprintf('COM%i', 28), 'BaudRate', 500000);
 picodaq_serial.InputBufferSize = 2 ^ 20; % 1 MB buffer
 fopen(picodaq_serial);
 disp('Opened.')
@@ -66,6 +66,9 @@ end
 while picodaq_serial.BytesAvailable > 0
     fread(picodaq_serial, 1, 'uint8');
 end
+test = k(:,3)/2^23*1.2*8;
+plot(test);
+ft2(test,2500);
 
 %% Close
 fclose(picodaq_serial);
