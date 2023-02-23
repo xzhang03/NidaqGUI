@@ -33,6 +33,18 @@ while picodaq_serial.NumBytesAvailable > 0
 end
 char(vec)
 
+%% Show firmware info
+write(picodaq_serial, [38 0], 'uint8');
+
+pause(0.1);
+vec = [];
+ind = 0;
+while picodaq_serial.NumBytesAvailable > 0
+    ind = ind + 1;
+    vec(ind) = read(picodaq_serial, 1, 'uint8');
+end
+disp(erase(char(vec), char(10)));
+
 %% Setup
 n = 5000;
 chunk = 1;
