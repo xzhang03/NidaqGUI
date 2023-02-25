@@ -223,6 +223,9 @@ if nicfg.active
         if nicfg.useMLlibrary % Using MonkeyLogic DAQ library or not
             nicfg.nidaq_session = startNidaq_ML(nicfg.NidaqFrequency,...
                 nicfg.NidaqChannels, nicfg.NidaqDevice);
+        elseif nicfg.usepicoDAQ
+            nicfg.nidaq_session = startpicoDAQ(nidaqpath,...
+                nicfg.picDAQparams);
         else
             nicfg.nidaq_session = startNidaq(nidaqpath,...
                 nicfg.NidaqFrequency, nicfg.NidaqChannels,...
@@ -318,6 +321,11 @@ if nicfg.active
     if isfield(nicfg, 'nidaq_session')
         if nicfg.useMLlibrary % Using MonkeyLogic DAQ library or not
             stopNidaq_ML(nicfg.nidaq_session, nidaqpath);
+        elseif nicfg.usepicoDAQ
+            omnisetting = nicfg;
+            omnisetting = rmfield(omnisetting, 'nidaq_session');
+            configfp = handles.loadconfig.UserData.fp;
+            stoppicoDAQ(nicfg.nidaq_session, nicfg.ChannelNames, omnisetting, configfp)
         else
             omnisetting = nicfg;
             omnisetting = rmfield(omnisetting, 'nidaq_session');

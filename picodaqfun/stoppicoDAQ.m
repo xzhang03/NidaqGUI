@@ -1,8 +1,8 @@
-function stoppicoDAQ(openDAQ, channelnames, omniboxsetting, configfp)
+function stoppicoDAQ(openDAQ, channelnames, omniboxsetting, configfp) %#ok<*INUSD>
 % Stop a picoDAQ session
 
 if nargin < 4
-    configfp = '';
+    configfp = ''; %#ok<*NASGU>
     if nargin < 3
         omniboxsetting = [];
     end
@@ -18,7 +18,7 @@ fclose(openDAQ.logfile);
 
 %% Read the whole log file in
 fp = fopen(openDAQ.logpath, 'r');
-[data, ~] = fread(fp, [6, inf], 'int32'); %#ok<ASGLU>
+[data, ~] = fread(fp, [6, inf], 'int32');
 fclose(fp);
 
 

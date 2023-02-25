@@ -12,7 +12,7 @@ p  = inputParser;
 % DAQ
 addOptional(p, 'daqcom', 'COM1');
 addOptional(p, 'frequency', 2500); % DAQ sampling frequency, must be multiples of 100;
-addOptional(p, 'databuffer', 2400); % Save to harddrive every X bytes of data recorded (must be multiples of 6).
+addOptional(p, 'databuffer', 7500); % Save to harddrive every X bytes of data recorded (must be multiples of 6).
 addOptional(p, 'fda', 8); % Signal amplitude suppression by fully-diff amplifier, multiply this value at the end.
 
 % ADC
