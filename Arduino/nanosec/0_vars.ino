@@ -87,11 +87,11 @@ byte rngvec_ITI[maxrngind]; // Initialize array for RNG ITI
 
 // ============ Food TTL ============
 // Food TTL (basically sync'ed with opto)
-unsigned int nfoodpulsedelay = 2000; // Time after opto pulse train onset in ms (applies to both opto-then-food and food-then-opto)
-unsigned int foodpulse_ontime = 150; // in ms
-unsigned int foodpulse_cycletime = 300; // in ms
+unsigned int nfoodpulsedelay = 2000; // Time after opto pulse train onset in ms (applies to both opto-then-food and food-then-opto)***
+unsigned int foodpulse_ontime = 150; // in ms***
+unsigned int foodpulse_cycletime = 300; // in ms***
 unsigned int nfoodpulsedelay_complement = 4 * 50; // Pulses before pulse train onset in ms (applies to food-then-opto). Note this shifts early the time0 of when foodttl arming happens
-byte foodpulses = 5; // Number of food ttl pulses per stim period.
+byte foodpulses = 5; // Number of food ttl pulses per stim period.***
 byte foodpulses_left = 0; // Try counting down this time. Probably easier to debug
 unsigned long tfood0, tfood1;
 bool optothenfood = true; // Set false is foodthenopto
@@ -121,11 +121,11 @@ byte foodtype = 1; // type of food
 
 bool foodttlcuewait = false;
 bool foodttlactionwait = false;
-unsigned int cuedelay = 2000; //
-unsigned int cuedur = 1000; // Time for food cue 
-unsigned int actiondelay = 2000;
-unsigned int actiondur = 5000;
-unsigned int deliverydur = 5000;
+unsigned int cuedelay = 2000; //***
+unsigned int cuedur = 1000; // Time for food cue ***
+unsigned int actiondelay = 2000;***
+unsigned int actiondur = 5000;***
+unsigned int deliverydur = 5000;***
 bool actionperiodon = false;
 
 

@@ -69,6 +69,10 @@
 // 34: Action period duration (n * 100 ms) [R]
 // 35: Delivery period duration (n * 100 ms) [S]
 
+// ====== Multi trial type ======
+// 62: Max trialtype index (n = 0-3)[n]
+// 63: Current trialtype to edit (n = 0 - 3)[o]
+
 // ============= Encoder =============
 // 23: Encoder useage (n = 1 yes, 0 no) [G]
 // 43: Auto encoder serial transmission (n = 1 yes, 0 no) [[]
@@ -84,9 +88,6 @@
 // ============== i2c ==============
 // 61: Test PCA9685 [m]
 
-
-// 62: [n]
-// 63: [o]
 // 64: [p]
 // 65: [q]
 // 66: [r]

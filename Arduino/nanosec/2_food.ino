@@ -16,7 +16,7 @@ void preopto_rev_arm(void){
   */
 }
 
-// Arm foodttl
+// Arm foodttl (This is a bottleneck that all behavioral tasks have to go through).
 void armfoodttl(void){
   // Food ttl
   foodttlarmed = true;
@@ -219,7 +219,19 @@ void foodttl(void){
   }
 }
 
-// Get trial type
+// Get trial IO
+// Trial IO is a 16-bit integer with the following bit mapping
+// 15-13: Cue type (choose 1)
+// 15: 1 - PWM tone/LED cue, 0 - no
+// 14: 1 - digital cue using dio expander (MCP23008), 0 - no
+// 13: 1 - PWM cue using i2c led (PCA9685), 0 - no
+// 12-10: 3 bit of R intensty (i2c led mode only)
+// 9-7: 3 bit of G intensity (i2c led mode only)
+// 6-4: 3 bit of B intensity (i2c led mode only)
+// 3: 1 - active high action, 0 - active low action
+// 2: 1 - use DIO to delivery outcome, 0 - use native nanosec food port
+// 1-0: 2 bit DIO port number (DIO delivery mode only)
+
 byte gettrialtype(void){
   byte trialtypenow = 1;
   return trialtypenow;
