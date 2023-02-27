@@ -1,21 +1,45 @@
 function previewchannel(nicfg)
 % Preview channel data in matlab
 
-% Number of analog channels (hardcoded for now)
-nchannels = 8;
+if nicfg.usepicoDAQ
+    % Basic info
+    daqname = 'PicoDAQ';
 
-% Basic info
-daqname = nicfg.NidaqDevice;
+    % Number of analog channels (hardcoded for now)
+    nchannels = 20;
 
-% Channels
-channels = 0: nchannels-1;
-channelcell = cell(nchannels, 1);
-for i = 1 : nchannels
-    channelcell{i} = sprintf('ai%i (%i)', channels(i), channels(i)+1);
+    % Channels
+    channels = 0: nchannels-1;
+    channelcell = cell(nchannels, 1);
+    for i = 1 : 4
+        channelcell{i} = sprintf('ai%i (%i)', channels(i), channels(i)+1);
+    end
+    for i = 5 : nchannels
+        channelcell{i} = sprintf('di%i (%i)', channels(i)-4, channels(i)+1);
+    end
+
+    % Modes
+    modes = {'Auto'};
+else
+    % Number of analog channels (hardcoded for now)
+    nchannels = 8;
+    
+    % Basic info
+    daqname = nicfg.NidaqDevice;
+    
+    % Channels
+    channels = 0: nchannels-1;
+    channelcell = cell(nchannels, 1);
+    for i = 1 : nchannels
+        channelcell{i} = sprintf('ai%i (%i)', channels(i), channels(i)+1);
+    end
+
+    % Modes
+    modes = {'Differential', 'SingleEnded', 'SingleEndedNonReferenced'};
 end
 
-% Modes
-modes = {'Differential', 'SingleEnded', 'SingleEndedNonReferenced'};
+
+
 %% Initialize figure
 hfig = figure('Name', 'Preview');
 subplot(1,6,2:6);
@@ -39,6 +63,10 @@ uicontrol(hpan, 'Style', 'text', 'Position', toploc - [0 50 0 0], 'String',...
     'Mode', 'FontSize', 10);
 modemenu = uicontrol(hpan, 'Style', 'popupmenu', 'Position', toploc - [0 70 0 0],...
     'String', modes);
+if nicfg.usepicoDAQ
+    modemenu.Enable = 'inactive';
+    modemenu.ForegroundColor = [0.5 0.5 0.5];
+end
 
 % Rate
 uicontrol(hpan, 'Style', 'text', 'Position', toploc - [0 100 0 0], 'String',...
@@ -66,32 +94,59 @@ uicontrol(hpan, 'Style', 'pushbutton', 'Position', toploc - [0 300 0 0], 'String
 
 %% Start
     function startpreview(src,~)
-        % Specify connection
-        daq_connection = daq.createSession('ni'); %create a session in 64 bit
+        % Specifics
         channelmenu.UserData = channels(channelmenu.Value);
         ratecontrol.UserData = str2double(ratecontrol.String);
         samplecontrol.UserData = str2double(samplecontrol.String);
         displaycontrol.UserData = str2double(displaycontrol.String);
-        mode = modes{modemenu.Value};
-        daq_connection.Rate = ratecontrol.UserData;
-        daq_connection.NumberOfScans = samplecontrol.UserData;
-        daq_connection.NotifyWhenDataAvailableExceeds = displaycontrol.UserData;
-        
-        % Channel
-        ai = daq_connection.addAnalogInputChannel(daqname, channelmenu.UserData , 'Voltage'); 
-        ai.TerminalConfig = mode;
-        
-        % Listener
-        lh = addlistener(daq_connection,'DataAvailable',@plotData);
-        daq_connection.IsContinuous = true;
-        daq_connection.startBackground;
-        src.UserData = daq_connection;
+    
+        if nicfg.usepicoDAQ
+            % Serial initialize
+            picodaq_serial = previewpicoDAQ(nicfg.picDAQparams);
+            
+            % Over-write frequency
+            write(picodaq_serial, [2 ratecontrol.UserData/100], 'uint8');
+    
+            % Add callback
+            configureCallback(picodaq_serial, 'byte', samplecontrol.UserData * 6, @plotData_picodaq);
+
+            % Start
+            write(picodaq_serial, [1 0], 'uint8');
+
+            src.UserData = picodaq_serial;
+
+        else
+            % Specify connection
+            daq_connection = daq.createSession('ni'); %create a session in 64 bit
+            
+            mode = modes{modemenu.Value};
+            daq_connection.Rate = ratecontrol.UserData;
+            daq_connection.NumberOfScans = samplecontrol.UserData;
+            daq_connection.NotifyWhenDataAvailableExceeds = displaycontrol.UserData;
+            
+            % Channel
+            ai = daq_connection.addAnalogInputChannel(daqname, channelmenu.UserData , 'Voltage'); 
+            ai.TerminalConfig = mode;
+            
+            % Listener
+            lh = addlistener(daq_connection,'DataAvailable',@plotData);
+            daq_connection.IsContinuous = true;
+            daq_connection.startBackground;
+            src.UserData = daq_connection;
+        end
     end
     
 %% Stop
     function stoppreview(~,~)
-        startbutton.UserData.stop;
-        delete(startbutton.UserData);
+        if nicfg.usepicoDAQ
+            write(startbutton.UserData, [0 0], 'uint8');
+            flush(startbutton.UserData,"input");
+            configureCallback(startbutton.UserData, 'off');
+            delete(startbutton.UserData);
+        else
+            startbutton.UserData.stop;
+            delete(startbutton.UserData);
+        end
     end
 
 %% Plot
@@ -100,6 +155,42 @@ uicontrol(hpan, 'Style', 'pushbutton', 'Position', toploc - [0 300 0 0], 'String
         
         % FFT 
         d = event.Data - mean(event.Data);
+        y = fft(d);
+        n = length(d);
+        y2 = abs(y/ratecontrol.UserData);
+        y3 = y2(1:n/2+1);
+        y3(2:end-1) = 2*y3(2:end-1);
+        x = ratecontrol.UserData*(0:(n/2))/n;
+        [ymax, loc] = max(y3);
+        title(sprintf('Dominant Freq = %i Hz, Power = %iE-5', round(x(loc)), round(ymax*10e5)));
+    end
+
+    function plotData_picodaq(src, ~)
+        try
+            data = read(src, src.BytesAvailableFcnCount, 'int32');
+        catch
+            return;
+        end
+
+        data = reshape(data, 6, []);
+
+        if channelmenu.UserData < 4
+            % Analog
+            data = data(channelmenu.UserData+3, :)';
+            data = data / 2^23 * 1.2 * 8;
+        else
+            % Digital
+            data = bitget(data(2,:), 16 - channelmenu.UserData + 4);
+            data = data';
+        end
+        
+        % Plot
+        x = (1 : displaycontrol.UserData)' / ratecontrol.UserData;
+        data2show = data(1 : displaycontrol.UserData);
+        plot(x, data2show)
+
+        % FFT 
+        d = data2show - mean(data2show);
         y = fft(d);
         n = length(d);
         y2 = abs(y/ratecontrol.UserData);
