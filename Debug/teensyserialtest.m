@@ -52,6 +52,7 @@ fwrite(nicfg.arduino_serial, uint8([255 39]));
 val = fread(nicfg.arduino_serial, 1, 'int32');
 typecast(int32(val), 'uint8')
 
+
 %% stop
 fwrite(nicfg.arduino_serial, uint8([0 0]));
 val = fread(nicfg.arduino_serial, 1, 'int32');

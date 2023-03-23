@@ -18,8 +18,6 @@ if nicfg.arduino_serial.BytesAvailable > 3
 end
 fprintf('Nanosec firmware version: %s\n', char(ver'));
 
-
-
 %% Check conflict
 if (nicfg.tcp.enable + nicfg.optophotometry.enable + nicfg.scoptophotometry.enable) ~= 1
     msgbox('Must select 1 and only 1 from Tcp, Optophotometry, and Same-color optophotometry modes.')
@@ -27,6 +25,24 @@ end
 
 if (nicfg.audiosync.enable && nicfg.optodelayTTL.buzzerenable)
     msgbox('Cannot use audio sync and buzzer cue at the same time.')
+end
+
+if (nicfg.optodelayTTL.ntrialtypes > 1 && nicfg.scheduler.manualoverride)
+    msgbox('External trigger and multi trialtypes are not compatible at the moment.')
+end
+
+%% Backward compatibility
+% Buzzer => Cue
+if ~isfield(nicfg.optodelayTTL, 'cueenable')
+    nicfg.optodelayTTL.cueenable = nicfg.optodelayTTL.buzzerenable;
+    nicfg.optodelayTTL.cuedelay = nicfg.optodelayTTL.buzzerdelay;
+    nicfg.optodelayTTL.cuedur = nicfg.optodelayTTL.buzzerdur;
+    nicfg.optodelayTTL = rmfield(nicfg.optodelayTTL, {'buzzerenable', 'buzzerdelay', 'buzzerdur'});
+end
+
+% Multiple trial types
+if ~isfield(nicfg.optodelayTTL, 'ntrialtypes')
+   nicfg.optodelayTTL.ntrialtypes = 1;
 end
 
 %% TCP
@@ -204,7 +220,7 @@ else
     disp('Scheduler -> Off');
 end
 
-%% Opto locked TTL
+%% Behavior
 if nicfg.optodelayTTL.enable
     % Opto locked TTL
     fwrite(nicfg.arduino_serial, uint8([24 1]));
@@ -215,23 +231,82 @@ if nicfg.optodelayTTL.enable
     fwrite(nicfg.arduino_serial, uint8([18 a]));
     fwrite(nicfg.arduino_serial, uint8([50 b]));
     
-    % Pulse width
-    fwrite(nicfg.arduino_serial, uint8([19 nicfg.optodelayTTL.pulsewidth]));
+    % Multi trial type
+    fwrite(nicfg.arduino_serial, uint8([62 nicfg.optodelayTTL.ntrialtypes]));
     
-    % Pulse cycle
-    fwrite(nicfg.arduino_serial, uint8([20 nicfg.optodelayTTL.cycle]));
+    % Iterating trial types
+    for i = 1 : nicfg.optodelayTTL.ntrialtypes
+        % Current trial to edit
+        fwrite(nicfg.arduino_serial, uint8([63 i-1]));
+        
+        % Trial frequency weight
+        fwrite(nicfg.arduino_serial, uint8([67 nicfg.optodelayTTL.trialfreq(i)]));
+        
+        % Pulse width
+        fwrite(nicfg.arduino_serial, uint8([19 nicfg.optodelayTTL.pulsewidth(i)]));
+        
+        % Pulse cycle
+        fwrite(nicfg.arduino_serial, uint8([20 nicfg.optodelayTTL.cycle(i)]));
+        
+        % Train length
+        fwrite(nicfg.arduino_serial, uint8([21 nicfg.optodelayTTL.trainlength(i)]));
+        
+        % Buzzer duration
+        fwrite(nicfg.arduino_serial, uint8([32 nicfg.optodelayTTL.cuedur(i)]));
+        
+        % Delivery period duration
+        fwrite(nicfg.arduino_serial, uint8([35 nicfg.optodelayTTL.deliverydur(i)]));
+        
+        % Constructing Trial IO (a single uint16 integer to specify input/output pins a trial type)
+        trialinfo = nicfg.optodelayTTL.(sprintf('type%i', i));
+        trialio = uint16(0);
+        switch trialinfo.cuetype
+            case 'Buzzer'
+                trialio = bitset(trialio, 16);
+                
+            case 'DIO'
+                trialio = bitset(trialio, 15);
+                trialio = ... % 3 or 4 Channel binary info (DO7, DO6, DO5, DO4)
+                    trialio + bitshift(trialinfo.RGB(1), 12)...
+                    + bitshift(trialinfo.RGB(2), 11) + bitshift(trialinfo.RGB(3), 10); 
+                if length(trialinfo.RGB) == 4
+                    trialio = trialio + bitshift(trialinfo.RGB(4), 9);
+                end
+                
+            case 'PWMRGB'
+                trialio = bitset(trialio, 14);
+                trialio = trialio + bitshift(trialinfo.RGB(1), 10)...
+                    + bitshift(trialinfo.RGB(2), 7) + bitshift(trialinfo.RGB(3), 4); % RGB
+        end
+        
+        % Polarity of action detection (normally active high). Only not set
+        % if actionpol is false
+        if ~isfield(trialinfo, 'actionpol')
+            trialio = bitset(trialio, 4);
+        elseif trialinfo.actionpol
+            trialio = bitset(trialio, 4);
+        end
+        
+        % Reward delivery
+        switch trialinfo.rewardtype
+            case 'Native'
+                % Nothing
+            case 'DIO'
+                trialio = bitset(trialio, 3);
+        end
+        trialio = trialio + trialinfo.DIOport;
+        
+        % Write upper byte and then lower byte
+        fwrite(nicfg.arduino_serial, uint8([65 bitshift(trialio, -8)]));
+        fwrite(nicfg.arduino_serial, uint8([66 bitand(trialio, 255)]));
+    end
     
-    % Train length
-    fwrite(nicfg.arduino_serial, uint8([21 nicfg.optodelayTTL.trainlength]));
+    % Variables that are unchanged in multi trialtypes
+    % Cue
+    fwrite(nicfg.arduino_serial, uint8([30 nicfg.optodelayTTL.cueenable]));
     
-    % Buzzer
-    fwrite(nicfg.arduino_serial, uint8([30 nicfg.optodelayTTL.buzzerenable]));
-    
-    % Buzzer delay
-    fwrite(nicfg.arduino_serial, uint8([31 nicfg.optodelayTTL.buzzerdelay]));
-    
-    % Buzzer duration
-    fwrite(nicfg.arduino_serial, uint8([32 nicfg.optodelayTTL.buzzerdur]));
+    % Cue delay
+    fwrite(nicfg.arduino_serial, uint8([31 nicfg.optodelayTTL.cuedelay]));
     
     % Conditional
     fwrite(nicfg.arduino_serial, uint8([22 nicfg.optodelayTTL.conditional]));
@@ -241,9 +316,6 @@ if nicfg.optodelayTTL.enable
     
     % Action period duration
     fwrite(nicfg.arduino_serial, uint8([34 nicfg.optodelayTTL.actiondur]));
-    
-    % Delivery period duration
-    fwrite(nicfg.arduino_serial, uint8([35 nicfg.optodelayTTL.deliverydur]));
     
     % Sequence of opto and TTL (default: opto-> TTL)
     if isfield(nicfg.optodelayTTL, 'optothenTTL')

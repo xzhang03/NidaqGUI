@@ -3,13 +3,20 @@
 
 // What to include
 // PCA9685 PWM driver
-#define usePCA9685 false
+#define usePCA9685 true
 #define PCA9685add 0x40
 #if usePCA9685
   #include <Adafruit_PWMServoDriver.h>
   Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(PCA9685add);
 #endif
 
+// MCP23008 DIO expansion
+#define useMCP23008 true
+#define MCP23008add 0x20
+#if useMCP23008
+  #include "MCP23008.h"
+  MCP23008 MCP(MCP23008add);
+#endif
 
 void i2c_init(void){
 
@@ -19,6 +26,11 @@ void i2c_init(void){
   #if usePCA9685
     pwm.begin();
     pwm.setPWMFreq(1600);  // This is the maximum PWM frequency
+  #endif
+
+  #if useMCP23008
+    MCP.begin();
+    MCP.pinMode8(0b11111111);  // 0 = output, 1 = input
   #endif
 }
 
