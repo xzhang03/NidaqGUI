@@ -157,6 +157,11 @@ void parseserial(){
       foodttlwait = false;
       foodttlon = false;
 
+      // Multiple trial types
+      if (usefoodpulses){
+        rng(rngvec_trialtype, freq_cumvec[ntrialtypes-1] , 0, maxrngind);
+      }
+
       if (foodttlconditional){
         foodttlcuewait = false;
         foodttlactionwait = false;
@@ -427,29 +432,29 @@ void parseserial(){
 
     case 19:
       // Pulse on time (n * 10 ms)
-      foodpulse_ontime = n * 10;
+      foodpulse_ontime_vec[trialtype_edit] = n * 10;
       if (debugmode){
         Serial.print("Food pulse on time (ms): ");
-        Serial.println(foodpulse_ontime);
+        Serial.println(foodpulse_ontime_vec[trialtype_edit]);
       }
       break;
 
     case 20: 
       // 20: Pulse cycle time (n * 10 ms)
-      foodpulse_cycletime = n * 10;
+      foodpulse_cycletime_vec[trialtype_edit] = n * 10;
       if (debugmode){
         Serial.print("Food pulse cycle time (ms): ");
-        Serial.println(foodpulse_cycletime);
+        Serial.println(foodpulse_cycletime_vec[trialtype_edit]);
       }
       break;
 
     case 21:
       // 21: Pulses per train (n)
-      foodpulses = n;
+      foodpulses_vec[trialtype_edit] = n;
       foodpulses_left = 0;
       if (debugmode){
         Serial.print("Pulses per train: ");
-        Serial.println(foodpulses);
+        Serial.println(foodpulses_vec[trialtype_edit]);
       }
       break;
 
@@ -583,10 +588,10 @@ void parseserial(){
 
     case 32:
       // 32: Cue duration (n * 100 ms)
-      cuedur = n * 100;
+      cuedur_vec[trialtype_edit] = n * 100;
       if (debugmode){
         Serial.print("New cue duration (ms): ");
-        Serial.println(cuedur);
+        Serial.println(cuedur_vec[trialtype_edit]);
       }
       break;
 
@@ -610,10 +615,10 @@ void parseserial(){
 
     case 35:
       // 35: Delivery period duration (n * 100 ms);
-      deliverydur = n * 100;
+      deliverydur_vec[trialtype_edit] = n * 100;
       if (debugmode){
         Serial.print("New delivery period duration (ms): ");
-        Serial.println(deliverydur);
+        Serial.println(deliverydur_vec[trialtype_edit]);
       }
       break;
 
@@ -867,6 +872,99 @@ void parseserial(){
       // 61: Test PCA9685 [m]
       testPCA9685();
       break;
+
+    case 62:
+      // 62: Max trial types (n = 1-4)[n]
+      ntrialtypes = n;
+      if (!usescheduler){
+        // If no scheduler, roll RNG now to avoid beind stuck on type 1
+        rng(rngvec_trialtype, freq_cumvec[ntrialtypes-1] , 0, maxrngind);
+      }
+      break;
+
+    case 63:
+      // 63: Current trialtype to edit (n = 0 - 3)[o]
+      trialtype_edit = n;
+      break;
+    
+    case 64:
+      // 64: Report RNG (n = 0 ITI, 1 opto, 2 trialtype)[p]
+      {
+        Serial.println("RNG");
+        uint16_t irp = 0;
+        switch (n){
+          case 0:
+            for (irp = 0; irp < maxrngind; irp++){
+              Serial.print(rngvec[irp]);
+              Serial.print(" ");
+            }
+            Serial.println();
+            break;
+          case 1:
+            for (irp = 0; irp < maxrngind; irp++){
+              Serial.print(rngvec_ITI[irp]);
+              Serial.print(" ");
+            }
+            Serial.println();
+            break;
+          case 2:
+            for (irp = 0; irp < maxrngind; irp++){
+              Serial.print(rngvec_trialtype[irp]);
+              Serial.print(" ");
+            }
+            Serial.println();
+            break;
+        }
+      }
+      break;
+
+    case 65:
+      // 65: Trial IO upper byte (n = MSB)[q]
+      switch (trialtype_edit){
+        case 0:
+          trialio0 = (n << 8) + (trialio0 & 0xFF);
+          break;
+        case 1:
+          trialio1 = (n << 8) + (trialio1 & 0xFF);
+          break;
+        case 2:
+          trialio2 = (n << 8) + (trialio2 & 0xFF);
+          break;
+        case 3:
+          trialio3 = (n << 8) + (trialio3 & 0xFF);
+          break;
+      }
+      break;
+    case 66:
+      // 66: Trial IO lower byte (n = LSB)[r]
+      switch (trialtype_edit){
+        case 0:
+          trialio0 = n + (trialio0 & 0xFF00);
+          break;
+        case 1:
+          trialio1 = n + (trialio1 & 0xFF00);
+          break;
+        case 2:
+          trialio2 = n + (trialio2 & 0xFF00);
+          break;
+        case 3:
+          trialio3 = n + (trialio3 & 0xFF00);
+          break;
+      }
+      break;
+
+    case 67:
+      // 67: Trial frequency weight (n = weight)[s]
+      freq_vec[trialtype_edit] = n;
+      freq_cumvec[0] = freq_vec[0];
+      freq_cumvec[1] = freq_vec[0] + freq_vec[1];
+      freq_cumvec[2] = freq_vec[0] + freq_vec[1] + freq_vec[2];
+      freq_cumvec[3] = freq_vec[0] + freq_vec[1] + freq_vec[2] + freq_vec[3];
+      if (debugmode){
+        Serial.print("Frequency updated to: ");
+        Serial.println(n);
+      }
+      break;
       
   }
 
@@ -1029,6 +1127,45 @@ void showpara(void){
   Serial.println(actiondur);
   Serial.print("Food TTL Time out window (ms): ");
   Serial.println(deliverydur);
+
+  // Multiple trial types
+  Serial.println("====== Multi trialtypes ======");
+  Serial.print("N trial types: ");
+  Serial.println(ntrialtypes);
+  Serial.print("Current trial type to edit: ");
+  Serial.println(trialtype_edit);
+  for (byte ip = 0; ip < maxtrialtypes; ip++){
+    Serial.print("Trial type: ");
+    Serial.print(ip);
+    Serial.println(": ");
+    Serial.print("IO: ");
+    switch (ip){
+      case 0:
+        Serial.println(trialio0);
+        break;
+      case 1:
+        Serial.println(trialio1);
+        break;
+      case 2:
+        Serial.println(trialio2);
+        break;
+      case 3:
+        Serial.println(trialio3);
+        break;
+    }
+    Serial.print("Frequency weight: ");
+    Serial.println(freq_vec[ip]);
+    Serial.print("Cue duration (ms): ");
+    Serial.println(cuedur_vec[ip]);
+    Serial.print("TTL on time (ms): ");
+    Serial.println(foodpulse_ontime_vec[ip]);
+    Serial.print("TTL cycle time (ms): ");
+    Serial.println(foodpulse_cycletime_vec[ip]);
+    Serial.print("TTLs per train: ");
+    Serial.println(foodpulses_vec[ip]);
+    Serial.print("TTL Time out window (ms): ");
+    Serial.println(deliverydur_vec[ip]);
+  }
   
   // System wide
   Serial.println("============= System =============");
@@ -1050,7 +1187,7 @@ void slowserialecho(void){
       echo[0] = 0;
       echo[1] = 0;
       echo[2] = 0;
-      echo[3] = 1;
+      echo[3] = 1; // Don't change
       if (!usescheduler){
         echo[2] = 1; // Echo back [0 0 1 1] as no scheduler
       }
@@ -1071,9 +1208,9 @@ void slowserialecho(void){
       Serial.write(echo, 4);
 
       // Echo back RNG info
-      echo[3] = 2;
-      echo[2] = useRNG; // Echo back [X X 0 2] as no RNG
-      echo[1] = usescheduler; // Echo back [X 0 X 2] as no RNG
+      echo[3] = 2; // Don't change
+      echo[2] = useRNG; // Echo back [X X 0 X] as no RNG
+      echo[1] = trialtype; 
       echo[0] = trainpass;
       Serial.write(echo, 4);
     }

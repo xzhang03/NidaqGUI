@@ -5,18 +5,22 @@ function str = omniliveupdate(echoscheduler, echoRNG)
     if echoscheduler(3) == 1
         str = 'No scheduler';
     elseif echoscheduler(3) == 2
-        str = sprintf('Scheduler: Pre-opto %i/%i', itrain, ntrain);
+        str = sprintf('Pre-opto %i/%i', itrain, ntrain);
     elseif echoscheduler(3) == 3
-        str = sprintf('Scheduler: Post-opto %i/%i', itrain, ntrain);
+        str = sprintf('Post-opto %i/%i', itrain, ntrain);
     else
-        str = sprintf('Scheduler: %i/%i', itrain, ntrain);
+        str = sprintf('Trial: %i/%i', itrain, ntrain);
     end
     
+    % Multi Trial type
+    strType = sprintf("T%i", echoRNG(2)+1);
+    
+    % RNG
     if echoRNG(3) == 0
-        strRNG = 'RNG: off';
+        strRNG = '';
     else
         strRNG = sprintf("RNG: %i", echoRNG(1));
     end
     
-    str = sprintf('%s. %s', str, strRNG);
+    str = sprintf('%s. %s. %s', str, strType, strRNG);
 end

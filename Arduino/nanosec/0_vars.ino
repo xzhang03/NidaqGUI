@@ -99,11 +99,6 @@ bool inputttl = false; // Animal licked
 bool foodttlwait = false; // In waiting for delivery
 bool foodttlon = false;
 
-// Multiple trial types
-byte trialtype = 1; // type of trial
-byte cuetype = 1; // type of cue
-byte foodtype = 1; // type of food
-
 // ======== Food TTL Conditional ========
 // Cue: Opto start => cue delay => cue duration
 // Action: Opto start => action delay => action window
@@ -122,15 +117,33 @@ byte foodtype = 1; // type of food
 bool foodttlcuewait = false;
 bool foodttlactionwait = false;
 unsigned int cuedelay = 2000; //
-unsigned int cuedur = 1000; // Time for food cue 
+unsigned int cuedur = 1000; // Time for food cue
 unsigned int actiondelay = 2000;
 unsigned int actiondur = 5000;
-unsigned int deliverydur = 5000;
+unsigned int deliverydur = 5000; //
 bool actionperiodon = false;
 
+// ============ Multiple trial types ============
+#define maxtrialtypes 4
+byte trialtype = 0; // Trial type to use
+byte trialtype_edit = 0; // Trial type to edit
+byte ntrialtypes = 1; // If more than 1, RNG kicks in
+byte rngvec_trialtype[maxrngind]; // Initialize array for RNG trial type
+uint16_t trialio  = 0b0000000000001000;
+uint16_t trialio0 = 0b0000000000001000; // See 2_food
+uint16_t trialio1 = 0b0011110000001000;
+uint16_t trialio2 = 0b0010001110001000;
+uint16_t trialio3 = 0b0010000001111000;
+byte freq_vec[maxtrialtypes] = {3, 0, 0, 0}; // Frequency weights of the trial types
+byte freq_cumvec[maxtrialtypes] = {3, 3, 3, 3}; // Cumulative version of above
+unsigned int cuedur_vec[maxtrialtypes] = {1000, 1000, 1000, 1000}; // Time for food cue
+unsigned int foodpulse_ontime_vec[maxtrialtypes] = {150, 150, 150, 150};; // in ms
+unsigned int foodpulse_cycletime_vec[maxtrialtypes] = {300, 300, 300, 300}; // in ms
+byte foodpulses_vec[maxtrialtypes] = {5, 5, 5, 5}; // Number of food ttl pulses per stim period.
+unsigned int deliverydur_vec[maxtrialtypes] = {5000, 5000, 5000, 5000};
 
 // ============== I2c ==============
-bool usei2c = false;
+bool usei2c = true;
 
 // ============ Switches ============
 // photometry and optophotometry switches

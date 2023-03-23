@@ -16,7 +16,7 @@ void preopto_rev_arm(void){
   */
 }
 
-// Arm foodttl
+// Arm foodttl (This is a bottleneck that all behavioral tasks have to go through).
 void armfoodttl(void){
   // Food ttl
   foodttlarmed = true;
@@ -24,22 +24,30 @@ void armfoodttl(void){
   inputttl = !foodttlconditional;
   tfood0 = tnowmillis;
 
+  // Determine the trial type
+  trialtype = gettrialtype();
+    
   if (usecue){
     foodttlcuewait = true;
     cueon = false;
 
-    // Determine the trial type
-    trialtype = gettrialtype();
-    
-    // Determine cue type for this trial
-    cuetype = getcuetype(trialtype);
+    // Multiple trial type
+    cuedur = cuedur_vec[trialtype];
   }
   
   if (foodttlconditional){
     foodttlactionwait = true;
     actionperiodon = false;
+
+    // Multi trial types
+    deliverydur = deliverydur_vec[trialtype];
   }
-  
+
+  // Delivery (multi trial types)
+  foodpulse_ontime = foodpulse_ontime_vec[trialtype];
+  foodpulse_cycletime = foodpulse_cycletime_vec[trialtype];
+  foodpulses = foodpulses_vec[trialtype];
+    
   if ((debugmode || serialdebug) && showfoodttl){
     Serial.print("Food TTL armed at (ms): ");
     Serial.println(tfood0);
@@ -53,11 +61,6 @@ void foodttl(void){
 //    Serial.println(tfooddelta);
 //  }
   
-  // 0. Food not alarm and not during cue, nothing to do here - exit.
-  if (~foodttlarmed && ~cueon){
-    return;
-  }
-      
   // 1. Cue
   if (usecue){
     if (foodttlcuewait){
@@ -65,8 +68,7 @@ void foodttl(void){
       if ((tnowmillis - tfood0) >= cuedelay){
         // First time trying to get out of the cue delay
         foodttlcuewait = false;
-        docueon(cuetype); // Cue on default type 1
-        
+        docueon(trialio, trialtype); // Cue on default type 1
         
         if ((debugmode || serialdebug) && showfoodttl){
           Serial.print("Cue on at (ms): ");
@@ -78,7 +80,7 @@ void foodttl(void){
       // After waiting and cue is on
       if ((tnowmillis - tfood0) >= (cuedelay + cuedur)){
         // Cue long enough and time to turn off (default type 1)
-        docueoff(cuetype);
+        docueoff(trialio);
         
         if ((debugmode || serialdebug) && showfoodttl){
           Serial.print("Cue off at (ms): ");
@@ -106,7 +108,7 @@ void foodttl(void){
     else if (actionperiodon){
       if(!inputttl){
         // In action perdio until getting a pulse
-        inputttl = checklicks(1); // Check licks (type 1)
+        inputttl = checklicks(trialio); // Check licks
 
         if ((debugmode || serialdebug) && showfoodttl){
           if (inputttl){
@@ -139,7 +141,6 @@ void foodttl(void){
         // Trying to get out of the waiting period (happens when detection or time out (below)
         if (inputttl){
           foodpulses_left = foodpulses;
-          foodtype = getfoodtype(trialtype);
           foodttlwait = false;
           foodttlon = false;
           tfood1 = tfood0; // % Setup cycle time for the actual delivery
@@ -154,7 +155,6 @@ void foodttl(void){
       else{
         // Unconditional
         foodpulses_left = foodpulses;
-        foodtype = getfoodtype(trialtype);
         foodttlwait = false;
         foodttlon = false;
         tfood1 = tfood0; // % Setup cycle time for the actual delivery
@@ -186,7 +186,7 @@ void foodttl(void){
       if (((tnowmillis - tfood1) >= (foodpulse_cycletime)) && !foodttlon){
         // Beginning of each cycle
         tfood1 = tnowmillis;
-        dofoodon(foodtype); // Food delivery on - default type 1
+        dofoodon(trialio); // Food delivery on
         
         if ((debugmode || serialdebug) && showfoodttl){
           Serial.print("Food pulse on at (ms): ");
@@ -195,7 +195,7 @@ void foodttl(void){
       }
       else if (((tnowmillis - tfood1) >= (foodpulse_ontime)) && foodttlon){
         // Turn off
-        dofoodoff(foodtype); // Food delivery off - default type 1
+        dofoodoff(trialio); // Food delivery off
         
         foodpulses_left--;
         if ((debugmode || serialdebug) && showfoodttl){
@@ -219,88 +219,201 @@ void foodttl(void){
   }
 }
 
-// Get trial type
+// Get trial IO
+// Trial IO is a 16-bit integer with the following bit mapping
+// 15-13: Cue type (choose 1)
+// 15: 1 - PWM tone/LED cue, 0 - no
+// 14: 1 - digital cue using dio expander (MCP23008), 0 - no
+// 13: 1 - PWM cue using i2c led (PCA9685), 0 - no
+
+// 12-4: i2c led mode only
+// 12-10: 3 bit of R intensty
+// 9-7: 3 bit of G intensity
+// 6-4: 3 bit of B intensity
+
+// 12-4: DIO mode (MCP23008)
+// 12-9: 4 bit of 4 output channels (12 - DO7, 11 - DO6, 10 - DO5, 9 - DO4)
+
+// 3: 1 - active high action, 0 - active low action
+// 2: 1 - use DIO to delivery outcome, 0 - use native nanosec food port
+// 1-0: 2 bit DIO port number (DIO delivery mode only)
+
 byte gettrialtype(void){
   byte trialtypenow = 1;
-  return trialtypenow;
-}
-
-// Get cue type
-byte getcuetype(byte trialtype){
-  byte cuetypenow = 1;
-  switch (trialtype){
-    case 1:
-      cuetypenow = 1;
-      break;
+  
+  if (ntrialtypes == 1){
+    trialtypenow = 0;
+    trialio = trialio0;
   }
-  return cuetypenow;
+  else{
+    if (rngvec_trialtype[itrain] < freq_cumvec[0]){
+      trialtypenow = 0;
+      trialio = trialio0;
+    }
+    else if (rngvec_trialtype[itrain] < freq_cumvec[1]){
+      trialtypenow = 1;
+      trialio = trialio1;
+    }
+    else if (rngvec_trialtype[itrain] < freq_cumvec[2]){
+      trialtypenow = 2;
+      trialio = trialio2;
+    }
+    else if (rngvec_trialtype[itrain] < freq_cumvec[3]){
+      trialtypenow = 3;
+      trialio = trialio3;
+    }
+  }
+  
+  return trialtypenow;
 }
 
 // Cue on
 // Type 1: tone PWM
-void docueon(byte cuetype){
+void docueon(uint16_t trialio, uint8_t trialtype){
+  byte cuetype = 0; // 0 - native pwm, 1 - MCP23008 DIO, 2 - external PWM
+  const uint16_t cm = 585; // Color mutiplier (max value after multiplication is 4096)
+  cueon = true;
+  
+  if (bitRead(trialio, 15) == 1){
+    cuetype = 0;
+  }
+  else if (bitRead(trialio, 14) == 1){
+    cuetype = 1;
+  }
+  else if (bitRead(trialio, 13) == 1){
+    cuetype = 2;
+  }
+  byte Rv = (trialio >> 10) & 0b111 ; // Red value
+  byte Gv = (trialio >> 7) & 0b111 ; // Green value
+  byte Bv = (trialio >> 4) & 0b111 ; // Green value
+  
   switch (cuetype){
-    case 1:
+    case 0:
+      // Native PWM
       tone(audiopin, audiofreq);
-      cueon = true;
+      break;
+
+    case 1:
+      // MCP23008
+      MCP.digitalWrite(4, bitRead(trialio, 9));
+      MCP.digitalWrite(5, bitRead(trialio, 10));
+      MCP.digitalWrite(6, bitRead(trialio, 11));
+      MCP.digitalWrite(7, bitRead(trialio, 12));
+      break;
+
+    case 2:
+      // External pwm
+      pwm.setPin(0, cm * Rv, false);
+      pwm.setPin(1, cm * Gv, false);
+      pwm.setPin(2, cm * Bv, false);
+
+      switch (trialtype){
+        case 0:
+          MCP.digitalWrite(4, HIGH);
+          break;
+        case 1:
+          MCP.digitalWrite(5, HIGH);
+          break;
+        case 2:
+          MCP.digitalWrite(6, HIGH);
+          break;
+        case 3:
+          MCP.digitalWrite(7, HIGH);
+          break;
+      }
       break;
   }
 }
 
 // Cue off
 // Type 1: tone PWM
-void docueoff(byte cuetype){
+void docueoff(uint16_t trialio){
+  byte cuetype = 0; // 0 - native pwm, 1 - MCP23008 DIO, 2 - external PWM
+  cueon = false;
+  if (bitRead(trialio, 15) == 1){
+    cuetype = 0;
+  }
+  else if (bitRead(trialio, 14) == 1){
+    cuetype = 1;
+  }
+  else if (bitRead(trialio, 13) == 1){
+    cuetype = 2;
+  }
+  
   switch (cuetype){
-    case 1:
+    case 0:
+      // Native PWM
       noTone(audiopin);
-      cueon = false;
       break;
-  }
-}
 
-// Get food type
-// Type 1 pulse trains
-byte getfoodtype(byte trialtype){
-  byte foodtypenow = 1;
-  switch (trialtype){
     case 1:
-      foodtypenow = 1;
+      // MCP23008
+      MCP.digitalWrite(4, 0);
+      MCP.digitalWrite(5, 0);
+      MCP.digitalWrite(6, 0);
+      MCP.digitalWrite(7, 0);
       break;
+
+    case 2:
+      // External pwm
+      pwm.setPin(0, 0, false);
+      pwm.setPin(1, 0, false);
+      pwm.setPin(2, 0, false);
+      MCP.digitalWrite(4, LOW);
+      MCP.digitalWrite(5, LOW);
+      MCP.digitalWrite(6, LOW);
+      MCP.digitalWrite(7, LOW);
+      break;
+      
   }
-  return foodtypenow;
 }
 
 // food on (also includes other reactions)
 // Type 1: direct digital pin write
-void dofoodon(byte foodtype){
+void dofoodon(uint16_t trialio){
+  byte foodtype = bitRead(trialio, 2); // 1 - DIO board, 0 - native
+  byte DIOport = trialio & 0b11; // DO 0-3
+  foodttlon = true;
+  
   switch (foodtype){
-    case 1:
-      foodttlon = true;
+    case 0:
       digitalWrite(foodTTLpin, HIGH);
-//      digitalWrite(led_pin, HIGH);
+      break;
+    case 1:
+      MCP.digitalWrite(DIOport, HIGH);
       break;
   }
 }
 
 // food off (also includes other reactions)
 // Type 1: direct digital pin write
-void dofoodoff(byte foodtype){
+void dofoodoff(uint16_t trialio){
+  byte foodtype = bitRead(trialio, 2); // 1 - DIO board, 0 - native
+  byte DIOport = trialio & 0b11; // DO 0-3
+  foodttlon = false;
+  
   switch (foodtype){
-    case 1:
-      foodttlon = false;
+    case 0:
       digitalWrite(foodTTLpin, LOW);
-//      digitalWrite(led_pin, LOW);
+      break;
+    case 1:
+      MCP.digitalWrite(DIOport, LOW);
       break;
   }
 }
 
 // Check licks
 // Type 1: digital read of food TTL pin
-bool checklicks(byte licktype){
+bool checklicks(uint16_t trialio){
   bool lickout = false;
+  byte licktype = bitRead(trialio, 3); // 1 - active high, 0 - active low
+  
   switch (licktype){
     case 1:
       lickout = digitalRead(foodTTLinput); // active high 
+      break;
+    case 0:
+      lickout = !digitalRead(foodTTLinput); // active low
       break;
   }
   return lickout;

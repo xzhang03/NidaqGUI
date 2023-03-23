@@ -48,6 +48,7 @@
 // 40: RNG ITI or not (n = 1 yes, 0 no) [X]
 // 41: min randomized ITI (n * 1 s) [Y]
 // 42: max randomized ITI (n * 2 s) [Z]
+// 64: Report RNG (n = 0 ITI, 1 opto, 2 trialtype)[p]
 
 // ============ Food TTL ============
 // 24: Use Food TTL or not (n = 1 yes, 0 no)  [H]
@@ -69,6 +70,13 @@
 // 34: Action period duration (n * 100 ms) [R]
 // 35: Delivery period duration (n * 100 ms) [S]
 
+// ====== Multi trial type ======
+// 62: Max trial types (n = 1-4)[n]
+// 63: Current trialtype to edit (n = 0 - 3)[o]
+// 65: Trial IO upper byte (n = MSB)[q]
+// 66: Trial IO lower byte (n = LSB)[r]
+// 67: Trial frequency weight (n = weight)[s]
+
 // ============= Encoder =============
 // 23: Encoder useage (n = 1 yes, 0 no) [G]
 // 43: Auto encoder serial transmission (n = 1 yes, 0 no) [[]
@@ -84,13 +92,6 @@
 // ============== i2c ==============
 // 61: Test PCA9685 [m]
 
-
-// 62: [n]
-// 63: [o]
-// 64: [p]
-// 65: [q]
-// 66: [r]
-// 67: [s]
 // 68: [t]
 // 69: [u]
 // 70: [v]

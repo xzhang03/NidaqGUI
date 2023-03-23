@@ -1,4 +1,4 @@
-// Third Gen photometry box: Nanosec v3.35
+// Third Gen photometry box: Nanosec v3.5
 // Handle almost everything you need for photometry
 // Needs a decent number of pins
 // Ongoing attempt to split up the code for better maintenance
@@ -17,6 +17,7 @@
  * 11.Hardware random number generator for opto trials
  * 12.Online serial echo of trial and RNG infomation
  * 13.Multiple behavioral trial types switchable online
+ * 14.Expanded IO (external PWM and DIO)
  * 
  */
 
@@ -33,6 +34,7 @@
 // 2_enc:  Encoder functions
 // 2_extt: External TTL trigger functions
 // 2_food: Food/reward delivery functions
+// 2_i2c: I2C functions
 // 2_RNG:  RNG functions
 // 2_sche: Scheduler functions
 // 2_ser:  Serial functions
@@ -41,7 +43,7 @@
 //
 
 // =============== Version ===============
-#define nsver "v3.35"
+#define nsver "v3.50"
 
 // =============== Hardware ===============
 // Now running teensy 4.0 at 450 Mhz (2.2 ns step)
