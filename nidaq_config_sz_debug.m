@@ -165,7 +165,7 @@ nicfg.optodelayTTL.type4.DIOport = 0; % Only used in DIO
 
 % Encoder
 nicfg.encoder.enable = true;
-nicfg.encoder.autoecho = true; % Using auto echo (turn off for debugging)
+nicfg.encoder.autoecho = false; % Using auto echo (turn off for debugging)
 
 % Trial and RNG info echo
 nicfg.onlineecho.enable = true; % Auto trial and rng echo (turn off for debugging)

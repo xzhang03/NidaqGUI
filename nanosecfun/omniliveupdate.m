@@ -13,7 +13,7 @@ function str = omniliveupdate(echoscheduler, echoRNG)
     end
     
     % Multi Trial type
-    strType = sprintf("T%i", echoRNG(4)+1);
+    strType = sprintf("T%i", echoRNG(2)+1);
     
     % RNG
     if echoRNG(3) == 0

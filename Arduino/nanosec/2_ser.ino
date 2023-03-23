@@ -1187,7 +1187,7 @@ void slowserialecho(void){
       echo[0] = 0;
       echo[1] = 0;
       echo[2] = 0;
-      echo[3] = 1;
+      echo[3] = 1; // Don't change
       if (!usescheduler){
         echo[2] = 1; // Echo back [0 0 1 1] as no scheduler
       }
@@ -1208,9 +1208,9 @@ void slowserialecho(void){
       Serial.write(echo, 4);
 
       // Echo back RNG info
-      echo[3] = trialtype;
+      echo[3] = 2; // Don't change
       echo[2] = useRNG; // Echo back [X X 0 X] as no RNG
-      echo[1] = usescheduler; // Echo back [X 0 X X] as no scheduler
+      echo[1] = trialtype; 
       echo[0] = trainpass;
       Serial.write(echo, 4);
     }

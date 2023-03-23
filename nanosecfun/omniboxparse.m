@@ -12,9 +12,9 @@ end
 
 %% Firmware version
 fwrite(nicfg.arduino_serial, uint8([254 0]));
-pause(0.1);
-if nicfg.arduino_serial.BytesAvailable > 3
-    ver = fread(nicfg.arduino_serial, 4, 'uint8');
+pause(0.3);
+if nicfg.arduino_serial.BytesAvailable > 20
+    ver = fread(nicfg.arduino_serial, nicfg.arduino_serial.BytesAvailable, 'uint8');
 end
 fprintf('Nanosec firmware version: %s\n', char(ver'));
 

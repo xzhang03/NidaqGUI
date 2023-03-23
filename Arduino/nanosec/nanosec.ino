@@ -43,7 +43,7 @@
 //
 
 // =============== Version ===============
-#define nsver "v3.5"
+#define nsver "v3.50"
 
 // =============== Hardware ===============
 // Now running teensy 4.0 at 450 Mhz (2.2 ns step)
@@ -54,7 +54,7 @@ extern "C" uint32_t set_arm_clock(uint32_t frequency);
 
 // ================ PCB ================
 #define PCB true
-#define TeensyTester true //***
+#define TeensyTester false //
  
 // =============== Debug ===============
 #define debugmode false // Master switch for all serial debugging
