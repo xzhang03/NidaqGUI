@@ -2,7 +2,7 @@ I2C repeater is a device used to support more I2C devices and allow I2C devices 
 
 ## IO ports
 ### Input side
-I2C I0 and I1 are the input side. By default (no R1, R2, C1, C2), they are isolated from VDC and everything else. They are connected and whatever the voltage from one of these will be passed to the next one. Therefore, do not use both I0 and I1 if nanosec i2c voltage is specified at 5V.
+I2C I0 and I1 are the input side. By default (no R1, R2, C1, C2), they are isolated from VDC and everything else. They are connected and whatever the voltage from one of these will be passed to the next one. Therefore, do not use both I0 and I1 if they are in different logic voltages (usually when nanosec i2c voltage is specified at 5V).
 
 ### Output side
 I2C O0, O1, O2 are the output side. They are connected and whatever the voltage from one of these will be passed to the others. Their logic voltage depends on where the power comes from: V0, V1, or VDC.
@@ -16,10 +16,10 @@ I0 and I1 are by default isolated from everything else. Populating R1, R2, C1, C
 If you bridge V0, the output logic is the same voltage as the nanosec voltage level (3.3V 250mA from teensy or 5V, depending on what you choose on the nanosec PCB). There is however no voltage supplied on the output side. Do not use both I0 and I1 if nanosec i2c voltage is specified at 5V.
 
 ### V1 mode
-If you bridge V1, the system power will be from one of the downstream devices. Please be sure that the input SCL and SDA logic voltages are both 3.3V before connecting to nanosec.
+If you bridge V1, the system power will be from one of the downstream devices. Please be sure that the input SCL and SDA logic voltages are both 3.3V before connecting to nanosec (i.e., do not populate R1, R2, C1, C2 unless you are sure the voltage here is precisely 3.3V).
 
 ### V0 + V1 mode (most common)
-If you bridge both V0 and V1, you are using nanosec voltage (3.3V or 5V, 5V is recommended) to power the chip as well as any downstream devices. Be careful to not draw too much current from the nanosec power supply if you use 3.3V nanaosec i2c voltage.
+If you bridge both V0 and V1, you are using nanosec voltage (3.3V or 5V) to power the chip as well as any downstream devices. If you choose 3.3V on Nanosec, be careful to not draw too much current from the teensy power regulator. If you choose 5V, do not use both I0 and I1.
 
 ### VDC mode
 If you bridge VDC, the system power will be coming from the DC jack. No power is however delivered to downstream devices.
