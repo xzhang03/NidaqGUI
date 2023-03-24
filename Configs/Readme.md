@@ -66,7 +66,7 @@ nicfg.AImode = {0, 'Differential'; 1, 'Differential'; 2, 'Differential'; 3, 'Dif
                 14, 'SingleEnded'; 15, 'SingleEnded'};
 ```
 
-### 4. picodaq
+### 4. Picodaq (Nidaq replacement)
 All the picodaq settings are paramterized in a single cell like this. Picodaq has 4 analog channels and 16 digital channels, and is optimize for 2500 Hz sampling rate. 
 ```matlab
 nicfg.picoDAQparams = {'daqcom', 'COM28', 'frequency', nicfg.NidaqFrequency};
