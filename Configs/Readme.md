@@ -1,4 +1,4 @@
-# All about Nanosec Config Files
+# All about Nanosec Config Files v3.5
 
 ## A. Basic configs
 ### 1. General
