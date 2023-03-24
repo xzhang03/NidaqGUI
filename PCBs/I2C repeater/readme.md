@@ -1,3 +1,4 @@
+# I2c repeater
 I2C repeater is a device used to support more I2C devices and allow I2C devices to be placed further apart. One of the jumper pins: V0, V1, or VDC must be bridged for it to work. Connecting them does not affect the input logic voltags (from nanosec), which are isolated from everything else. However, please be careful about how you bridge them (see below). One advantage of this device is that it isolates the input logic voltage and support communication between different logic levels, and the other one is that this device should enable I2c communication over long distanec (theoretically many meters).
 
 ## IO ports
