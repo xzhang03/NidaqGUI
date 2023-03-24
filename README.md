@@ -132,3 +132,8 @@ Timing of conditional reward delivery system. A cue window is specified at a del
 ### 2. Conditional Food-then-opto
 Same as before, but food is set to be delivered before opto. Now everything is moved earlier by the lead time.
 ![conditiona_food-then-opto](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/conditional%20foodthenopto.png)
+
+## K. Multiple trial types
+Nanosec supports up to 4 simultaneous trial types, with independent cue/outcome relationships. The cues can come from the native buzzer, or from an external [digital IO expander](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander) (MCP23008), or from an external [dimmable RGB module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/LED%20cue%20i2c) (PCA9685). If the dimmable RGB module is used, the external DIO expander should also be used to indicate trial types/onsets. The action input is shared betweel all the trial types. The output can be from the native food TTL port or from the external DIO expander. If both dimmable RGB module and DIO expanders are used, I recommend using [I2c repeater module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/I2C%20repeater) as well.
+
+The following parameters are specified independently: Trial frequency, cue source and RGB values, cue duration, outcome source, outcome being conditional/unconditional, outcome pulse width, outcome pulse number, outcome pulse cycle time, outcome delivery window (rarely changed).
