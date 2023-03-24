@@ -88,7 +88,7 @@ Master enable.
 nicfg.omnibox.enable = true;
 ```
 
-### 2. Two-color photometry
+### 2. Two-color photometry (TCP)
 Change this to true to enable tcp mode (must set optophotometry and same-color optophotometry to false).
 ```matlab
 nicfg.tcp.enable = false;
