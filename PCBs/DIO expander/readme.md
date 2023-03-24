@@ -1,3 +1,4 @@
+# DIO expander
 This board expands the digital capability of nanosec. It uses the I2C DIO chip MCP 23008, which uses I2C at a default address of (0x20). More bits can be written on the address with the 3-bit DIP switch. Because the digital IO is commanded through I2C, it's not quite as fast but probably still has micro-seconds precision.
 
 ## Hookup guide
