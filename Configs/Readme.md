@@ -99,7 +99,7 @@ Behavioral inter-trial interval (in seceonds, from trial start to trial start). 
 nicfg.tcp.behaviorcycle = 10;
 ```
 
-These 2 values change how often the two pulses of tcp occur. It's in increments of 100 us, so 100 means 100 * 100 us = 10 ms. By default, pulse 1 happens happens 10 ms after pulse 1 happens, and pulse 2 happens 10 ms after pulse 1 happens. That's why 100/100 means interleaved 50 Hz pulsing in both channels. It is the sum of the two numbers that determines the length of a pulse1-pulse2 cycle. Some of the photoemtry/behavioral timing mechanisms are through counting cycles, so changing this number may affect them. I tried to account for cycle changes but you may still need to let me know if some timings are off because of this.
+These 2 values change how often the two pulses of tcp occur. It's in increments of 100 us, so 100 means 100 * 100 us = 10 ms. By default, pulse 1 happens happens 10 ms after pulse 1 happens, and pulse 2 happens 10 ms after pulse 1 happens. That's why 100/100 means interleaved 50 Hz pulsing in both channels. It is the sum of the two numbers that determines the length of a pulse1-pulse2 cycle (e.g., 100/100 means 20 ms cycle). Some of the photoemtry/behavioral timing mechanisms are done by counting cycles, so changing this number may affect them. I tried to account for cycle changes, but you may still need to let me know if some timings are off because of this.
 ```matlab
 nicfg.tcp.pulsecycle1 = 100;
 nicfg.tcp.pulsecycle2 = 100;
