@@ -30,7 +30,8 @@ void i2c_init(void){
 
   #if useMCP23008
     MCP.begin();
-    MCP.pinMode8(0b11111111);  // 0 = output, 1 = input
+    MCP.pinMode8(0b00000000);  // 0 = output, 1 = input
+    MCP.write8(0x00);
   #endif
 }
 
@@ -43,6 +44,17 @@ void testPCA9685(void){
         delay(30);
       #endif
     }
+  }
+}
+
+// Test MCP23008
+void testMCP23008(void){
+  for (byte iled = 0; iled < 8; iled++){
+    #if useMCP23008
+      MCP.digitalWrite(iled, HIGH);
+      delay(250);
+      MCP.digitalWrite(iled, LOW);
+    #endif
   }
 }
 

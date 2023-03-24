@@ -119,9 +119,9 @@ nicfg.scheduler.randomITI_max = 40; % Highest value of ITI (exclusive, in second
 % Delivery (unconditional): Opto start => delivery delay => delivery
 nicfg.optodelayTTL.enable = true; % Default false
 nicfg.optodelayTTL.delay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s). Max 65535 (6553.5s).
-nicfg.optodelayTTL.pulsewidth = [15 15 15 15]; % Pulsewidth in X * 10 ms. E.g., 15 means 150 ms pulses. Default is 15 (150 ms).
-nicfg.optodelayTTL.cycle = [30 30 30 30]; % Pulse cycle in X * 10 ms. E.g., 30 means 300 ms pulses. Default is 30 (300 ms).
-nicfg.optodelayTTL.trainlength = [2 4 8 16]; % Pulse train length. E.g., 5 means 5 pulses. Default is 5.
+nicfg.optodelayTTL.pulsewidth = [15 30 60 100]; % Pulsewidth in X * 10 ms. E.g., 15 means 150 ms pulses. Default is 15 (150 ms).
+nicfg.optodelayTTL.cycle = [30 60 120 200]; % Pulse cycle in X * 10 ms. E.g., 30 means 300 ms pulses. Default is 30 (300 ms).
+nicfg.optodelayTTL.trainlength = [8 4 2 1]; % Pulse train length. E.g., 5 means 5 pulses. Default is 5.
 nicfg.optodelayTTL.optothenTTL = true; % Sets the sequence: opto->food or food->opto. Has to be true in listen mode. Default true (opto => food).
 nicfg.optodelayTTL.lead = 4; % How many seconds is the food TTL armed before an opto train. This does not affect the cue/actoin/reward delays above. Default 4s. Max 65535s.
 
@@ -129,19 +129,19 @@ nicfg.optodelayTTL.lead = 4; % How many seconds is the food TTL armed before an 
 % Cue: Opto start => buzzer delay => buzzer duration
 nicfg.optodelayTTL.cueenable = true; % Buzzer or not (default false)
 nicfg.optodelayTTL.cuedelay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
-nicfg.optodelayTTL.cuedur = [10 10 10 10]; % Delay in 100 ms. E.g., 10 means 1 seconds. Default 10 (1s)
+nicfg.optodelayTTL.cuedur = [2 4 8 16]; % Delay in 100 ms. E.g., 10 means 1 seconds. Default 10 (1s)
 
 % Action: Opto start => action delay => action window
 % Delivery (conditional): Opto start => delivery delay => delivery window start => delivery (if action) => timeout (if no delivery)
 % If action and devliveries have the same delay, that means food devlivery happens as soon as a lick
-nicfg.optodelayTTL.conditional = false; %true TTL delivery is conditional or not. If so, pin 10 must be hooked up with an active-high input. Input comes during the delay window will allow for subsequent pulse output.
+nicfg.optodelayTTL.conditional = [true, false, false, false]; %true TTL delivery is conditional or not. If so, pin 10 must be hooked up with an active-high input. Input comes during the delay window will allow for subsequent pulse output.
 nicfg.optodelayTTL.actiondelay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.actiondur = 20; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 nicfg.optodelayTTL.deliverydur = [50 50 50 50]; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 
 % Multiple trial types
 nicfg.optodelayTTL.ntrialtypes = 4; % Multiple trial types (Max is 4)
-nicfg.optodelayTTL.trialfreq = [3 3 3 3]; % Relative weights of trial frequency
+nicfg.optodelayTTL.trialfreq = [0 3 3 3]; % Relative weights of trial frequency
 
 nicfg.optodelayTTL.type1.cuetype = 'Buzzer'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
 nicfg.optodelayTTL.type1.RGB = [0 0 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
@@ -150,25 +150,25 @@ nicfg.optodelayTTL.type1.DIOport = 0; % Only used in DIO
 
 nicfg.optodelayTTL.type2.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
 nicfg.optodelayTTL.type2.RGB = [7 0 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
-nicfg.optodelayTTL.type2.rewardtype = 'Native'; % 'Native', 'DIO'
+nicfg.optodelayTTL.type2.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type2.DIOport = 0; % Only used in DIO
 
 nicfg.optodelayTTL.type3.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
-nicfg.optodelayTTL.type3.RGB = [0 7 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
-nicfg.optodelayTTL.type3.rewardtype = 'Native'; % 'Native', 'DIO'
-nicfg.optodelayTTL.type3.DIOport = 0; % Only used in DIO
+nicfg.optodelayTTL.type3.RGB = [0 5 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
+nicfg.optodelayTTL.type3.rewardtype = 'DIO'; % 'Native', 'DIO'
+nicfg.optodelayTTL.type3.DIOport = 1; % Only used in DIO
 
 nicfg.optodelayTTL.type4.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
-nicfg.optodelayTTL.type4.RGB = [0 0 7]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
-nicfg.optodelayTTL.type4.rewardtype = 'Native'; % 'Native', 'DIO'
-nicfg.optodelayTTL.type4.DIOport = 0; % Only used in DIO
+nicfg.optodelayTTL.type4.RGB = [0 0 3]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
+nicfg.optodelayTTL.type4.rewardtype = 'DIO'; % 'Native', 'DIO'
+nicfg.optodelayTTL.type4.DIOport = 2; % Only used in DIO
 
 % Encoder
 nicfg.encoder.enable = true;
 nicfg.encoder.autoecho = false; % Using auto echo (turn off for debugging)
 
 % Trial and RNG info echo
-nicfg.onlineecho.enable = true; % Auto trial and rng echo (turn off for debugging)
+nicfg.onlineecho.enable = false; % Auto trial and rng echo (turn off for debugging)
 nicfg.onlineecho.periodicity = 10; % Periodicity in 100 ms. E.g., 10 means 1 second. Default 10 (1s)
 
 % Audio sync

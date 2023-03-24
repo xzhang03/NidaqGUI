@@ -5,7 +5,6 @@
 // 0: stop pulse
 // 5: Quad encoder position
 // 9: Show all parameters
-// 60: Scan i2c addresses [l]
 // 253: reboot (n = 104)
 // 254: version
 // 255: status update (n = variable)
@@ -90,9 +89,10 @@
 // 45: Auto trial and rng echo periodicity (n * 100 ms) []]
 
 // ============== i2c ==============
+// 60: Scan i2c addresses [l]
 // 61: Test PCA9685 [m]
+// 68: Test MCP23008 [t]
 
-// 68: [t]
 // 69: [u]
 // 70: [v]
 // 71: [w]

@@ -460,6 +460,7 @@ void parseserial(){
 
     case 22:
       // 22: Conditional or not (n = 1 yes, 0 no) 
+      foodttlconditional_vec[trialtype_edit] = (n == 1);
       foodttlconditional = (n == 1);
       foodttlwait = false;
       if (foodttlconditional){
@@ -965,7 +966,11 @@ void parseserial(){
         Serial.println(n);
       }
       break;
-      
+
+    case 68:
+      // 68: Test MCP23008 [t]
+      testMCP23008();
+      break;
   }
 
   if (debugpins){

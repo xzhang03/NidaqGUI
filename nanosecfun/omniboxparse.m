@@ -222,6 +222,9 @@ end
 
 %% Behavior
 if nicfg.optodelayTTL.enable
+    % Mode
+    disp('Behavior -> On');
+    
     % Opto locked TTL
     fwrite(nicfg.arduino_serial, uint8([24 1]));
     
@@ -233,6 +236,7 @@ if nicfg.optodelayTTL.enable
     
     % Multi trial type
     fwrite(nicfg.arduino_serial, uint8([62 nicfg.optodelayTTL.ntrialtypes]));
+    fprintf('Trial types -> %i\n', nicfg.optodelayTTL.ntrialtypes);
     
     % Iterating trial types
     for i = 1 : nicfg.optodelayTTL.ntrialtypes
@@ -256,6 +260,9 @@ if nicfg.optodelayTTL.enable
         
         % Delivery period duration
         fwrite(nicfg.arduino_serial, uint8([35 nicfg.optodelayTTL.deliverydur(i)]));
+        
+        % Conditional
+        fwrite(nicfg.arduino_serial, uint8([22 nicfg.optodelayTTL.conditional(i)]));
         
         % Constructing Trial IO (a single uint16 integer to specify input/output pins a trial type)
         trialinfo = nicfg.optodelayTTL.(sprintf('type%i', i));
@@ -308,9 +315,6 @@ if nicfg.optodelayTTL.enable
     % Cue delay
     fwrite(nicfg.arduino_serial, uint8([31 nicfg.optodelayTTL.cuedelay]));
     
-    % Conditional
-    fwrite(nicfg.arduino_serial, uint8([22 nicfg.optodelayTTL.conditional]));
-    
     % Action period delay
     fwrite(nicfg.arduino_serial, uint8([33 nicfg.optodelayTTL.actiondelay]));
     
@@ -336,6 +340,9 @@ if nicfg.optodelayTTL.enable
         fwrite(nicfg.arduino_serial, uint8([48 nicfg.optodelayTTL.optothenTTL])); % True: opto->TTL, TTL->opto
     end
 else
+    % Mode
+    disp('Behavior -> Off');
+    
     fwrite(nicfg.arduino_serial, uint8([24 0]));
 end
 
@@ -368,6 +375,9 @@ if nicfg.onlineecho.enable
     
     % Periodicity
     fwrite(nicfg.arduino_serial, uint8([45 nicfg.onlineecho.periodicity]));
+else
+    % Disable
+    fwrite(nicfg.arduino_serial, uint8([44 0]));
 end
 
 end

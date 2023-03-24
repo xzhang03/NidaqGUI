@@ -21,7 +21,6 @@ void armfoodttl(void){
   // Food ttl
   foodttlarmed = true;
   foodttlwait = true;
-  inputttl = !foodttlconditional;
   tfood0 = tnowmillis;
 
   // Determine the trial type
@@ -34,7 +33,10 @@ void armfoodttl(void){
     // Multiple trial type
     cuedur = cuedur_vec[trialtype];
   }
-  
+
+  // Determine conditional
+  foodttlconditional = foodttlconditional_vec[trialtype];
+  inputttl = !foodttlconditional;
   if (foodttlconditional){
     foodttlactionwait = true;
     actionperiodon = false;
@@ -271,7 +273,7 @@ byte gettrialtype(void){
 // Type 1: tone PWM
 void docueon(uint16_t trialio, uint8_t trialtype){
   byte cuetype = 0; // 0 - native pwm, 1 - MCP23008 DIO, 2 - external PWM
-  const uint16_t cm = 585; // Color mutiplier (max value after multiplication is 4096)
+  const uint16_t cscale[8] = {0, 3, 11, 35, 114, 374, 1223, 3998}; // Color scale (log scale, is 4096)
   cueon = true;
   
   if (bitRead(trialio, 15) == 1){
@@ -303,9 +305,9 @@ void docueon(uint16_t trialio, uint8_t trialtype){
 
     case 2:
       // External pwm
-      pwm.setPin(0, cm * Rv, false);
-      pwm.setPin(1, cm * Gv, false);
-      pwm.setPin(2, cm * Bv, false);
+      pwm.setPin(0, cscale[Rv], false);
+      pwm.setPin(1, cscale[Gv], false);
+      pwm.setPin(2, cscale[Bv], false);
 
       switch (trialtype){
         case 0:
@@ -406,7 +408,7 @@ void dofoodoff(uint16_t trialio){
 // Type 1: digital read of food TTL pin
 bool checklicks(uint16_t trialio){
   bool lickout = false;
-  byte licktype = bitRead(trialio, 3); // 1 - active high, 0 - active low
+  byte licktype = bitRead(trialio, 3); // 1 - active high, 0 - pavlovian
   
   switch (licktype){
     case 1:

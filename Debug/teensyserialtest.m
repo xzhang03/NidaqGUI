@@ -67,8 +67,16 @@ fwrite(nicfg.arduino_serial, uint8([253 104]));
 fclose(nicfg.arduino_serial);
 disp('Reset and closed.')
 
+%% I2c ping
+% Run serial debug after
+fwrite(nicfg.arduino_serial, [60 0]); 
+
+%% RNG dump
+% Run serial debug after
+fwrite(nicfg.arduino_serial, [64 0]); 
+
 %% test
-write(nicfg.arduino_serial, [255 0]); 
+fwrite(nicfg.arduino_serial, [68 0]); 
 
 %% Performance (speed test)
 fwrite(nicfg.arduino_serial, uint8([1 0]));

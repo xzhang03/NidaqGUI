@@ -141,6 +141,7 @@ unsigned int foodpulse_ontime_vec[maxtrialtypes] = {150, 150, 150, 150};; // in 
 unsigned int foodpulse_cycletime_vec[maxtrialtypes] = {300, 300, 300, 300}; // in ms
 byte foodpulses_vec[maxtrialtypes] = {5, 5, 5, 5}; // Number of food ttl pulses per stim period.
 unsigned int deliverydur_vec[maxtrialtypes] = {5000, 5000, 5000, 5000};
+bool foodttlconditional_vec[maxtrialtypes] = {false, false, false, false};
 
 // ============== I2c ==============
 bool usei2c = true;
