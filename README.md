@@ -67,11 +67,11 @@ Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/
 
 ## D. Modes
 
-**Two-color photometry**
+### Two-color photometry
 ![TCP](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/TCP.png)
 Two interleaved pulses, each to the digital inputs of the LED drivers. No scheduler associated with this mode. Parameters are changeable in arduino (T1, T2) and in matlab (TP1, TP2). Intensities are controlled by the current limiting resistors of the LED drivers.
 
-**Optophotometry**
+### Optophotometry
 ![Optophotometry](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Optophotometry.png)
 One photometry pulse and one opto pulse. Photometry pulse width and cycle lengths are changeable in arduino (T1, TPeriod1). Opto parameters are changeable in Matlab through serial communicaiton (T2, TPeriod2), so can be changed on an experiment-by-experiment basis. TPeriod2 must be an integer multiplier of TPeriod1. Max T2 is [TPeriod1 - T1]. Opto train lengths and train periods are also adjustable in terms of number of pulses. The opto pulses immediately follow the offset of photometry pulse to allow max time following an opto pulse for LED to dim (LEDs don't dim instantly). Intensities are controlled by the current limiting resistors of the LED drivers.
 
@@ -86,7 +86,7 @@ You can use channel 2 for pure optogenetic stimulations. Pulse widths are adjust
 3. TPeriod1 is operationally defined as the sum of PulseCycle1 and PulseCycle2. For normal usage, you can set PulseCycle1 to 0 and PulseCycle2 to whatever value that can be used for the stimulation frequency of choice (see 1 for examples). For maximum cycle time, set both values to 25.5 ms to obtain TPeriod1 = 51 ms.
 4. Changing TPeriod1 will also affect the train cycle, which by default assumes TPeriod1 = 20 ms. If you double TPeriod1, you should half the traincycle value that is uploaded to microcontroller in order for the final train cycle time (in real time units) to remain the same.
 
-**Same-color optophotometry**
+### Same-color optophotometry
 ![Scoptophotometry](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/SCoptophotometry.png)
 The same digital output controls the timing of both photometry and opto (same color). Photometry parameters are changeable in arduino (T1, T2, TPeriod1). Opto parameters are changeable in Matlab throug serial communicaiton (T3, T4, TPeriod2). TPeriod2 must be an integer multiplier of TPeriod1. Opto train lengths and train periods are also adjustable in terms of number of pulses. The second output sets the intensity of the LED during the opto period, and when it's in the photometry period, the output level is not LOW but **OPEN**. OPEN means the driver uses its own current limiting resistor (potentiometer) to set the intensity of the photometry pulses and uses the microcontroller defined intensty only during opto stims.
 
