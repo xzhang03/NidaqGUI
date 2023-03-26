@@ -69,11 +69,11 @@ Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/
 
 ### Two-color photometry
 ![TCP](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/TCP.png)
-Two interleaved pulses, each to the digital inputs of the LED drivers. No scheduler associated with this mode. Parameters are changeable in arduino (T1, T2) and in matlab (TP1, TP2). Intensities are controlled by the current limiting resistors of the LED drivers.
+Two interleaved pulses, each to the digital inputs of the LED drivers. No scheduler associated with this mode. Parameters are changeable in arduino (T1, T2) and in Matlab (TP1, TP2). Intensities are controlled by the current limiting resistors of the LED drivers.
 
 ### Optophotometry
 ![Optophotometry](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Optophotometry.png)
-One photometry pulse and one opto pulse. Photometry pulse width and cycle lengths are changeable in arduino (T1, TPeriod1). Opto parameters are changeable in Matlab through serial communicaiton (T2, TPeriod2), so can be changed on an experiment-by-experiment basis. TPeriod2 must be an integer multiplier of TPeriod1. Max T2 is [TPeriod1 - T1]. Opto train lengths and train periods are also adjustable in terms of number of pulses. The opto pulses immediately follow the offset of photometry pulse to allow max time following an opto pulse for LED to dim (LEDs don't dim instantly). Intensities are controlled by the current limiting resistors of the LED drivers.
+One photometry pulse and one opto pulse. Photometry pulse width (T1) is changeable in arduino. Opto and cycle parameters are changeable in Matlab through serial communicaiton (T2, TP1, TP2), so can be changed on an experiment-by-experiment basis. TPeriod2 must be an integer multiplier of TPeriod1. Max T2 is [TPeriod1 - T1]. Opto train lengths and train periods are also adjustable in terms of number of pulses. The opto pulses immediately follow the offset of photometry pulse to allow max time following an opto pulse for LED to dim (LEDs don't dim instantly). Intensities are controlled by the current limiting resistors of the LED drivers.
 
 ***Pure optogenetics***
 You can use channel 2 for pure optogenetic stimulations. Pulse widths are adjustable to a max value of TPeriod1. In this mode, TPeriod1 is adjustable at a resolution of 0.1 ms to a max value of 51 ms. Please use caution and follow the following rules.
