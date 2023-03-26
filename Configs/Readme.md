@@ -271,7 +271,7 @@ Cue duration. This is in 100-ms increments so 10 means 1 s.
 nicfg.optodelayTTL.cuedur = [10 10 10 10];
 ```
 
-### 5.3 Conditional: Opto -> Behavior
+#### 5.3 Conditional: Opto -> Behavior
 Conditional tasks add an action window, during which a pulse is needed (e.g., licking) to trigger reward pulses. If triggered, reward pulses start as soon as the reward delay (see above) is done. The same action pulses outside the action window do not trigger rewards. The timing diagram is below.
 
 ![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/conditional.png)
@@ -297,7 +297,7 @@ The width of reward-delivery window in 100-ms increments. This is another way to
 nicfg.optodelayTTL.deliverydur = [50 50 50 50]; 
 ```
 
-### 5.4 Uncondtional`and Conditional: Behavior -> Opto
+#### 5.4 Uncondtional`and Conditional: Behavior -> Opto
 By default, behavior follows opto but you could do it the other way around but moving the behavioral reference point into a spot that X seconds leading opto onset instead of at opto onset. This method doesn't change the cue, action, and reward delays - just moves them earlier by the same amount. The actual delays therefore depends both on the delays above as well as the lead value. The timing diagrams are below.
 
 Unconditional behavior -> opto
@@ -310,17 +310,17 @@ Conditional behavior -> opto
 ![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/conditional%20foodthenopto.png)
 
 
-Enable food then opto by setting this false. By default, it's opto -> behavior, in which case the lead value has no use.
+Enable behavior-then-opto by setting this false. By default, it's opto-then-behavior, in which case the lead value has no use.
 ```matlab
 nicfg.optodelayTTL.optothenTTL = true;
 ```
 
-The lead value in seconds.
+The lead value in seconds. Only effective if optothenTTL is set to false.
 ```matlab
 nicfg.optodelayTTL.lead = 4;
 ```
 
-### 6. Multi trial types
+### 6. Multi trialtypes
  The number and frequency of the trial types are user defined in Matlab. Some of the experiment types will require additional hardware.
 > 1. Traditional one cue type (e.g., buzzer) and one output type (e.g., food TTL). You don't need additional hardward for this except for a buzzer or a single-color LED.
 > 2. Multiple reward output types (e.g., multiple TTL outputs to control different solenoids). In total, you have 5 options for reward outputs: 1 food TTL port on Nanosec and GPIO0-3 on an additional [DIO expander module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). Which port to use for which trial is defined in the config file and multiple trial types could share the same port. The DIO expander module is connected to the Nanosec I2c port. You can use either Option 1 (no vreg no i2c repeater) or Option 2 (no vreg but with i2c repeater) in the hookup guide there. Please note that, if you use Option 1, make sure the I2c voltage on the Nanosec PCB is set to 3.3V. 
