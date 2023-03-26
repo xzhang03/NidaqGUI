@@ -176,7 +176,7 @@ nicfg.scoptophotometry.pulsewidth = 10;
 ```
 
 ### 4. Scheduler
-Scheduler makes experimeriments simpler by defining 1) a pre-opto period, and 2) a pre-set number of opto trains. If scheduler is turned off, opto experiments (and behavior experiements, see below) are set to happen for an infinite number of trials on its own. When scheduler is on, there is a trial structure, no opto. or behavioral trials will happen until the pre-opto. period is over, and when the set number of trials are done, no more opto. or behavioral trials will happen anymore. This however does not turn off photometry pulses, which allows for post-opto. recordings. Please see below for details.
+Scheduler makes experimeriments more streamlined by defining 1) a pre-opto period, and 2) a pre-set number of opto trains. If scheduler is turned off, opto experiments (and behavior experiements, see below) are set to happen for an infinite number of trials on its own. When scheduler is on, there is a trial structure, no opto or behavioral trials will happen until the pre-opto period is over, and when the set number of trials are done, no more opto or behavioral trials will happen anymore. This however does not turn off photometry pulses, which allows for post-opto recordings. Please see below for details.
 
 Enable. Nothing below is uploaded if false.
 ```matlab
@@ -207,3 +207,28 @@ This sets the polarity of external triggers to active high (true, default) or ac
 ```matlab
 nicfg.scheduler.listenpol = true;
 ```
+
+RNG for opto experiments. Use this option if you don't want to do opto on every trial (usually true in the context of behavior). In the pass trials, the opto hapens as normal. In the no-pass trials, no opto pulses will be delivered. Pass chance is set between 0 (no chance) to 100 (always pass). The pass/fail is determined by teensy4.0 hardward RNG (proprietary), and is seeded when you press start. You can't pre-determine or pre-view the RNG.
+```matlab
+nicfg.scheduler.useRNG = false; 
+nicfg.scheduler.passchance = 30; 
+```
+
+Control experiments. Use this option if you want to do a control session where every trial of opto is a no-pass. This option really just enables RNG and sets pass chance to 0. You can do that to gain the same effect.
+```matlab
+nicfg.scheduler.control = false;
+```
+
+Randomized inter-trial interval. If you want to randomized ITI, set this option to true and define lower and upper limits of randomization. randomITI_min and randomITI_max are both set in seconds. If you flag randomITI to true, nanosec will ignore the cycle or behavior cycle values above. The ITI randomization is determined by teensy4.0 hardward RNG (proprietary), and is seeded when you press start. You can't pre-determine or pre-view the RNG.
+```matlab
+nicfg.scheduler.randomITI = false; 
+nicfg.scheduler.randomITI_min = 30; 
+nicfg.scheduler.randomITI_max = 40; 
+```
+
+### 5. Behavior
+Nanosec behavior is very customizable, which also comes with a little bit of a learning curve up front. The basic idea is to time lock a behavioral trial with an optogenetic trial. You could do opto before the task or after the task within a trial. In the TCP mode, where there is no opto, behavioral trials run on its own schedule as if there is a pseudo opto experiment going on. 
+
+**Multiple Trial types**: Nanosec behavioral system supports up to 4 trial types that are independent from each other. They share the same action input (e.g., lick TTL) but the cue output and the reward/punishment outputs are independently customized. The number and frequency of the trial types are user defined in Matlab. Some of the experiment types will require additional hardward.
+> 1. Traditional one cue type (e.g., buzzer) and one output type (e.g., food TTL). You don't need additional hardward for this.
+> 2. Multiple output types (e.g., multiple TTL outputs to control different solenoids). You will need 
