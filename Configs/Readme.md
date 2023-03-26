@@ -238,20 +238,90 @@ Nanosec behavior is very customizable, which also comes with a little bit of a l
 nicfg.optodelayTTL.enable = false;
 ```
 
-#### 5.2 Uncondtional Opto -> Behavior
+#### 5.2 Uncondtional: Opto -> Behavior
 This is the basic building block of behavior tasks. The timing diagram is below.
 
 ![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/unconditional.png)
 
 
-When does the first reward pulse start after opto train start. This is in 100-ms increments, so 20 means 2 s.
+When does the first reward pulse start after opto train start. This is in 100-ms increments, so 20 means 2 s. This corresponds to the Food-window delay in the scheme above.
 ```matlab
 nicfg.optodelayTTL.delay = 20;
 ```
 
+These values define the pulse width, pulse cycle (from onset to onset), and pulse number. Pulse width and cycle are in 10-ms increments, so 15 means 150 ms.
+```matlab
+nicfg.optodelayTTL.pulsewidth = [15 15 15 15];
+nicfg.optodelayTTL.cycle = [30 30 30 30]; 
+nicfg.optodelayTTL.trainlength = [5 5 5 5]; 
+```
+
+Cue enable. Turn this on if you want cue (doesn't mean it's conditional).
+```matlab
+nicfg.optodelayTTL.cueenable = false;
+```
+
+When does the cue start after opto train start. This is in 100-ms increments, so 20 means 2 s. This corresponds to the Cue delay in the scheme above.
+```matlab
+nicfg.optodelayTTL.cuedelay = 20;
+```
+
+Cue duration. This is in 100-ms increments so 10 means 1 s.
+```matlab
+nicfg.optodelayTTL.cuedur = [10 10 10 10];
+```
+
+### 5.3 Conditional: Opto -> Behavior
+Conditional tasks add an action window, during which a pulse is needed (e.g., licking) to trigger reward pulses. If triggered, reward pulses start as soon as the reward delay (see above) is done. The same action pulses outside the action window do not trigger rewards. The timing diagram is below.
+
+![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/conditional.png)
 
 
- The number and frequency of the trial types are user defined in Matlab. Some of the experiment types will require additional hardward.
+Set conditional on or off per trial type.
+```matlab
+nicfg.optodelayTTL.conditional = [false, false, false, false];
+```
+
+When does the action window start after opto onset. This is in 100-ms increments, so 20 means 2 s. This corresponds to Action delay in the scheme above.
+```matlab
+nicfg.optodelayTTL.actiondelay = 20;
+```
+
+The width of action window in 100-ms increments, so 50 means 5 s. The corresponds to Action duration in the scheme above.
+```matlab
+nicfg.optodelayTTL.actiondur = 50;
+```
+
+The width of reward-delivery window in 100-ms increments. This is another way to define when the action is too late. This corresponds to Food-window duration in the scheme above. This window only limits when the reward pulse can occur. If a train starts, it will finish.
+```matlab
+nicfg.optodelayTTL.deliverydur = [50 50 50 50]; 
+```
+
+### 5.4 Uncondtional`and Conditional: Behavior -> Opto
+By default, behavior follows opto but you could do it the other way around but moving the behavioral reference point into a spot that X seconds leading opto onset instead of at opto onset. This method doesn't change the cue, action, and reward delays - just moves them earlier by the same amount. The actual delays therefore depends both on the delays above as well as the lead value. The timing diagrams are below.
+
+Unconditional behavior -> opto
+
+![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/unconditional%20foodthenopto.png)
+
+
+Conditional behavior -> opto
+
+![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/conditional%20foodthenopto.png)
+
+
+Enable food then opto by setting this false. By default, it's opto -> behavior, in which case the lead value has no use.
+```matlab
+nicfg.optodelayTTL.optothenTTL = true;
+```
+
+The lead value in seconds.
+```matlab
+nicfg.optodelayTTL.lead = 4;
+```
+
+### 6. Multi trial types
+ The number and frequency of the trial types are user defined in Matlab. Some of the experiment types will require additional hardware.
 > 1. Traditional one cue type (e.g., buzzer) and one output type (e.g., food TTL). You don't need additional hardward for this except for a buzzer or a single-color LED.
 > 2. Multiple reward output types (e.g., multiple TTL outputs to control different solenoids). In total, you have 5 options for reward outputs: 1 food TTL port on Nanosec and GPIO0-3 on an additional [DIO expander module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). Which port to use for which trial is defined in the config file and multiple trial types could share the same port. The DIO expander module is connected to the Nanosec I2c port. You can use either Option 1 (no vreg no i2c repeater) or Option 2 (no vreg but with i2c repeater) in the hookup guide there. Please note that, if you use Option 1, make sure the I2c voltage on the Nanosec PCB is set to 3.3V. 
 > 3. Multiple digital cue types (e.g., different TTL outputs to drive LEDs on/off at different colors). In total, you have 2 options for cue outputs: 1 buzzer port on Nanosec and a combination of GP4-7 on the [DIO expander module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). If you use the DIO expander module here, you can either turn on GP4-7 one per trial type or different combinations per trial type. You can have the same cue or cue-combo for different trial types. The DIO expander module is connected to the Nanosec I2c port. You can use either Option 1 (no vreg no i2c repeater) or Option 2 (no vreg but with i2c repeater) in the hookup guide there. Please note that, if you use Option 1, make sure the I2c voltage on the Nanosec PCB is set to 3.3V. 
