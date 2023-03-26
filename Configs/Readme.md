@@ -179,5 +179,32 @@ nicfg.scoptophotometry.pulsewidth = 10;
 ### 4. Scheduler
 Scheduler makes experimeriments simpler by defining 1) a pre-opto period, and 2) a pre-set number of opto trains. If scheduler is turned off, opto experiments (and behavior experiements, see below) are set to happen for an infinite number of trials on its own. When scheduler is on, there is a trial structure, no opto. or behavioral trials will happen until the pre-opto. period is over, and when the set number of trials are done, no more opto. or behavioral trials will happen anymore. This however does not turn off photometry pulses, which allows for post-opto. recordings. Please see below for details.
 
+Enable. Nothing below is uploaded if false.
+```matlab
+nicfg.scheduler.enable = false;
+```
 
+Pre-opto (and pre-behavior) period is seconds.
+```matlab
+nicfg.scheduler.delay = 120;
+```
 
+Number of opto (and behavioral) trains
+```matlab
+nicfg.scheduler.ntrains = 10;
+```
+
+External pulse triggers. If this set true, extenal inputs could be used to trigger opto (and behavioral) train in additio to schedular trains. If the external trigger TTL BNC port is left open, do not turn this on as the input is floating.
+```matlab
+nicfg.scheduler.manualoverride = false; 
+```
+
+In listening mode, all scheduler trials are suppressed unless there is an external input. Turning this on will aumatically turn manualoveride on.
+```matlab
+nicfg.scheduler.listenmode = false;
+```
+
+This sets the polarity of external triggers to active high (true) or active low (false)
+```matlab
+nicfg.scheduler.listenpol = true;
+```
