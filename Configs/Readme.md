@@ -148,7 +148,7 @@ nicfg.optophotometry.pulsecycle1 = 60;
 nicfg.optophotometry.pulsecycle2 = 140; 
 ```
 
-### 3. Same-color optophotometry
+### 4. Same-color optophotometry
 ![Scoptophotometry](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/SCoptophotometry.png)
 Same-color optophotometry is done by using an analog pulse (Ch2) to temporarily control the LED light intensity and perform opto stimulation. When opto stimulation is not turned on, the analog output is high-impedence, i.e., as if it's unplugged. The cycle (TPeriod) is 20 ms by default. This enable enables experiments that are not possible otherwise, but non-linear bleaching could be an issue.
 
@@ -177,7 +177,7 @@ Opto pulse width. This corresponds to T3 above. This step will alter the pulse w
 nicfg.scoptophotometry.pulsewidth = 10;
 ```
 
-### 4. Scheduler
+### 5. Scheduler
 Scheduler makes experimeriments more streamlined by defining 1) a pre-opto period, and 2) a pre-set number of opto trains. If scheduler is turned off, opto experiments (and behavior experiements, see below) are set to happen for an infinite number of trials on its own. When scheduler is on, there is a trial structure, no opto or behavioral trials will happen until the pre-opto period is over, and when the set number of trials are done, no more opto or behavioral trials will happen anymore. This however does not turn off photometry pulses, which allows for post-opto recordings. Please see below for details.
 
 Enable. Nothing below is uploaded if false.
@@ -228,17 +228,17 @@ nicfg.scheduler.randomITI_min = 30;
 nicfg.scheduler.randomITI_max = 40; 
 ```
 
-### 5. Behavior
+### 6. Behavior
 Nanosec behavior is very customizable, which also comes with a little bit of a learning curve up front. The basic idea is to time lock a behavioral trial with an optogenetic trial. You could do opto before the task or after the task within a trial (hence the old name optodelayTTL). In the TCP mode, where there is no opto, behavioral trials run on its own schedule as if there is a pseudo opto experiment going on. 
 
 **Multiple Trial types**: Nanosec behavioral system supports up to 4 trial types that are independent from each other. They share the same action input (e.g., lick TTL) but the cue output and the reward/punishment outputs are independently customized. Some of the parameters are a single value, meaning that they are shared between all trial types. Some are a 1x4 vector, meaning that they are independent per trial type 1, 2, 3, 4. You will see below on details of multi trial-types, but if you only use 1 trial type, set ntrialtypes to 1.
 
-#### 5.1 Master enable for behavior.
+#### 6.1 Master enable for behavior.
 ```matlab
 nicfg.optodelayTTL.enable = false;
 ```
 
-#### 5.2 Uncondtional: Opto -> Behavior
+#### 6.2 Uncondtional: Opto -> Behavior
 This is the basic building block of behavior tasks. The timing diagram is below.
 
 ![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/unconditional.png)
@@ -271,7 +271,7 @@ Cue duration. This is in 100-ms increments so 10 means 1 s.
 nicfg.optodelayTTL.cuedur = [10 10 10 10];
 ```
 
-#### 5.3 Conditional: Opto -> Behavior
+#### 6.3 Conditional: Opto -> Behavior
 Conditional tasks add an action window, during which a pulse is needed (e.g., licking) to trigger reward pulses. If triggered, reward pulses start as soon as the reward delay (see above) is done. The same action pulses outside the action window do not trigger rewards. The timing diagram is below.
 
 ![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/conditional.png)
@@ -297,7 +297,7 @@ The width of reward-delivery window in 100-ms increments. This is another way to
 nicfg.optodelayTTL.deliverydur = [50 50 50 50]; 
 ```
 
-#### 5.4 Uncondtional`and Conditional: Behavior -> Opto
+#### 6.4 Uncondtional`and Conditional: Behavior -> Opto
 By default, behavior follows opto but you could do it the other way around but moving the behavioral reference point into a spot that X seconds leading opto onset instead of at opto onset. This method doesn't change the cue, action, and reward delays - just moves them earlier by the same amount. The actual delays therefore depends both on the delays above as well as the lead value. The timing diagrams are below.
 
 Unconditional behavior -> opto
@@ -320,10 +320,10 @@ The lead value in seconds. Only effective if optothenTTL is set to false.
 nicfg.optodelayTTL.lead = 4;
 ```
 
-### 6. Multi trialtypes
+### 7. Multi trialtypes
 Nanosec supports up to 4 trial types. Given the IO limitation of Nanosec PCB, additional cue and reward types need to be actualized with additional hardware. Please power off Nanosec before making these hardware adjustments.
 
-#### 6.1 Hardware modes
+#### 7.1 Hardware modes
 1. Traditional one cue type (e.g., buzzer) and one output type (e.g., food TTL). 
 2. Multiple reward output types (e.g., multiple TTL outputs to control different solenoids). 
    - In total, you have 5 options for reward outputs: 1 food TTL port on Nanosec and GPIO0-3 on an additional [DIO expander module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). 
@@ -339,7 +339,7 @@ Nanosec supports up to 4 trial types. Given the IO limitation of Nanosec PCB, ad
    
    ![Hookup image](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/Multi%20trialtype%20hookup%20guide.png)
 
-#### 6.2 Matlab configs
+#### 7.2 Matlab configs
  
 These two values together define the number of trialtypes and occurence frequencies. If you set ntrialtypes as 1, only Trialtype 1 is done so only the first number of all the behavioral definition vectors is used. The frequency values are expressed as integer weights (just as in MonkeyLogic). A frequency vector of [3 3 3 3] means that all trials occur at equal frequency, and is the same as [1 1 1 1] or [10 10 10 10]. A frequency vector of [8 6 4 2] means 40%, 30%, 20%, 10% occurence of the 4 trial types (assuming trial types is set to 4). In general, it's a good idea to keep the frequency weights low. If you set the frequency vector to [3 1 3 3] and ntrialtypes to 2, only Trialtype 1 and 2 will be done, and they are 3:1 in frequency. If you set the frequency to [3 0 3 3] and ntrialtypes to 4, only Trialtypes 1, 3, 4 will be done, and 2 has no chance of occuring.
 ```matlab
@@ -347,7 +347,7 @@ nicfg.optodelayTTL.ntrialtypes = 1;
 nicfg.optodelayTTL.trialfreq = [3 0 0 0];
 ```
 
-This defines the cue type of Trialtype 1. 'Buzzer' is the buzzer port on Nanosec PCB. 'DIO' means combinations of digital pulse cues (Mode 3 in Section 6.1). 'PWMRGB' means the cue comes from the dimmable LED module (Mode 4 in Section 6.1).
+This defines the cue type of Trialtype 1. 'Buzzer' is the buzzer port on Nanosec PCB. 'DIO' means combinations of digital pulse cues (Mode 3 in Section 7.1). 'PWMRGB' means the cue comes from the dimmable LED module (Mode 4 in Section 7.1).
 ```matlab
 nicfg.optodelayTTL.type1.cuetype = 'Buzzer';
 ```
@@ -391,7 +391,7 @@ nicfg.optodelayTTL.type4.rewardtype = 'DIO';
 nicfg.optodelayTTL.type4.DIOport = 0;
 ```
 
-### 7. Encoder
+### 8. Encoder
 Enable running encoder recordings (generally ON even if no encoder). Please see module info [here](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/Rotary%20Encoder).
 ```matlab
 nicfg.encoder.enable = true;
@@ -402,7 +402,7 @@ Turn on to use Nanosec hardware timers to control encoder sampling, which yields
 nicfg.encoder.autoecho = true;
 ```
 
-### 8. Online Scheduler and RNG echo
+### 9. Online Scheduler and RNG echo
 Online info showing trial number, opto RNG info, and trial type info if turned on. These info comes from Nanosec so it should be accurate.
 ```matlab
 nicfg.onlineecho.enable = true;
@@ -413,7 +413,7 @@ How often does online echo occur in 100-ms increments, so 10 means one echo per 
 nicfg.onlineecho.periodicity = 10;
 ```
 
-### 9. Audio sync
+### 10. Audio sync
 Use this option to turn on buzzer at the photometry camera rate (default 30 Hz), which allows for audio/visual synchronizing. It cannot be used together with buzzer cue.
 ```matlab
 nicfg.audiosync.enable = false;
