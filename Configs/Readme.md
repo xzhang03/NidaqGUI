@@ -142,6 +142,7 @@ Overlap mode. If you turn on overlap mode, opto pulse gets turned on as soon as 
 nicfg.optophotometry.overlap = false;
 ```
 
+
 These 2 values change how often the photometry pulse amd thet opto pulse occur (sum together to TPeriod in the scheme above). They are in increments of 100 us, so 60/140 means that opto light gets turned on 6 ms after photometry light is on, and photometry light is on 14 ms after opto light was on. It is the sum of the two numbers that determines TPeriod1 value above (e.g., 30/140 means 20 ms cycle). Some of the photoemtry/behavioral timing mechanisms are done by counting cycles, so changing this number may affect them. I tried to account for cycle changes, but you may still need to let me know if some timings are off because of this.
 nicfg.optophotometry.pulsecycle1 = 60; 
 nicfg.optophotometry.pulsecycle2 = 140; 
