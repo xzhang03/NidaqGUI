@@ -69,7 +69,7 @@ Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/
 
 **Two-color photometry**
 ![TCP](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/TCP.png)
-Two interleaved pulses, each to the digital inputs of the LED drivers. No scheduler associated with this mode. Parameters are changeable in arduino (T1, T2, T3, TPeriod). Intensities are controlled by the current limiting resistors of the LED drivers.
+Two interleaved pulses, each to the digital inputs of the LED drivers. No scheduler associated with this mode. Parameters are changeable in arduino (T1, T2) and in matlab (TP1, TP2). Intensities are controlled by the current limiting resistors of the LED drivers.
 
 **Optophotometry**
 ![Optophotometry](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Optophotometry.png)
