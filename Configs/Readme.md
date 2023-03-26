@@ -323,19 +323,105 @@ nicfg.optodelayTTL.lead = 4;
 ### 6. Multi trialtypes
 Nanosec supports up to 4 trial types. Given the IO limitation of Nanosec PCB, additional cue and reward types need to be actualized with additional hardware. Please power off Nanosec before making these hardware adjustments.
 
-#### Hardware
+#### 6.1 Hardware modes
 1. Traditional one cue type (e.g., buzzer) and one output type (e.g., food TTL). 
 2. Multiple reward output types (e.g., multiple TTL outputs to control different solenoids). 
-   - In total, you have 5 options for reward outputs: 1 food TTL port on Nanosec and GPIO0-3 on an additional [DIO expander module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). Which port to use for which trial is defined in the config file and multiple trial types could share the same port. 
+   - In total, you have 5 options for reward outputs: 1 food TTL port on Nanosec and GPIO0-3 on an additional [DIO expander module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). 
    - Hook up guide is [here](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). You can use either Option 1 (no vreg no i2c repeater) or Option 2 (no vreg but with i2c repeater) in the hookup guide there. Please note that, if you use Option 1, make sure the I2c voltage on the Nanosec PCB is set to 3.3V. 
 3. Multiple digital cue types (e.g., different TTL outputs to drive LEDs on/off at different colors). 
-   - In total, you have 2 options for cue outputs: 1 buzzer port on Nanosec and a combination of GP4-7 on the [DIO expander module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). If you use the DIO expander module here, you can either turn on GP4-7 one per trial type or different combinations per trial type. You can have the same cue or cue-combo for different trial types. 
+   - In total, you have 2 options for cue outputs: 1 buzzer port on Nanosec and a combination of GP4-7 on the [DIO expander module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). If you use the DIO expander module here, you can either turn on GPIO4-7 one port per trial type or one combination per trial type. 
    - Hook up guide is [here](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). You can use either Option 1 (no vreg no i2c repeater) or Option 2 (no vreg but with i2c repeater) in the hookup guide there. Please note that, if you use Option 1, make sure the I2c voltage on the Nanosec PCB is set to 3.3V. 
-4. (Most common) Multiple dimmable RGB cue types (e.g., bright red for Trial type 1 and dim blue+green for Trial type 2). 
-   - Each trial type can have a RGB value of cue, with each color having 8 levels of intensities (512 colors in total). The 8 intensity levels are on a log scale: 0, 3, 11, 35, 114, 374, 1223, 3998 (max 4095) and is done through the [dimmable LED module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/LED%20cue%20i2c). 
+4. (Most common) Multiple dimmable RGB cue types and output ports (e.g., bright red for Trial type 1 and dim blue+green for Trial type 2). 
+   - Each trial type can have a RGB value of cue, with each primary color having 8 levels of intensities (512 colors in total). This is done through the [dimmable LED module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/LED%20cue%20i2c). 
    - Because the dimmable LED module does not send pulses on which trial type is done per trial (i.e., it only gives the color), you will also likely want to use a [DIO expander module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander) to send collectable pulses on which trial is on and when. This shouldn't be an issue because you likely already use the DIO expander to deliver different output pulses on GPIO0-3 (see 2 above). Trial type 1 always uses GPIO4; Trial type 2 always uses GPIO5; Trial type 3 always uses GPIO6; Trial type 4 always uses GPIO7. 
-   - If you use both the dimmable LED module and the DIO expander module, you will also want to use an [I2c repeater](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/I2C%20repeater) to safely isolate Nanosec's I2c logic level from everything else. A setup guide to use the dimmable RGB module, DIO expander, and I2c repeater rogether is the Option 2 of [Here](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/LED%20cue%20i2c). The general idea is to 1) pass Nanosec i2c to repeater i2c input side, use repeater outputside to pass the voltage supply to downstream modules, and use the repeater outputside to split the i2c communication to downstreawm modules. 
+   - If you use both the dimmable LED module and the DIO expander module, you will also want to use an [I2c repeater](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/I2C%20repeater) as an intermediate to safely isolate Nanosec's I2c logic level from everything else. 
+   - A setup guide to use the dimmable RGB module, DIO expander, and I2c repeater rogether is the **Option 2** of [Here](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/LED%20cue%20i2c). 
    
    ![Hookup image](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/Multi%20trialtype%20hookup%20guide.png)
 
- The number and frequency of the trial types are user defined in Matlab. Some of the experiment types will require additional hardware.
+#### 6.2 Matlab configs
+ 
+These two values together define the number of trialtypes and occurence frequencies. If you set ntrialtypes as 1, only Trialtype 1 is done so only the first number of all the behavioral definition vectors is used. The frequency values are expressed as integer weights (just as in MonkeyLogic). A frequency vector of [3 3 3 3] means that all trials occur at equal frequency, and is the same as [1 1 1 1] or [10 10 10 10]. A frequency vector of [8 6 4 2] means 40%, 30%, 20%, 10% occurence of the 4 trial types (assuming trial types is set to 4). In general, it's a good idea to keep the frequency weights low. If you set the frequency vector to [3 1 3 3] and ntrialtypes to 2, only Trialtype 1 and 2 will be done, and they are 3:1 in frequency. If you set the frequency to [3 0 3 3] and ntrialtypes to 4, only Trialtypes 1, 3, 4 will be done, and 2 has no chance of occuring.
+```matlab
+nicfg.optodelayTTL.ntrialtypes = 1; 
+nicfg.optodelayTTL.trialfreq = [3 0 0 0];
+```
+
+This defines the cue type of Trialtype 1. 'Buzzer' is the buzzer port on Nanosec PCB. 'DIO' means combinations of digital pulse cues (Mode 3 in Section 6.1). 'PWMRGB' means the cue comes from the dimmable LED module (Mode 4 in Section 6.1).
+```matlab
+nicfg.optodelayTTL.type1.cuetype = 'Buzzer';
+```
+
+This defines the DIO or RGB cues. If cuetype is Buzzer, this input is ignored. If cuetype is DIO, then this value should be set as a binary 1x4 vector that specifies which ports of DIO GPIO4-7 will be turned on as cue (e.g., [0 1 1 0] means that GPIO5 and GPIO6 is turned on as cue). If cue type is PWMRGB, then this value should be a 1x3 vector with each value between 0 and 7 to specify RGB color brightness (e.g., [0 2 7] means no red, dim green, and bright blue). The 8 intensity levels are on a log scale: 0, 3, 11, 35, 114, 374, 1223, 3998 (max 4095), and they should appear linear to the eye. You can have the same cue or cue-combo for different trial types. 
+```matlab
+nicfg.optodelayTTL.type1.RGB = [0 0 0];
+```
+
+Where does the reward pulse come from. This could be 'Native', meaning the food BNC port from Nanosec, or it could be DIO, meaning from GPIO0-3 on DIO expander.
+```matlab
+nicfg.optodelayTTL.type1.rewardtype = 'Native';
+```
+
+Which port on DIO will be used for reward (GPIO0, 1, 2, 3). Multiple trial types could share the same reward port. This value is ignored if reward type is set to 'Native'.
+```matlab
+nicfg.optodelayTTL.type1.DIOport = 0;
+```
+
+These settings are for Trialtype 2.
+```matlab
+nicfg.optodelayTTL.type2.cuetype = 'PWMRGB';
+nicfg.optodelayTTL.type2.RGB = [7 0 0];
+nicfg.optodelayTTL.type2.rewardtype = 'DIO';
+nicfg.optodelayTTL.type2.DIOport = 0;
+```
+
+These settings are for Trialtype 3.
+```matlab
+nicfg.optodelayTTL.type3.cuetype = 'PWMRGB';
+nicfg.optodelayTTL.type3.RGB = [7 0 0];
+nicfg.optodelayTTL.type3.rewardtype = 'DIO';
+nicfg.optodelayTTL.type3.DIOport = 0;
+```
+
+These settings are for Trialtype 4.
+```matlab
+nicfg.optodelayTTL.type4.cuetype = 'PWMRGB';
+nicfg.optodelayTTL.type4.RGB = [7 0 0];
+nicfg.optodelayTTL.type4.rewardtype = 'DIO';
+nicfg.optodelayTTL.type4.DIOport = 0;
+```
+
+### 7. Encoder
+Enable running encoder recordings (generally ON even if no encoder). Please see module info [here](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/Rotary%20Encoder).
+```matlab
+nicfg.encoder.enable = true;
+```
+
+Turn on to use Nanosec hardware timers to control encoder sampling, which yields more accurate results.
+```matlab
+nicfg.encoder.autoecho = true;
+```
+
+### 7. Online Scheduler and RNG echo
+Online info showing trial number, opto RNG info, and trial type info if turned on. These info comes from Nanosec so it should be accurate.
+```matlab
+nicfg.onlineecho.enable = true;
+```
+
+How often does online echo occur in 100-ms increments, so 10 means one echo per 1 s. Please be ware that decreasing this value by a lot will make updates much more frequent, but it will add Matlab stress and potentially lag.
+```matlab
+nicfg.onlineecho.periodicity = 10;
+```
+
+### 8. Audio sync
+Use this option to turn on buzzer at the photometry camera rate (default 30 Hz), which allows for audio/visual synchronizing. It cannot be used together with buzzer cue.
+```matlab
+nicfg.audiosync.enable = false;
+```
+
+Buzzer pitch in 100 Hz increments, so 20 means 2 kHz.
+```matlab
+nicfg.audiosync.freq = 20;
+```
+
+
