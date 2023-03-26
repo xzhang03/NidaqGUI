@@ -402,7 +402,7 @@ Turn on to use Nanosec hardware timers to control encoder sampling, which yields
 nicfg.encoder.autoecho = true;
 ```
 
-### 7. Online Scheduler and RNG echo
+### 8. Online Scheduler and RNG echo
 Online info showing trial number, opto RNG info, and trial type info if turned on. These info comes from Nanosec so it should be accurate.
 ```matlab
 nicfg.onlineecho.enable = true;
@@ -413,7 +413,7 @@ How often does online echo occur in 100-ms increments, so 10 means one echo per 
 nicfg.onlineecho.periodicity = 10;
 ```
 
-### 8. Audio sync
+### 9. Audio sync
 Use this option to turn on buzzer at the photometry camera rate (default 30 Hz), which allows for audio/visual synchronizing. It cannot be used together with buzzer cue.
 ```matlab
 nicfg.audiosync.enable = false;
