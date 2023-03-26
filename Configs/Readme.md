@@ -110,7 +110,7 @@ nicfg.tcp.pulsecycle2 = 100;
 ### 3. Optophotometry
 ![Optophotometry](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/Optophotometry.png)
 
-Enable. Nothing is uploaded if false.
+Enable. Nothing is uploaded if false. If enabled, TCP and same-color optomphotometry must be both false.
 ```matlab
 nicfg.optophotometry.enable = false;
 ```
@@ -138,4 +138,18 @@ nicfg.optophotometry.pulsewidth = 10;
 Overlap mode. If you turn on overlap mode, opto pulse gets turned on as soon as the photometry pulse starts instead of when photometry pulse is turned off. This allows for 100% duty cycle of opto stim if you also set the pulse width to 20 ms (cycle is 20 ms). The disadvantage is that opto light may contaminate photometry recordings. If that's not a priority or if the opto light gets sent down a different fiber than the photometry light, use this option freely.
 ```matlab
 nicfg.optophotometry.overlap = false;
+```
+
+These 2 values change how often the photometry pulse amd thet opto pulse occur (sum together to TPeriod in the scheme above). They are in increments of 100 us, so 60/140 means that opto light gets turned on 6 ms after photometry light is on, and photometry light is on 14 ms after opto light was on. It is the sum of the two numbers that determines TPeriod1 value above (e.g., 30/140 means 20 ms cycle). Some of the photoemtry/behavioral timing mechanisms are done by counting cycles, so changing this number may affect them. I tried to account for cycle changes, but you may still need to let me know if some timings are off because of this.
+nicfg.optophotometry.pulsecycle1 = 60; 
+nicfg.optophotometry.pulsecycle2 = 140; 
+
+### 3. Same-color optophotometry
+![Scoptophotometry](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/SCoptophotometry.png)
+
+Same-color optophotometry is done by using an analog pulse (Ch2) to temporarily control the LED light intensity and perform opto stimulation. When opto stimulation is not turned on, the analog output is high-impedence, i.e., as if it's unplugged.
+
+Enable. Nothing is uploaded if false. If enabled, TCP and optomphotometry must be both false.
+```matlab
+nicfg.scoptophotometry.enable = false;
 ```
