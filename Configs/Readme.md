@@ -137,14 +137,16 @@ Opto pulse width. This corresponds to T2 in the image above. Notice that normall
 nicfg.optophotometry.pulsewidth = 10;
 ```
 
-Overlap mode. If you turn on overlap mode, opto pulse gets turned on as soon as the photometry pulse starts instead of when photometry pulse is turned off. This allows for 100% duty cycle of opto stim if you also set the pulse width to 20 ms (cycle is 20 ms). The disadvantage is that opto light may contaminate photometry recordings. If that's not a priority or if the opto light gets sent down a different fiber than the photometry light, use this option freely.
+Overlap mode. If you turn on overlap mode, opto pulse gets turned on as soon as the photometry pulse starts instead of when photometry pulse is turned off. This means that the actual pulse width is the sum of pulse width above and cycle 1 (default 6 ms). This allows for 100% duty cycle of opto stim if you also set the pulse width to 14 ms (cycle 1 is 6 ms so 20 ms pulse totday). The disadvantage is that opto light may contaminate photometry recordings. If that's not a priority or if the opto light gets sent down a different fiber than the photometry light, use this option freely.
 ```matlab
 nicfg.optophotometry.overlap = false;
 ```
 
 These 2 values change how often the photometry pulse amd thet opto pulse occur (TP1 and TP2, sum together to TPeriod in the scheme above). They are in increments of 100 us, so 60/140 means that opto light gets turned on 6 ms after photometry light is on, and photometry light is on 14 ms after opto light was on. It is the sum of the two numbers that determines TPeriod1 value above (e.g., 30/140 means 20 ms cycle). Some of the photometry/behavioral timing mechanisms are done by counting cycles, so changing this number may affect them. I tried to account for cycle changes, but you may still need to let me know if some timings are off because of this.
+```matlab
 nicfg.optophotometry.pulsecycle1 = 60; 
 nicfg.optophotometry.pulsecycle2 = 140; 
+```
 
 ### 3. Same-color optophotometry
 ![Scoptophotometry](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/SCoptophotometry.png)
@@ -227,9 +229,27 @@ nicfg.scheduler.randomITI_max = 40;
 ```
 
 ### 5. Behavior
-Nanosec behavior is very customizable, which also comes with a little bit of a learning curve up front. The basic idea is to time lock a behavioral trial with an optogenetic trial. You could do opto before the task or after the task within a trial. In the TCP mode, where there is no opto, behavioral trials run on its own schedule as if there is a pseudo opto experiment going on. 
+Nanosec behavior is very customizable, which also comes with a little bit of a learning curve up front. The basic idea is to time lock a behavioral trial with an optogenetic trial. You could do opto before the task or after the task within a trial (hence the old name optodelayTTL). In the TCP mode, where there is no opto, behavioral trials run on its own schedule as if there is a pseudo opto experiment going on. 
 
-**Multiple Trial types**: Nanosec behavioral system supports up to 4 trial types that are independent from each other. They share the same action input (e.g., lick TTL) but the cue output and the reward/punishment outputs are independently customized. The number and frequency of the trial types are user defined in Matlab. Some of the experiment types will require additional hardward.
+**Multiple Trial types**: Nanosec behavioral system supports up to 4 trial types that are independent from each other. They share the same action input (e.g., lick TTL) but the cue output and the reward/punishment outputs are independently customized. Some of the parameters are a single value, meaning that they are shared between all trial types. Some are a 1x4 vector, meaning that they are independent per trial type 1, 2, 3, 4. You will see below on details of multi trial-types, but if you only use 1 trial type, set ntrialtypes to 1.
+
+Master enable for behavior.
+```matlab
+nicfg.optodelayTTL.enable = false;
+```
+
+**Uncondtional Opto -> Behavior**
+This is the basic building block of behavior tasks. The timing diagram is below.
+![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/unconditional.png)
+
+When does the first reward pulse start after opto train start. This is in 100-ms increments, so 20 means 2 s.
+```matlab
+nicfg.optodelayTTL.delay = 20;
+```
+
+
+
+ The number and frequency of the trial types are user defined in Matlab. Some of the experiment types will require additional hardward.
 > 1. Traditional one cue type (e.g., buzzer) and one output type (e.g., food TTL). You don't need additional hardward for this except for a buzzer or a single-color LED.
 > 2. Multiple reward output types (e.g., multiple TTL outputs to control different solenoids). In total, you have 5 options for reward outputs: 1 food TTL port on Nanosec and GPIO0-3 on an additional [DIO expander module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). Which port to use for which trial is defined in the config file and multiple trial types could share the same port. The DIO expander module is connected to the Nanosec I2c port. You can use either Option 1 (no vreg no i2c repeater) or Option 2 (no vreg but with i2c repeater) in the hookup guide there. Please note that, if you use Option 1, make sure the I2c voltage on the Nanosec PCB is set to 3.3V. 
 > 3. Multiple digital cue types (e.g., different TTL outputs to drive LEDs on/off at different colors). In total, you have 2 options for cue outputs: 1 buzzer port on Nanosec and a combination of GP4-7 on the [DIO expander module](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/DIO%20expander). If you use the DIO expander module here, you can either turn on GP4-7 one per trial type or different combinations per trial type. You can have the same cue or cue-combo for different trial types. The DIO expander module is connected to the Nanosec I2c port. You can use either Option 1 (no vreg no i2c repeater) or Option 2 (no vreg but with i2c repeater) in the hookup guide there. Please note that, if you use Option 1, make sure the I2c voltage on the Nanosec PCB is set to 3.3V. 

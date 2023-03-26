@@ -73,8 +73,8 @@ nicfg.optophotometry.overlap = false; % If overlap is true, opto and photometry 
 % mod above
 % 3. Changing these values will also affect the train cycle (which assumes
 % each full cycle is 20 ms).
-nicfg.optophotometry.pulsecycle1 = 65; % Pulse cycle 1 in X * 100 us. E.g., 65 means 6.5 ms. Default 65 (6.5 ms)
-nicfg.optophotometry.pulsecycle2 = 135; % Pulse cycle 1 in X * 100 us. E.g., 135 means 13.5 ms. Default 135 (13.5 ms)
+nicfg.optophotometry.pulsecycle1 = 60; % Pulse cycle 1 in X * 100 us. E.g., 65 means 6.5 ms. Default 65 (6.5 ms)
+nicfg.optophotometry.pulsecycle2 = 140; % Pulse cycle 1 in X * 100 us. E.g., 135 means 13.5 ms. Default 135 (13.5 ms)
 
 % Same-color optophotometry
 % Variable pulse width. 20 ms means always on
@@ -89,7 +89,7 @@ nicfg.scheduler.enable = false; % Default false
 nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 65535s.
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
-nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external active low. This will enable manualoverride above.
+nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external input. This will enable manualoverride above.
 
 % Hardware Opto RNG (determines a train goes through or not)
 % (Scheduler only and does not apply to the listening mode)
