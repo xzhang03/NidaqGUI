@@ -233,12 +233,12 @@ Nanosec behavior is very customizable, which also comes with a little bit of a l
 
 **Multiple Trial types**: Nanosec behavioral system supports up to 4 trial types that are independent from each other. They share the same action input (e.g., lick TTL) but the cue output and the reward/punishment outputs are independently customized. Some of the parameters are a single value, meaning that they are shared between all trial types. Some are a 1x4 vector, meaning that they are independent per trial type 1, 2, 3, 4. You will see below on details of multi trial-types, but if you only use 1 trial type, set ntrialtypes to 1.
 
-Master enable for behavior.
+#### 5.1 Master enable for behavior.
 ```matlab
 nicfg.optodelayTTL.enable = false;
 ```
 
-**Uncondtional Opto -> Behavior**
+#### 5.2 Uncondtional Opto -> Behavior
 This is the basic building block of behavior tasks. The timing diagram is below.
 ![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/unconditional.png)
 
