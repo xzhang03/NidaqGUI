@@ -90,6 +90,7 @@ nicfg.omnibox.enable = true;
 
 ### 2. Two-color photometry (TCP)
 ![TCP](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/TCP.png)
+TCP is done by pulses two LEDs in an interleaved manner. TCP operates in 20 ms cycles (50 Hz) by default.
 
 Change this to true to enable tcp mode (must set optophotometry and same-color optophotometry to false).
 ```matlab
@@ -109,6 +110,7 @@ nicfg.tcp.pulsecycle2 = 100;
 
 ### 3. Optophotometry
 ![Optophotometry](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/Optophotometry.png)
+Optophotometry is done by inserting opto pulses as soon as photometry pulse is done (but can be changed see below). Optophotometry operates in 20 ms cycles (50 Hz) by default.
 
 Enable. Nothing is uploaded if false. If enabled, TCP and same-color optomphotometry must be both false.
 ```matlab
@@ -146,10 +148,35 @@ nicfg.optophotometry.pulsecycle2 = 140;
 
 ### 3. Same-color optophotometry
 ![Scoptophotometry](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/SCoptophotometry.png)
-
-Same-color optophotometry is done by using an analog pulse (Ch2) to temporarily control the LED light intensity and perform opto stimulation. When opto stimulation is not turned on, the analog output is high-impedence, i.e., as if it's unplugged.
+Same-color optophotometry is done by using an analog pulse (Ch2) to temporarily control the LED light intensity and perform opto stimulation. When opto stimulation is not turned on, the analog output is high-impedence, i.e., as if it's unplugged. The cycle (TPeriod) is 20 ms by default. This enable enables experiments that are not possible otherwise, but non-linear bleaching could be an issue.
 
 Enable. Nothing is uploaded if false. If enabled, TCP and optomphotometry must be both false.
 ```matlab
 nicfg.scoptophotometry.enable = false;
 ```
+
+Frequency modulator, meaning how many photometry pulses does it need before triggering an opto pulse. The photometry runs at 50 Hz (20 ms per cycle), so the opto actual frequency is 50 Hz/X, e.g., 5 means 10 Hz opto.
+```matlab
+nicfg.scoptophotometry.freqmod = 5;
+```
+
+Number of pulses per train
+```matlab
+nicfg.scoptophotometry.trainlength = 10;
+```
+
+How often does an opto train happen in seconds.
+```matlab
+nicfg.scoptophotometry.cycle = 30;
+```
+
+Opto pulse width. This corresponds to T3 above. This step will alter the pulse width from the photometry length (6 ms default) to the opto pulse width, and change it back when photometry is back.
+```matlab
+nicfg.scoptophotometry.pulsewidth = 10;
+```
+
+### 4. Scheduler
+Scheduler makes experimeriments simpler by defining 1) a pre-opto period, and 2) a pre-set number of opto trains. If scheduler is turned off, opto experiments (and behavior experiements, see below) are set to happen for an infinite number of trials on its own. When scheduler is on, there is a trial structure, no opto. or behavioral trials will happen until the pre-opto. period is over, and when the set number of trials are done, no more opto. or behavioral trials will happen anymore. This however does not turn off photometry pulses, which allows for post-opto. recordings. Please see below for details.
+
+
+
