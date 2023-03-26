@@ -204,7 +204,7 @@ In listening mode, all scheduler trials are suppressed unless there is an extern
 nicfg.scheduler.listenmode = false;
 ```
 
-This sets the polarity of external triggers to active high (true) or active low (false)
+This sets the polarity of external triggers to active high (true, default) or active low (false)
 ```matlab
 nicfg.scheduler.listenpol = true;
 ```
