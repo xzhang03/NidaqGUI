@@ -17,10 +17,10 @@ I recommend using a [DIO expander module](https://github.com/xzhang03/NidaqGUI/t
 | DIO Trial 2 cue indicator  |   |   | | GPIO5 |
 | DIO Trial 3 cue indicator |   |   | | GPIO6 |
 | DIO Trial 4 cue indicator  |   |   | | GPIO7 |
-| DIO Trial 1 outcome pulse  |   |   | | GPIO0 |
-| DIO Trial 2 outcome pulse  |   |   | | GPIO1 |
-| DIO Trial 3 outcome pulse |   |   | | GPIO2 |
-| DIO Trial 4 outcome pulse  |   |   | | GPIO3 |
+| DIO Trial 1 outcome pulse  |   |   | | Any of GPIO0-3 |
+| DIO Trial 2 outcome pulse  |   |   | | Any of GPIO0-3 |
+| DIO Trial 3 outcome pulse |   |   | | Any of GPIO0-3 |
+| DIO Trial 4 outcome pulse  |   |   | | Any of GPIO0-3 |
 
 [PCA9685 datasheet](https://www.nxp.com/docs/en/data-sheet/PCA9685.pdf)
 
