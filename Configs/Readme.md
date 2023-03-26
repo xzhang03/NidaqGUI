@@ -89,6 +89,8 @@ nicfg.omnibox.enable = true;
 ```
 
 ### 2. Two-color photometry (TCP)
+![TCP](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/TCP.png)
+
 Change this to true to enable tcp mode (must set optophotometry and same-color optophotometry to false).
 ```matlab
 nicfg.tcp.enable = false;
@@ -99,8 +101,41 @@ Behavioral inter-trial interval (in seceonds, from trial start to trial start). 
 nicfg.tcp.behaviorcycle = 10;
 ```
 
-These 2 values change how often the two pulses of tcp occur. It's in increments of 100 us, so 100 means 100 * 100 us = 10 ms. By default, pulse 1 happens happens 10 ms after pulse 1 happens, and pulse 2 happens 10 ms after pulse 1 happens. That's why 100/100 means interleaved 50 Hz pulsing in both channels. It is the sum of the two numbers that determines the length of a pulse1-pulse2 cycle (e.g., 100/100 means 20 ms cycle). Some of the photoemtry/behavioral timing mechanisms are done by counting cycles, so changing this number may affect them. I tried to account for cycle changes, but you may still need to let me know if some timings are off because of this.
+These 2 values change how often the two pulses of tcp occur (sum together to TPeriod in the scheme above). It's in increments of 100 us, so 100 means 100 * 100 us = 10 ms. By default, pulse 1 happens happens 10 ms after pulse 1 happens, and pulse 2 happens 10 ms after pulse 1 happens. That's why 100/100 means interleaved 50 Hz pulsing in both channels. It is the sum of the two numbers that determines the length of a pulse1-pulse2 cycle (e.g., 100/100 means 20 ms cycle). Some of the photoemtry/behavioral timing mechanisms are done by counting cycles, so changing this number may affect them. I tried to account for cycle changes, but you may still need to let me know if some timings are off because of this.
 ```matlab
 nicfg.tcp.pulsecycle1 = 100;
 nicfg.tcp.pulsecycle2 = 100;
+```
+
+### 3. Optophotometry
+![Optophotometry](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/Optophotometry.png)
+
+Enable. Nothing is uploaded if false.
+```matlab
+nicfg.optophotometry.enable = false;
+```
+
+Frequency modulator, meaning how many photometry pulses does it need before triggering an opto pulse. The photometry runs at 50 Hz (20 ms per cycle), so the opto actual frequency is 50 Hz/X, e.g., 5 means 10 Hz opto.
+```matlab
+nicfg.optophotometry.freqmod = 5; 
+```
+
+Number of pulses per train
+```matlab
+nicfg.optophotometry.trainlength = 10; 
+```
+
+How often does an opto train happen in seconds.
+```matlab
+nicfg.optophotometry.cycle = 30;
+```
+
+Opto pulse width. This corresponds to T2 in the image above. Notice that normally Optopulse gets turned on as soon as a photometry pulse is off (to allow as much time as possible for opto pulse to decay before taking a photometry time point), so this number is normally 14 or less given that photometry pulses are 6 ms each (i.e., max 70% duty cycle). You can however increase it to 20 if you set overlap to true below to get 100% duty cycle.
+```matlab
+nicfg.optophotometry.pulsewidth = 10;
+```
+
+Overlap mode. If you turn on overlap mode, opto pulse gets turned on as soon as the photometry pulse starts instead of when photometry pulse is turned off. This allows for 100% duty cycle of opto stim if you also set the pulse width to 20 ms (cycle is 20 ms). The disadvantage is that opto light may contaminate photometry recordings. If that's not a priority or if the opto light gets sent down a different fiber than the photometry light, use this option freely.
+```matlab
+nicfg.optophotometry.overlap = false;
 ```
