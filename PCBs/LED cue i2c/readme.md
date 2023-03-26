@@ -10,7 +10,9 @@ I recommend using a [DIO expander module](https://github.com/xzhang03/NidaqGUI/t
 | Purpose | Nanosec  | I2c repeater | I2c LED module | DIO expander |
 | ------- | -------- | ------------ | -------------- | ------------ |
 | I2c nanosec-repeater | I2C  | I2C I0 |  |  |
-| Leave empty if using 5V on nanosec | X | I2C I1 | X | X |
+| Set Nanosec I2c voltage | Bridge I2c 5V or 3.3V  |  |  |  |
+| Leave I1 empty if using 5V on nanosec | X | I2C I1  = Empty| X | X |
+| Bridge V0 & V1 |   | Bridge V0 & V1 |  |  |
 | I2c repeater-LED     |   | I2C O0  | I2C | |
 | I2c repeater-DIO     |   | I2C O1  | | I2C |
 | DIO Trial 1 cue indicator  |   |   | | GPIO4 |
