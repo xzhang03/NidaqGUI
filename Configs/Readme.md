@@ -240,6 +240,7 @@ nicfg.optodelayTTL.enable = false;
 
 #### 5.2 Uncondtional Opto -> Behavior
 This is the basic building block of behavior tasks. The timing diagram is below.
+
 ![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/unconditional.png)
 
 When does the first reward pulse start after opto train start. This is in 100-ms increments, so 20 means 2 s.
