@@ -120,7 +120,6 @@ This is the timing of unconditional reward delivery system in which food is deli
 
 ![unconditiona_food-then-opto](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/unconditional%20foodthenopto.png)
 
-
 ## J. Conditional stim.-delayed TTL output (Conditional behavioral task)
 The generation of stimulation-delayed train is condition to a TTL input (e.g., licking) during the response period. An audio cue or an LED cue may be used to signal the onset of the response period.
 
