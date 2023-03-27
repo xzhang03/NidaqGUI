@@ -311,14 +311,14 @@ nicfg.optodelayTTL.deliverydur = [50 50 50 50];
 ```
 ---
 
-#### 6.4 Uncondtional`and Conditional: Behavior -> Opto
+#### 6.4 Uncondtional and Conditional: Behavior -> Opto
 By default, behavior follows opto but you could do it the other way around but moving the behavioral reference point into a spot that X seconds leading opto onset instead of at opto onset. This method doesn't change the cue, action, and reward delays - just moves them earlier by the same amount. The actual delays therefore depends both on the delays above as well as the lead value. The timing diagrams are below.
 
-Unconditional behavior -> opto
+**Unconditional behavior -> opto**
 
 ![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/unconditional%20foodthenopto.png)
 
-Conditional behavior -> opto
+**Conditional behavior -> opto**
 
 ![Timing](https://github.com/xzhang03/NidaqGUI/raw/master/Schemes/conditional%20foodthenopto.png)
 
