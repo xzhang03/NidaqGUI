@@ -141,7 +141,7 @@ nicfg.optodelayTTL.deliverydur = [50 50 50 50]; % Duration in 100 ms. E.g., 50 m
 
 % Multiple trial types
 nicfg.optodelayTTL.ntrialtypes = 4; % Multiple trial types (Max is 4)
-nicfg.optodelayTTL.trialfreq = [0 3 3 3]; % Relative weights of trial frequency
+nicfg.optodelayTTL.trialfreq = [3 3 3 3]; % Relative weights of trial frequency
 
 nicfg.optodelayTTL.type1.cuetype = 'Buzzer'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
 nicfg.optodelayTTL.type1.RGB = [0 0 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
@@ -165,10 +165,10 @@ nicfg.optodelayTTL.type4.DIOport = 2; % Only used in DIO
 
 % Encoder
 nicfg.encoder.enable = true;
-nicfg.encoder.autoecho = false; % Using auto echo (turn off for debugging)
+nicfg.encoder.autoecho = true; % Using auto echo (turn off for debugging)
 
 % Trial and RNG info echo
-nicfg.onlineecho.enable = false; % Auto trial and rng echo (turn off for debugging)
+nicfg.onlineecho.enable = true; % Auto trial and rng echo (turn off for debugging)
 nicfg.onlineecho.periodicity = 10; % Periodicity in 100 ms. E.g., 10 means 1 second. Default 10 (1s)
 
 % Audio sync
