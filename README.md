@@ -46,7 +46,7 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
 1. Use one of the PCB printing services (e.g., [JLCPCB](https://jlcpcb.com/), [PCBWAY](https://www.pcbway.com/), [OSHPARK](https://oshpark.com/), [etc](https://pcbshopper.com/)). Upload the zip Gerber files from [here for example](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/Nanosec/Gerber_PCB_Omnibox%20v3.zip). The sizes are pre-set so just choose your quantity, color, etc... You are good to go with PCBs
 2. Upload the bill of materials excel files, [this one for example](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/Nanosec/Nanosec%20Photometry%20BOM.xlsx), to [Digikey](https://www.digikey.com/en/mylists/). The quantities are for 1 unit. For resisters, trimmers, and header pins, you are better off using bulk kits from Amazon/Ebay. Please feel free to ask me about replacements.
 3. Upload code [here](https://github.com/xzhang03/NidaqGUI/tree/master/Arduino/nanosec). The instruction is in the readme file there.
-4. Add additional hardware as needed (with nanosec powered off).
+4. Add additional hardware as needed (with nanosec powered off). See the hardware folders for instructions.
 5. Install Data acquisition toolbox if using Nidaq
 4. Navigate to nanosec path in matlab
 5. Run **Nanosec_setup.m** once, which adds necessary files to path and create nanosec_settings.mat file. This step only needs to be done once per update.
@@ -74,7 +74,7 @@ Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/
 
 ### Update to newer versions of Nanosec
 1. Upload new code [here](https://github.com/xzhang03/NidaqGUI/tree/master/Arduino/nanosec). The instruction is in the readme file there.
-2. Update hardware connections as needed (with nanosec powered off).
+2. Update hardware connections as needed (with nanosec powered off). See the hardware folders for instructions.
 3. Remove old Nanosec paths from Matlab
 4. Navigate matlab to the new Nanosec folder. Run **Nanosec_setup.m** once, which adds necessary files to path and create nanosec_settings.mat file. This step only needs to be done once per update.
 5. New config explanations can be found in: https://github.com/xzhang03/NidaqGUI/tree/master/Configs
