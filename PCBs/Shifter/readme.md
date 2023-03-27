@@ -16,3 +16,5 @@ The shifter channel count is set using the dip switch. In the order of Ch2 HIGH 
 Configure nanosec i2c output voltage to 5V if you are powering shifter from nanosec. I2c Repeater may be used as well (with V0 and V1 bridged).
 
 ![schematic](./Schematic_Nanosec%20Shifter_2022-09-27.png)
+
+![Shifter footprint](./Shifter%20footprint.PNG)
