@@ -346,6 +346,8 @@ These two values together define the number of trialtypes and occurence frequenc
 nicfg.optodelayTTL.ntrialtypes = 1; 
 nicfg.optodelayTTL.trialfreq = [3 0 0 0];
 ```
+Below is an example distribution when asking Nanosec to do 4 trial types with equal frequency (ntrialtypes = 4 and trialfreq = [3 3 3 3]).
+![Random](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/Trialtype_rand.PNG?raw=true)
 
 This defines the cue type of Trialtype 1. 'Buzzer' is the buzzer port on Nanosec PCB. 'DIO' means combinations of digital pulse cues (Mode 3 in Section 7.1). 'PWMRGB' means the cue comes from the dimmable LED module (Mode 4 in Section 7.1).
 ```matlab
