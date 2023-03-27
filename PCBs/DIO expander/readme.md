@@ -16,3 +16,5 @@ Library: https://github.com/adafruit/Adafruit-MCP23008-library
 Datasheet: https://ww1.microchip.com/downloads/en/DeviceDoc/MCP23008-MCP23S08-Data-Sheet-20001919F.pdf
 
 ![Schematic](./Schematic_Nanosec%20DIO_2023-01-03.png)
+
+![Footprint](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/DIO%20expander/DIO%20footprint.PNG)
