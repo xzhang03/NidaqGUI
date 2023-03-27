@@ -22,7 +22,7 @@ function varargout = nidaqguisz(varargin)
 
 % Edit the above text to modify the response to help nidaqguisz
 
-% Last Modified by GUIDE v2.5 08-Apr-2022 12:26:01
+% Last Modified by GUIDE v2.5 27-Mar-2023 14:15:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,9 +58,38 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+% Look for Nanosec setting
+settingspath = 'nanosec_settings.mat';
+if exist(settingspath, 'file')
+    handles.loadconfig.UserData.nanosec_settings = load(settingspath);
+    handles.loadconfig.UserData.usesettings = true;
+else
+    handles.loadconfig.UserData.usesettings = false;
+end
+
 % Default config
-handles.loadconfig.UserData.fn = 'nidaq_config_sz';
-handles.loadconfig.UserData.fp = handles.loadconfig.UserData.fn;
+if handles.loadconfig.UserData.usesettings
+    handles.loadconfig.UserData.fn = handles.loadconfig.UserData.nanosec_settings.nanosec_config_name;
+    handles.loadconfig.UserData.fp = handles.loadconfig.UserData.nanosec_settings.nanosec_config_path;
+    if ~exist(handles.loadconfig.UserData.fp, 'file')
+        disp('Last config file not found... Using fall back.')
+        handles.loadconfig.UserData.usesettings = false;
+    end
+    
+    if ~exist(handles.loadconfig.UserData.nanosec_settings.nanosec_path, 'file')
+        disp('Nanosec path not found. Something is wrong.')
+        return
+    end
+end
+
+if ~handles.loadconfig.UserData.usesettings
+    % Fallback
+    handles.loadconfig.UserData.fn = 'ns_config';
+    if ~exist(handles.loadconfig.UserData.fn, 'file')
+        handles.loadconfig.UserData.fn = 'nidaq_config_sz'; 
+    end
+    handles.loadconfig.UserData.fp = handles.loadconfig.UserData.fn;
+end
 run(handles.loadconfig.UserData.fp);
 handles.configname.Text = sprintf('[%s]', handles.loadconfig.UserData.fn);
 global nicfg
@@ -182,6 +211,14 @@ if nicfg.active
     disp('Starting...');
     run(handles.loadconfig.UserData.fp);
     
+    % Save settings
+    if handles.loadconfig.UserData.usesettings
+        handles.loadconfig.UserData.nanosec_settings.nanosec_config_name = handles.loadconfig.UserData.fn;
+        handles.loadconfig.UserData.nanosec_settings.nanosec_config_path = handles.loadconfig.UserData.fp;
+        nanosec_settings = handles.loadconfig.UserData.nanosec_settings; %#ok<NASGU>
+        save(fullfile(handles.loadconfig.UserData.nanosec_settings.nanosec_path, 'nanosec_settings.mat'), '-struct', 'nanosec_settings');
+    end
+
     set(handles.TimeElapsedNumber, 'String', 'WAIT');
     drawnow();
     
@@ -418,7 +455,7 @@ function loadconfig_Callback(hObject, eventdata, handles)
 % hObject    handle to loadconfig (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[fn, fp] = uigetfile({'nidaq_config*.m'; 'ns_config*.m'; '*.m'; '*.*'}, 'Select Config File');
+[fn, fp] = uigetfile({'nidaq_config*.m;ns_config*.m', 'Nanosec setting (nidaq_config*.m, ns_config*.m)'; '*.m', 'Matlab (*.m)'; '*.*', 'All (*.*)'}, 'Select Config File');
 [~, handles.loadconfig.UserData.fn, ~] = fileparts(fn);
 handles.loadconfig.UserData.fp = fullfile(fp, fn);
 handles.configname.Text = sprintf('[%s]', handles.loadconfig.UserData.fn);
@@ -462,3 +499,21 @@ switch answer
     case 'Yes'
         omniboxreboot(nicfg);
 end
+
+
+% --------------------------------------------------------------------
+function test_panel_Callback(hObject, eventdata, handles)
+% hObject    handle to test_panel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+run(handles.loadconfig.UserData.fp);
+global nicfg
+nanosec_hardware_testpanel(nicfg.ArduinoCOM);
+
+
+% --------------------------------------------------------------------
+function reset_serial_Callback(hObject, eventdata, handles)
+% hObject    handle to reset_serial (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+clearallserial();

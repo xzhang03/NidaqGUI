@@ -40,10 +40,17 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
     b. **Omnibox mode**: I recommend [Teensy 4.0](https://www.pjrc.com/store/teensy40.html). It's fast, easy to program, and cheap. It also has many pins. **IT CANNOT HANDLE 5V LOGIC.** The drawback is the lack of true analog output for future ramp experiments.
   3. **Same-color optophotometry mode only**: a tri-state buffer such as [74AHCT125](https://www.adafruit.com/product/1787). I also use the buffer as a unidirectional logic level shifter since Teensy4.0 cannot take 5V logic inputs. An opamp is preferred for true analog buffer.
   
-## C. How to order and upload code to fresh Teensy
+## C. How to get started
+
+### From fresh Teensy
 1. Use one of the PCB printing services (e.g., [JLCPCB](https://jlcpcb.com/), [PCBWAY](https://www.pcbway.com/), [OSHPARK](https://oshpark.com/), [etc](https://pcbshopper.com/)). Upload the zip Gerber files from [here for example](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/Nanosec/Gerber_PCB_Omnibox%20v3.zip). The sizes are pre-set so just choose your quantity, color, etc... You are good to go with PCBs
 2. Upload the bill of materials excel files, [this one for example](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/Nanosec/Nanosec%20Photometry%20BOM.xlsx), to [Digikey](https://www.digikey.com/en/mylists/). The quantities are for 1 unit. For resisters, trimmers, and header pins, you are better off using bulk kits from Amazon/Ebay. Please feel free to ask me about replacements.
 3. Upload code [here](https://github.com/xzhang03/NidaqGUI/tree/master/Arduino/nanosec). The instruction is in the readme file there.
+4. Add additional hardware as needed (with nanosec powered off).
+5. Install Data acquisition toolbox if using Nidaq
+4. Navigate to nanosec path in matlab
+5. Run Nanosec_setup.m once, which adds necessary files to path and create nanosec_settings.mat file. This step only needs to be done once per update.
+6. Config explanations can be found in: https://github.com/xzhang03/NidaqGUI/tree/master/Configs
 
 PCB for Nanosec/Omniphotometrybox: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/Nanosec). Parts numbers on Digikey: WM5514-ND (BNC), CP-435107RS-ND (4-cond Audio/I2C jack).
 
@@ -64,6 +71,13 @@ PCB for I2C-based digital IO expander: [EasyEDA](https://github.com/xzhang03/Nid
 Containment for PCB box: [Github](https://github.com/xzhang03/Half_breadboard_box/blob/main/half%20breadboard%20box%20PCB.ai).
 
 Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/blob/master/Schemes/omnibox_half_breadboard.png).
+
+### Update to newer versions of Nanosec
+1. Upload new code [here](https://github.com/xzhang03/NidaqGUI/tree/master/Arduino/nanosec). The instruction is in the readme file there.
+2. Update hardware connections as needed (with nanosec powered off).
+3. Remove old Nanosec paths from Matlab
+4. Navigate matlab to the new Nanosec folder. Run this Nanosec_setup.m once, which adds necessary files to path and create nanosec_settings.mat file. This step only needs to be done once per update.
+5. New config explanations can be found in: https://github.com/xzhang03/NidaqGUI/tree/master/Configs
 
 ## D. Modes
 

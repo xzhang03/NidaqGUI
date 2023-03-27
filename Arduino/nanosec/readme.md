@@ -4,16 +4,22 @@
 Starting at version v3.3, this code is split up into parts. The main code is nanosec.ino. The rest are split as below. If you open any of them in arduino IDE, the rest will show up as tabs in alphabetical order. Arduino will concatenate them before compiling (hence the numbers). The splitting is done lazily right now and will be updated into proper .cpp and .h files in the future<sup>TM</sup>.
 
 * nanosec:	Modes, time, channel switches, debug
-* 0_pins: 	Pin and encoder variables
-* 0_vars: 	All other global variables
+* 0_pins:	Pin and encoder variables
+* 0_vars:	All other global variables
 * 1_ch:   Turning ch1/ch2 LEDs on and off
+* 1_i2c:  I2C settings
 * 1_mode: Mode switching functions
+* 1_opho: Optophotometry
 * 1_pind: Pin initilizatoin functions
+* 1_scop: Same-color optophotometry
+* 1_tcp:  Two-color photometry
 * 2_cam:  Cam pulse functions
+* 2_enc:  Encoder
 * 2_extt: External TTL trigger functions
 * 2_food: Food/reward delivery functions
 * 2_RNG:  RNG functions
 * 2_sche: Scheduler functions
+* 2_sem:  Serial menu
 * 2_ser:  Serial functions
 * 3_perf: Performance/speed check
 

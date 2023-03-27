@@ -18,6 +18,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Personal files
+nanosec_settings.mat
+
 # Unused files
 Deprecated_files
 Debugconfig

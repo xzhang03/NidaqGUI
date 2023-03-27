@@ -293,36 +293,59 @@ void docueon(uint16_t trialio, uint8_t trialtype){
     case 0:
       // Native PWM
       tone(audiopin, audiofreq);
+
+      #if useMCP23008
+        switch (trialtype){
+          case 0:
+            MCP.digitalWrite(4, HIGH);
+            break;
+          case 1:
+            MCP.digitalWrite(5, HIGH);
+            break;
+          case 2:
+            MCP.digitalWrite(6, HIGH);
+            break;
+          case 3:
+            MCP.digitalWrite(7, HIGH);
+            break;
+        }
+      #endif
       break;
 
     case 1:
       // MCP23008
-      MCP.digitalWrite(4, bitRead(trialio, 9));
-      MCP.digitalWrite(5, bitRead(trialio, 10));
-      MCP.digitalWrite(6, bitRead(trialio, 11));
-      MCP.digitalWrite(7, bitRead(trialio, 12));
+      #if useMCP23008
+        MCP.digitalWrite(4, bitRead(trialio, 9));
+        MCP.digitalWrite(5, bitRead(trialio, 10));
+        MCP.digitalWrite(6, bitRead(trialio, 11));
+        MCP.digitalWrite(7, bitRead(trialio, 12));
+      #endif
       break;
 
     case 2:
       // External pwm
-      pwm.setPin(0, cscale[Rv], false);
-      pwm.setPin(1, cscale[Gv], false);
-      pwm.setPin(2, cscale[Bv], false);
-
-      switch (trialtype){
-        case 0:
-          MCP.digitalWrite(4, HIGH);
-          break;
-        case 1:
-          MCP.digitalWrite(5, HIGH);
-          break;
-        case 2:
-          MCP.digitalWrite(6, HIGH);
-          break;
-        case 3:
-          MCP.digitalWrite(7, HIGH);
-          break;
-      }
+      #if usePCA9685
+        pwm.setPin(0, cscale[Rv], false);
+        pwm.setPin(1, cscale[Gv], false);
+        pwm.setPin(2, cscale[Bv], false);
+      #endif
+      
+      #if useMCP23008
+        switch (trialtype){
+          case 0:
+            MCP.digitalWrite(4, HIGH);
+            break;
+          case 1:
+            MCP.digitalWrite(5, HIGH);
+            break;
+          case 2:
+            MCP.digitalWrite(6, HIGH);
+            break;
+          case 3:
+            MCP.digitalWrite(7, HIGH);
+            break;
+        }
+      #endif
       break;
   }
 }
@@ -346,25 +369,38 @@ void docueoff(uint16_t trialio){
     case 0:
       // Native PWM
       noTone(audiopin);
+      #if useMCP23008
+        MCP.digitalWrite(4, LOW);
+        MCP.digitalWrite(5, LOW);
+        MCP.digitalWrite(6, LOW);
+        MCP.digitalWrite(7, LOW);
+      #endif
       break;
 
     case 1:
       // MCP23008
-      MCP.digitalWrite(4, 0);
-      MCP.digitalWrite(5, 0);
-      MCP.digitalWrite(6, 0);
-      MCP.digitalWrite(7, 0);
+      #if useMCP23008
+        MCP.digitalWrite(4, 0);
+        MCP.digitalWrite(5, 0);
+        MCP.digitalWrite(6, 0);
+        MCP.digitalWrite(7, 0);
+      #endif
       break;
 
     case 2:
       // External pwm
-      pwm.setPin(0, 0, false);
-      pwm.setPin(1, 0, false);
-      pwm.setPin(2, 0, false);
-      MCP.digitalWrite(4, LOW);
-      MCP.digitalWrite(5, LOW);
-      MCP.digitalWrite(6, LOW);
-      MCP.digitalWrite(7, LOW);
+      #if usePCA9685
+        pwm.setPin(0, 0, false);
+        pwm.setPin(1, 0, false);
+        pwm.setPin(2, 0, false);
+      #endif
+      
+      #if useMCP23008
+        MCP.digitalWrite(4, LOW);
+        MCP.digitalWrite(5, LOW);
+        MCP.digitalWrite(6, LOW);
+        MCP.digitalWrite(7, LOW);
+      #endif
       break;
       
   }
@@ -382,7 +418,9 @@ void dofoodon(uint16_t trialio){
       digitalWrite(foodTTLpin, HIGH);
       break;
     case 1:
-      MCP.digitalWrite(DIOport, HIGH);
+      #if useMCP23008
+        MCP.digitalWrite(DIOport, HIGH);
+      #endif
       break;
   }
 }
@@ -399,7 +437,9 @@ void dofoodoff(uint16_t trialio){
       digitalWrite(foodTTLpin, LOW);
       break;
     case 1:
-      MCP.digitalWrite(DIOport, LOW);
+      #if useMCP23008
+        MCP.digitalWrite(DIOport, LOW);
+      #endif
       break;
   }
 }

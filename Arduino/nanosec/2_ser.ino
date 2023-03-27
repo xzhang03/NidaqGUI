@@ -890,32 +890,16 @@ void parseserial(){
     
     case 64:
       // 64: Report RNG (n = 0 ITI, 1 opto, 2 trialtype)[p]
-      {
-        Serial.println("RNG");
-        uint16_t irp = 0;
-        switch (n){
-          case 0:
-            for (irp = 0; irp < maxrngind; irp++){
-              Serial.print(rngvec[irp]);
-              Serial.print(" ");
-            }
-            Serial.println();
-            break;
-          case 1:
-            for (irp = 0; irp < maxrngind; irp++){
-              Serial.print(rngvec_ITI[irp]);
-              Serial.print(" ");
-            }
-            Serial.println();
-            break;
-          case 2:
-            for (irp = 0; irp < maxrngind; irp++){
-              Serial.print(rngvec_trialtype[irp]);
-              Serial.print(" ");
-            }
-            Serial.println();
-            break;
-        }
+      switch (n){
+        case 0:
+          Serial.write(rngvec, maxrngind);
+          break;
+        case 1:
+          Serial.write(rngvec_ITI, maxrngind);
+          break;
+        case 2:
+          Serial.write(rngvec_trialtype, maxrngind);
+          break;
       }
       break;
 
