@@ -12,9 +12,9 @@ The shifter channel count is set using the dip switch. The switch definitions an
 | HIGH bit (H)  | LOW bit (L) | Output channels (H*2 + L + 1) |
 | ------------- | ------------- | ------------- |
 | 0  | 0  | 1  |
-| 0  | 1  | 2  |
-| 1  | 0  | 3  |
-| 1  | 1  | Not onboard  |
+| 0  | 1  | 1, 2  |
+| 1  | 0  | 1, 2, 3  |
+| 1  | 1  | 1, 2, 3, Not onboard  |
 
 ## Hookup guide
 Configure nanosec i2c output voltage to 5V if you are powering shifter from nanosec. I2c Repeater may be used as well (with V0 and V1 bridged).
