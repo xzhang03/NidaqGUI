@@ -3,14 +3,18 @@ The shifter is used to further multiplex photometry and optogenetic channels. It
 
 Use case 1: 465 nm and 405 nm photometry + 625 Chrimson stimulation. Using the nanosec optophotometry mode, you can use nanosec channel 1 and shifter to make interleaved 1A and 1B pulses (both at half frequency of the original channel 1) and control both 465 and 405 nm pulses. Nanosec channel 2 is free to be used to drive optogenetic stimulation pulses. 
 
-The shifter channel count is set using the dip switch. In the order of Ch2 HIGH bit, Ch2 LOW bit, Ch1 HIGH bit, Ch1 LOW bit. The truth table for each channel is below:
+The shifter channel count is set using the dip switch. The switch definitions and the truth table for each channel are below:
+| 1  | 2 | 3 | 4 |
+| ------------- | ------------- | ------------- | ------------- |
+| Ch2 LOW  | Ch2 HIGH  | Ch1 LOW  | Ch2 HIGH  |
+
 
 | HIGH bit (H)  | LOW bit (L) | Output channels (H*2 + L + 1) |
 | ------------- | ------------- | ------------- |
 | 0  | 0  | 1  |
 | 0  | 1  | 2  |
 | 1  | 0  | 3  |
-| 1  | 1  | 4  |
+| 1  | 1  | Not onboard  |
 
 ## Hookup guide
 Configure nanosec i2c output voltage to 5V if you are powering shifter from nanosec. I2c Repeater may be used as well (with V0 and V1 bridged).
