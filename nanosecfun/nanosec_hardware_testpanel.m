@@ -48,27 +48,31 @@ while true
             % Firmware version
             firmware_ver(nanosec_serial);
         case 2
+            % I2c scan
+            disp('I2c scan:');
+            i2c_scan(nanosec_serial)
+        case 3
             % PWM RGB module
             testPCA9685(nanosec_serial)
-        case 3
+        case 4
             % DIO expander module
             testMCP23008(nanosec_serial)
-        case 4
+        case 5
             % Dump Nanosec state
             nanosec_state(nanosec_serial)
-        case 5
+        case 6
             % Dump opto RNG
             disp('Opto RNG of last experiment:');
             dump_rng(nanosec_serial, 0)
-        case 6
+        case 7
             % Dump ITI RNG
             disp('ITI RNG of last experiment:');
             dump_rng(nanosec_serial, 1)
-        case 7
+        case 8
             % Dump trial type RNG
             disp('Trial type RNG of last experiment:');
             dump_rng(nanosec_serial, 2)
-        case 8
+        case 9
             % Dump all serial buffer
             dump_buffer(nanosec_serial)
     end
@@ -77,12 +81,13 @@ end
 %% Anonymous functions
     % UI
     function indx = funlist(ini)
-        fn = {'Firmware Version', 'Test PWM RGB', 'Test DIO expander', 'Dump Nanosec state', 'Dump opto RNG',...
+        fn = {'Firmware Version', 'I2c scan', 'Test PWM RGB', 'Test DIO expander',...
+            'Dump Nanosec state', 'Dump opto RNG',...
             'Dump ITI RNG', 'Dump Trial type RNG', 'Dump all serial'};
         [indx, ~] = listdlg('PromptString', sprintf('Select test %s', com),...
             'SelectionMode','single', 'InitialValue', ini, 'ListString',fn);
     end
-
+    
     % Firmware version
     function firmware_ver(serialin)
         fopen(serialin);
@@ -93,6 +98,22 @@ end
             ver = fread(serialin, serialin.BytesAvailable, 'uint8');
         end
         fprintf('Nanosec firmware version: %s\n', char(ver'));
+        fclose(serialin);
+    end
+    
+    % I2c scan
+    function i2c_scan(serialin)
+        fopen(serialin);
+        pause(0.1);
+        fwrite(serialin, uint8([60 0]));
+        pause(0.3);
+        vec = [];
+        ind = 0;
+        while serialin.BytesAvailable > 0
+            ind = ind + 1;
+            vec(ind) = fread(serialin, 1, 'uint8');
+        end
+        fprintf('%s', char(vec));
         fclose(serialin);
     end
     
