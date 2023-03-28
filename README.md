@@ -50,7 +50,8 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
 5. Install Data acquisition toolbox if using Nidaq
 4. Navigate to nanosec path in matlab
 5. Run **Nanosec_setup.m** once, which adds necessary files to path and create nanosec_settings.mat file. This step only needs to be done once per update.
-6. Config explanations can be found in: https://github.com/xzhang03/NidaqGUI/tree/master/Configs
+6. Use the GUI's **Nanosec test-panel** option to make sure the hardware is set up correctly
+7. Config explanations can be found in: https://github.com/xzhang03/NidaqGUI/tree/master/Configs
 
 PCB for Nanosec/Omniphotometrybox: [EasyEDA](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/Nanosec). Parts numbers on Digikey: WM5514-ND (BNC), CP-435107RS-ND (4-cond Audio/I2C jack).
 
@@ -77,7 +78,8 @@ Breadboard for Omniphotometrybox: [Scheme](https://github.com/xzhang03/NidaqGUI/
 2. Update hardware connections as needed (with nanosec powered off). See the hardware folders for instructions.
 3. Remove old Nanosec paths from Matlab
 4. Navigate matlab to the new Nanosec folder. Run **Nanosec_setup.m** once, which adds necessary files to path and create nanosec_settings.mat file. This step only needs to be done once per update.
-5. New config explanations can be found in: https://github.com/xzhang03/NidaqGUI/tree/master/Configs
+5. Use the GUI's **Nanosec test-panel** option to make sure the hardware is set up correctly
+6. New config explanations can be found in: https://github.com/xzhang03/NidaqGUI/tree/master/Configs
 
 ## D. Modes
 
