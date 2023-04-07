@@ -32,6 +32,8 @@ cd(nanosecpath.folder);
 %% Adding folders to path
 fprintf('Adding folders to path: \n');
 folderlist = {'nanosecfun', 'nidaqfun', 'picodaqfun', 'genfun'};
+addpath(nanosecpath.folder);
+fprintf('Parent folder, ');
 for i = 1 : length(folderlist)
     addpath(folderlist{i});
     if i < length(folderlist)
