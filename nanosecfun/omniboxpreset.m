@@ -9,8 +9,10 @@ else
     com = sprintf('COM%i', nicfg.ArduinoCOM);
 end
 
-nicfg.arduino_serial = serial(com, 'BaudRate', nicfg.baumrate);
-fopen(nicfg.arduino_serial);
+nicfg.arduino_serial = serialinitial(com, nicfg.baumrate);
+
+% nicfg.arduino_serial = serial(com, 'BaudRate', nicfg.baumrate);
+% fopen(nicfg.arduino_serial);
 
 % Wait
 pause(2);

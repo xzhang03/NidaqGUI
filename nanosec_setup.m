@@ -29,6 +29,14 @@ end
 % Navigate over
 cd(nanosecpath.folder);
 
+%% Check matlab version
+old = isempty(which('serialport'));
+nanosec_settings.oldmatlab = old;
+
+if old
+    disp('Matlab is old. Please copy "nanosecfun\old" to overwrite "nanosecfun".');
+end
+
 %% Adding folders to path
 fprintf('Adding folders to path: \n');
 folderlist = {'nanosecfun', 'nidaqfun', 'picodaqfun', 'genfun'};

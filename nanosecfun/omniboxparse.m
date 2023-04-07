@@ -11,10 +11,10 @@ else
 end
 
 %% Firmware version
-fwrite(nicfg.arduino_serial, uint8([254 0]));
+arduinoWrite(nicfg.arduino_serial, [254 0]);
 pause(0.3);
 if nicfg.arduino_serial.BytesAvailable > 20
-    ver = fread(nicfg.arduino_serial, nicfg.arduino_serial.BytesAvailable, 'uint8');
+    ver = arduinoRead(nicfg.arduino_serial, nicfg.arduino_serial.BytesAvailable, 'uint8');
 end
 fprintf('Nanosec firmware version: %s\n', char(ver'));
 
@@ -51,9 +51,9 @@ if nicfg.tcp.enable
     if isfield(nicfg.tcp, 'pulsecycle1')
         b = floor(nicfg.tcp.pulsecycle1 / 256);
         a = nicfg.tcp.pulsecycle1 - b * 256;
-        fwrite(nicfg.arduino_serial, uint8([53 a]));
+        arduinoWrite(nicfg.arduino_serial, [53 a]);
         if b > 0
-            fwrite(nicfg.arduino_serial, uint8([57 b]));
+            arduinoWrite(nicfg.arduino_serial, [57 b]);
         end
     end
     
@@ -61,18 +61,18 @@ if nicfg.tcp.enable
     if isfield(nicfg.tcp, 'pulsecycle2')
         b = floor(nicfg.tcp.pulsecycle2 / 256);
         a = nicfg.tcp.pulsecycle2 - b * 256;
-        fwrite(nicfg.arduino_serial, uint8([54 a]));
+        arduinoWrite(nicfg.arduino_serial, [54 a]);
         if b > 0
-            fwrite(nicfg.arduino_serial, uint8([58 b]));
+            arduinoWrite(nicfg.arduino_serial, [58 b]);
         end
     end
     
     % TCP behavioral cycle
-    fwrite(nicfg.arduino_serial, uint8([47 nicfg.tcp.behaviorcycle]));
+    arduinoWrite(nicfg.arduino_serial, [47 nicfg.tcp.behaviorcycle]);
         
     % TCP mode switch (do this at the end to modeswitch to correct
     % timings)
-    fwrite(nicfg.arduino_serial, uint8([3 0]));
+    arduinoWrite(nicfg.arduino_serial, [3 0]);
 
     % Disp
     disp('Mode -> TCP');
@@ -87,9 +87,9 @@ if nicfg.optophotometry.enable
     if isfield(nicfg.optophotometry, 'pulsecycle1')
         b = floor(nicfg.optophotometry.pulsecycle1 / 256);
         a = nicfg.optophotometry.pulsecycle1 - b * 256;
-        fwrite(nicfg.arduino_serial, uint8([36 a]));
+        arduinoWrite(nicfg.arduino_serial, [36 a]);
         if b > 0
-            fwrite(nicfg.arduino_serial, uint8([55 b]));
+            arduinoWrite(nicfg.arduino_serial, [55 b]);
         end
     end
     
@@ -97,32 +97,32 @@ if nicfg.optophotometry.enable
     if isfield(nicfg.optophotometry, 'pulsecycle2')
         b = floor(nicfg.optophotometry.pulsecycle2 / 256);
         a = nicfg.optophotometry.pulsecycle2 - b * 256;
-        fwrite(nicfg.arduino_serial, uint8([37 a]));
+        arduinoWrite(nicfg.arduino_serial, [37 a]);
         if b > 0
-            fwrite(nicfg.arduino_serial, uint8([56 b]));
+            arduinoWrite(nicfg.arduino_serial, [56 b]);
         end
     end
     
     % Frequency
-    fwrite(nicfg.arduino_serial, uint8([6 nicfg.optophotometry.freqmod]));
+    arduinoWrite(nicfg.arduino_serial, [6 nicfg.optophotometry.freqmod]);
     
     % Train length
-    fwrite(nicfg.arduino_serial, uint8([7 nicfg.optophotometry.trainlength]));
+    arduinoWrite(nicfg.arduino_serial, [7 nicfg.optophotometry.trainlength]);
     
     % Train cycle
-    fwrite(nicfg.arduino_serial, uint8([8 nicfg.optophotometry.cycle]));
+    arduinoWrite(nicfg.arduino_serial, [8 nicfg.optophotometry.cycle]);
     
     % Pulse width
-    fwrite(nicfg.arduino_serial, uint8([14 nicfg.optophotometry.pulsewidth]));
+    arduinoWrite(nicfg.arduino_serial, [14 nicfg.optophotometry.pulsewidth]);
     
     % Overlap
     if isfield(nicfg.optophotometry, 'overlap')
-        fwrite(nicfg.arduino_serial, uint8([59 nicfg.optophotometry.overlap]));
+        arduinoWrite(nicfg.arduino_serial, [59 nicfg.optophotometry.overlap]);
     end
     
     % Optophotometry mode switch (do this at the end to modeswitch to correct
     % timings)
-    fwrite(nicfg.arduino_serial, uint8([3 1]));
+    arduinoWrite(nicfg.arduino_serial, [3 1]);
 end
 
 %% Same-color optophotometry
@@ -131,26 +131,26 @@ if nicfg.scoptophotometry.enable
     disp('Mode -> Same-color optophotometry');
     
     % Frequency
-    fwrite(nicfg.arduino_serial, uint8([10 nicfg.scoptophotometry.freqmod]));
+    arduinoWrite(nicfg.arduino_serial, [10 nicfg.scoptophotometry.freqmod]);
     
     % Train length
-    fwrite(nicfg.arduino_serial, uint8([12 nicfg.scoptophotometry.trainlength]));
+    arduinoWrite(nicfg.arduino_serial, [12 nicfg.scoptophotometry.trainlength]);
     
     % Train cycle
-    fwrite(nicfg.arduino_serial, uint8([11 nicfg.scoptophotometry.cycle]));
+    arduinoWrite(nicfg.arduino_serial, [11 nicfg.scoptophotometry.cycle]);
     
     % Pulse width
-    fwrite(nicfg.arduino_serial, uint8([13 nicfg.scoptophotometry.pulsewidth]));
+    arduinoWrite(nicfg.arduino_serial, [13 nicfg.scoptophotometry.pulsewidth]);
     
     % Tristate pin polarity (protected)
     % Tristate pin polarity (do not change once a box is made).
     if isfield(nicfg.scoptophotometry, 'tristatepol')
-        fwrite(nicfg.arduino_serial, uint8([29 nicfg.scoptophotometry.tristatepol]));
+        arduinoWrite(nicfg.arduino_serial, [29 nicfg.scoptophotometry.tristatepol]);
     end
 
     % SC Optophotometry mode switch (do this at the end to modeswitch to correct
     % timings)
-    fwrite(nicfg.arduino_serial, uint8([3 2]));
+    arduinoWrite(nicfg.arduino_serial, [3 2]);
 end
 
 %% Scheduler
@@ -159,25 +159,25 @@ if nicfg.scheduler.enable
     disp('Scheduler -> On');
     
     % Scheduler
-    fwrite(nicfg.arduino_serial, uint8([15 1]));
+    arduinoWrite(nicfg.arduino_serial, [15 1]);
     
     % Delay (passing time in seconds)
     b = floor(nicfg.scheduler.delay / 256);
     a = nicfg.scheduler.delay - b * 256;
-    fwrite(nicfg.arduino_serial, uint8([4 a]));
-    fwrite(nicfg.arduino_serial, uint8([52 b]));
+    arduinoWrite(nicfg.arduino_serial, [4 a]);
+    arduinoWrite(nicfg.arduino_serial, [52 b]);
     
     % Number of trains (increments of 10)
     b = floor(nicfg.scheduler.ntrains / 256);
     a = nicfg.scheduler.ntrains - b * 256;
-    fwrite(nicfg.arduino_serial, uint8([16 a]));
-    fwrite(nicfg.arduino_serial, uint8([46 b]));
+    arduinoWrite(nicfg.arduino_serial, [16 a]);
+    arduinoWrite(nicfg.arduino_serial, [46 b]);
     
     % Manual override
-    fwrite(nicfg.arduino_serial, uint8([17 nicfg.scheduler.manualoverride]));
+    arduinoWrite(nicfg.arduino_serial, [17 nicfg.scheduler.manualoverride]);
     
     % Listen mode
-    fwrite(nicfg.arduino_serial, uint8([27 nicfg.scheduler.listenmode]));
+    arduinoWrite(nicfg.arduino_serial, [27 nicfg.scheduler.listenmode]);
     if (nicfg.scheduler.listenmode && ~nicfg.optodelayTTL.optothenTTL)
         % Trying to do listen mode and food->opto
         nicfg.optodelayTTL.optothenTTL = true;
@@ -187,36 +187,36 @@ if nicfg.scheduler.enable
     % Listen mode polarity (protected)
     % Listen mode polarity (true = active high, false = active low). Do not change unless you know what you are doing.
     if isfield(nicfg.scheduler, 'listenpol')
-        fwrite(nicfg.arduino_serial, uint8([28 nicfg.scheduler.listenpol]));
+        arduinoWrite(nicfg.arduino_serial, [28 nicfg.scheduler.listenpol]);
     end
     
     % Use RNG to determine if opto goes through or not
     if nicfg.scheduler.control
         % Control experiment
         % use opto RNG
-        fwrite(nicfg.arduino_serial, uint8([38 1]));
+        arduinoWrite(nicfg.arduino_serial, [38 1]);
 
         % RNG pass chance
-        fwrite(nicfg.arduino_serial, uint8([39 0]));
+        arduinoWrite(nicfg.arduino_serial, [39 0]);
     else
         % use opto RNG
-        fwrite(nicfg.arduino_serial, uint8([38 nicfg.scheduler.useRNG]));
+        arduinoWrite(nicfg.arduino_serial, [38 nicfg.scheduler.useRNG]);
 
         % RNG pass chance
-        fwrite(nicfg.arduino_serial, uint8([39 nicfg.scheduler.passchance]));
+        arduinoWrite(nicfg.arduino_serial, [39 nicfg.scheduler.passchance]);
     end
     
     % Randomize ITI
-    fwrite(nicfg.arduino_serial, uint8([40 nicfg.scheduler.randomITI]));
+    arduinoWrite(nicfg.arduino_serial, [40 nicfg.scheduler.randomITI]);
     
     % Randomize ITI min seconds
-    fwrite(nicfg.arduino_serial, uint8([41 nicfg.scheduler.randomITI_min]));
+    arduinoWrite(nicfg.arduino_serial, [41 nicfg.scheduler.randomITI_min]);
     
     % Randomize ITI max seconds
-    fwrite(nicfg.arduino_serial, uint8([42 nicfg.scheduler.randomITI_max]));
+    arduinoWrite(nicfg.arduino_serial, [42 nicfg.scheduler.randomITI_max]);
 else
     % No Scheduler
-    fwrite(nicfg.arduino_serial, uint8([15 0]));
+    arduinoWrite(nicfg.arduino_serial, [15 0]);
     disp('Scheduler -> Off');
 end
 
@@ -226,43 +226,43 @@ if nicfg.optodelayTTL.enable
     disp('Behavior -> On');
     
     % Opto locked TTL
-    fwrite(nicfg.arduino_serial, uint8([24 1]));
+    arduinoWrite(nicfg.arduino_serial, [24 1]);
     
     % Delay after opto train onsets
     b = floor(nicfg.optodelayTTL.delay / 256);
     a = nicfg.optodelayTTL.delay - b * 256;
-    fwrite(nicfg.arduino_serial, uint8([18 a]));
-    fwrite(nicfg.arduino_serial, uint8([50 b]));
+    arduinoWrite(nicfg.arduino_serial, [18 a]);
+    arduinoWrite(nicfg.arduino_serial, [50 b]);
     
     % Multi trial type
-    fwrite(nicfg.arduino_serial, uint8([62 nicfg.optodelayTTL.ntrialtypes]));
+    arduinoWrite(nicfg.arduino_serial, [62 nicfg.optodelayTTL.ntrialtypes]);
     fprintf('Trial types -> %i\n', nicfg.optodelayTTL.ntrialtypes);
     
     % Iterating trial types
     for i = 1 : nicfg.optodelayTTL.ntrialtypes
         % Current trial to edit
-        fwrite(nicfg.arduino_serial, uint8([63 i-1]));
+        arduinoWrite(nicfg.arduino_serial, [63 i-1]);
         
         % Trial frequency weight
-        fwrite(nicfg.arduino_serial, uint8([67 nicfg.optodelayTTL.trialfreq(i)]));
+        arduinoWrite(nicfg.arduino_serial, [67 nicfg.optodelayTTL.trialfreq(i)]);
         
         % Pulse width
-        fwrite(nicfg.arduino_serial, uint8([19 nicfg.optodelayTTL.pulsewidth(i)]));
+        arduinoWrite(nicfg.arduino_serial, [19 nicfg.optodelayTTL.pulsewidth(i)]);
         
         % Pulse cycle
-        fwrite(nicfg.arduino_serial, uint8([20 nicfg.optodelayTTL.cycle(i)]));
+        arduinoWrite(nicfg.arduino_serial, [20 nicfg.optodelayTTL.cycle(i)]);
         
         % Train length
-        fwrite(nicfg.arduino_serial, uint8([21 nicfg.optodelayTTL.trainlength(i)]));
+        arduinoWrite(nicfg.arduino_serial, [21 nicfg.optodelayTTL.trainlength(i)]);
         
         % Buzzer duration
-        fwrite(nicfg.arduino_serial, uint8([32 nicfg.optodelayTTL.cuedur(i)]));
+        arduinoWrite(nicfg.arduino_serial, [32 nicfg.optodelayTTL.cuedur(i)]);
         
         % Delivery period duration
-        fwrite(nicfg.arduino_serial, uint8([35 nicfg.optodelayTTL.deliverydur(i)]));
+        arduinoWrite(nicfg.arduino_serial, [35 nicfg.optodelayTTL.deliverydur(i)]);
         
         % Conditional
-        fwrite(nicfg.arduino_serial, uint8([22 nicfg.optodelayTTL.conditional(i)]));
+        arduinoWrite(nicfg.arduino_serial, [22 nicfg.optodelayTTL.conditional(i)]);
         
         % Constructing Trial IO (a single uint16 integer to specify input/output pins a trial type)
         trialinfo = nicfg.optodelayTTL.(sprintf('type%i', i));
@@ -273,6 +273,10 @@ if nicfg.optodelayTTL.enable
                 
             case 'DIO'
                 trialio = bitset(trialio, 15);
+                if any(trialinfo.RGB > 1)
+                    trialinfo.RGB(trialinfo.RGB > 1) = 1;
+                    msgbox('DIO color intensity is capped at 1');
+                end
                 trialio = ... % 3 or 4 Channel binary info (DO7, DO6, DO5, DO4)
                     trialio + bitshift(trialinfo.RGB(1), 12)...
                     + bitshift(trialinfo.RGB(2), 11) + bitshift(trialinfo.RGB(3), 10); 
@@ -282,6 +286,10 @@ if nicfg.optodelayTTL.enable
                 
             case 'PWMRGB'
                 trialio = bitset(trialio, 14);
+                if any(trialinfo.RGB > 7)
+                    trialinfo.RGB(trialinfo.RGB > 7) = 7;
+                    msgbox('RGB color intensity is capped at 7');
+                end
                 trialio = trialio + bitshift(trialinfo.RGB(1), 10)...
                     + bitshift(trialinfo.RGB(2), 7) + bitshift(trialinfo.RGB(3), 4); % RGB
         end
@@ -304,26 +312,26 @@ if nicfg.optodelayTTL.enable
         trialio = trialio + trialinfo.DIOport;
         
         % Write upper byte and then lower byte
-        fwrite(nicfg.arduino_serial, uint8([65 bitshift(trialio, -8)]));
-        fwrite(nicfg.arduino_serial, uint8([66 bitand(trialio, 255)]));
+        arduinoWrite(nicfg.arduino_serial, [65 bitshift(trialio, -8)]);
+        arduinoWrite(nicfg.arduino_serial, [66 bitand(trialio, 255)]);
     end
     
     % Variables that are unchanged in multi trialtypes
     % Cue
-    fwrite(nicfg.arduino_serial, uint8([30 nicfg.optodelayTTL.cueenable]));
+    arduinoWrite(nicfg.arduino_serial, [30 nicfg.optodelayTTL.cueenable]);
     
     % Cue delay
-    fwrite(nicfg.arduino_serial, uint8([31 nicfg.optodelayTTL.cuedelay]));
+    arduinoWrite(nicfg.arduino_serial, [31 nicfg.optodelayTTL.cuedelay]);
     
     % Action period delay
-    fwrite(nicfg.arduino_serial, uint8([33 nicfg.optodelayTTL.actiondelay]));
+    arduinoWrite(nicfg.arduino_serial, [33 nicfg.optodelayTTL.actiondelay]);
     
     % Action period duration
-    fwrite(nicfg.arduino_serial, uint8([34 nicfg.optodelayTTL.actiondur]));
+    arduinoWrite(nicfg.arduino_serial, [34 nicfg.optodelayTTL.actiondur]);
     
     % Sequence of opto and TTL (default: opto-> TTL)
     if isfield(nicfg.optodelayTTL, 'optothenTTL')
-        fwrite(nicfg.arduino_serial, uint8([48 nicfg.optodelayTTL.optothenTTL])); % True: opto->TTL, TTL->opto
+        arduinoWrite(nicfg.arduino_serial, [48 nicfg.optodelayTTL.optothenTTL]); % True: opto->TTL, TTL->opto
 
         if (~nicfg.optodelayTTL.optothenTTL)
             % Lead
@@ -332,52 +340,52 @@ if nicfg.optodelayTTL.enable
             % sequence of cue/action/reward starts.
             b = floor(nicfg.optodelayTTL.lead / 256);
             a = nicfg.optodelayTTL.lead - b * 256;
-            fwrite(nicfg.arduino_serial, uint8([49 a]));
-            fwrite(nicfg.arduino_serial, uint8([51 b]));
+            arduinoWrite(nicfg.arduino_serial, [49 a]);
+            arduinoWrite(nicfg.arduino_serial, [51 b]);
         end
     else
         nicfg.optodelayTTL.optothenTTL = true;
-        fwrite(nicfg.arduino_serial, uint8([48 nicfg.optodelayTTL.optothenTTL])); % True: opto->TTL, TTL->opto
+        arduinoWrite(nicfg.arduino_serial, [48 nicfg.optodelayTTL.optothenTTL]); % True: opto->TTL, TTL->opto
     end
 else
     % Mode
     disp('Behavior -> Off');
     
-    fwrite(nicfg.arduino_serial, uint8([24 0]));
+    arduinoWrite(nicfg.arduino_serial, [24 0]);
 end
 
 %% Encoder
 if nicfg.encoder.enable
     % Encoder
-    fwrite(nicfg.arduino_serial, uint8([23 1]));
+    arduinoWrite(nicfg.arduino_serial, [23 1]);
 else
-    fwrite(nicfg.arduino_serial, uint8([23 0]));
+    arduinoWrite(nicfg.arduino_serial, [23 0]);
 end
 
 % Auto echo
-fwrite(nicfg.arduino_serial, uint8([43 nicfg.encoder.autoecho]));
+arduinoWrite(nicfg.arduino_serial, [43 nicfg.encoder.autoecho]);
 
 %% Audio sync
 if nicfg.audiosync.enable
     % Audio enable
-    fwrite(nicfg.arduino_serial, uint8([25 1]));
+    arduinoWrite(nicfg.arduino_serial, [25 1]);
     
     % Frequency
-    fwrite(nicfg.arduino_serial, uint8([26 nicfg.audiosync.freq]));
+    arduinoWrite(nicfg.arduino_serial, [26 nicfg.audiosync.freq]);
 else
-    fwrite(nicfg.arduino_serial, uint8([25 0]));
+    arduinoWrite(nicfg.arduino_serial, [25 0]);
 end
 
 %% Auto-echo of trial and RNG info
 if nicfg.onlineecho.enable
     % Enable
-    fwrite(nicfg.arduino_serial, uint8([44 1]));
+    arduinoWrite(nicfg.arduino_serial, [44 1]);
     
     % Periodicity
-    fwrite(nicfg.arduino_serial, uint8([45 nicfg.onlineecho.periodicity]));
+    arduinoWrite(nicfg.arduino_serial, [45 nicfg.onlineecho.periodicity]);
 else
     % Disable
-    fwrite(nicfg.arduino_serial, uint8([44 0]));
+    arduinoWrite(nicfg.arduino_serial, [44 0]);
 end
 
 end
