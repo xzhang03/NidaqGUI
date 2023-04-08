@@ -11,7 +11,7 @@ function open_serial = arduinoOpen(com, baudrate)
         com = sprintf('COM%i', com);
     end
     
-    open_serial = serialinitial(com, baudrate, '');
+    open_serial = serialinitial(com, baudrate);
     % open_serial = serial(com, 'Terminator', '', 'BaudRate', baudrate);
     % fopen(open_serial);
 

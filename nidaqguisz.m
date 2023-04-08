@@ -259,7 +259,7 @@ if nicfg.active
         
         if nicfg.useMLlibrary % Using MonkeyLogic DAQ library or not
             nicfg.nidaq_session = startNidaq_ML(nicfg.NidaqFrequency,...
-                nicfg.NidaqChannels, nicfg.NidaqDevice);
+                   nicfg.NidaqChannels, nicfg.NidaqDevice);
         elseif nicfg.usepicoDAQ
             nicfg.nidaq_session = startpicoDAQ(nidaqpath,...
                 nicfg.picoDAQparams);
