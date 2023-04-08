@@ -2,16 +2,16 @@ global nicfg
 
 % Set the up the nidaq recording
 nicfg.BasePath         = 'C:\Users\steph\OneDrive\Documents\MATLAB\temp';       % Set the path in which data will be saved
-nicfg.ArduinoCOM       = -1;%5;             % Set the COM port for the Arduino, < 0 means off
+nicfg.ArduinoCOM       = 36;%5;             % Set the COM port for the Arduino, < 0 means off
 nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev2';        % Device name
-nicfg.NidaqChannels    = 8;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
+nicfg.NidaqChannels    = 0;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
 nicfg.NidaqDigitalChannels = 0;         % Set the number of digital channels on Port0 to record, starting at Line0
 nicfg.NidaqFrequency   = 2500;          % Set the recording frequency for the nidaq
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
 nicfg.usepicoDAQ       = true;          % Use picoDAQ
-nicfg.picoDAQparams     = {'daqcom', 'COM28', 'frequency', nicfg.NidaqFrequency}; % Parameters to be parsed
+nicfg.picoDAQparams     = {'daqcom', 'COM16', 'frequency', nicfg.NidaqFrequency}; % Parameters to be parsed
 nicfg.RunningFrequency = 30;         % Set the frequency at which running is recorded
 nicfg.DigitalString    = 'Port0/Line'; % Set a digital channel to be recorded, blank means no digital channels
 nicfg.AImode           = 'SingleEnded'; % 'Differential', 'SingleEnded', 'SingleEndedNonReferenced'. Nidaq only

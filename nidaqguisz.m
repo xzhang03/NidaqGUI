@@ -96,7 +96,7 @@ global nicfg
 
 % Serial port
 fprintf('Serial ports detected: ');
-disp(seriallist);
+disp(arduinoList);
 
 % Can't load if omnibox is not on
 if nicfg.omnibox.enable
@@ -243,11 +243,11 @@ if nicfg.active
         pause(2);
         
         % Set arduino frequency
-        fwrite(nicfg.arduino_serial, uint8([2 nicfg.RunningFrequency]));
+        arduinoWrite(nicfg.arduino_serial, [2 nicfg.RunningFrequency]);
         
         % Ping arduino
-        fwrite(nicfg.arduino_serial, uint8([5 0]));
-        fread(nicfg.arduino_serial, 1, 'int32');
+        arduinoWrite(nicfg.arduino_serial, [5 0]);
+        arduinoRead(nicfg.arduino_serial, 1, 'int32');
         
         % Parse for omnibox v3
         omniboxparse(nicfg)
@@ -259,7 +259,7 @@ if nicfg.active
         
         if nicfg.useMLlibrary % Using MonkeyLogic DAQ library or not
             nicfg.nidaq_session = startNidaq_ML(nicfg.NidaqFrequency,...
-                nicfg.NidaqChannels, nicfg.NidaqDevice);
+                   nicfg.NidaqChannels, nicfg.NidaqDevice);
         elseif nicfg.usepicoDAQ
             nicfg.nidaq_session = startpicoDAQ(nidaqpath,...
                 nicfg.picoDAQparams);
@@ -280,7 +280,7 @@ if nicfg.active
     
     % Start camera pulsing
     if ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1
-        fwrite(nicfg.arduino_serial, [1 0]);
+        arduinoWrite(nicfg.arduino_serial, [1 0]);
     end
     
     % Cycletime and initialize
@@ -321,7 +321,7 @@ if nicfg.active
     
     % Stop camera pulsing
     if ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1
-        fwrite(nicfg.arduino_serial, [0 0]);
+        arduinoWrite(nicfg.arduino_serial, [0 0]);
 
         pause(1);
 
@@ -343,7 +343,7 @@ if nicfg.active
     disp('Saving...');
     
     if ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1
-        fclose(nicfg.arduino_serial);
+        arduinoClose(nicfg.arduino_serial);
         nicfg = rmfield(nicfg, 'arduino_serial');
         if nicfg.RecordRunning
             arduinopath = fullfile(nicfg.BasePath, sprintf('%s-%s-%03i-running.mat', nicfg.MouseName, datestamp(), nicfg.Run));
