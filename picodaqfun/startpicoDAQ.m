@@ -104,6 +104,10 @@ logfile = fopen(logpath, 'w');
 % Add callback
 configureCallback(picodaq_serial, 'byte', p.databuffer, @(src, event)picocallback(src, event, logfile));
 
+%% Set reading frequency
+m = 2.5;
+picodaq_serial.UserData = struct('bytecheck', p.databuffer * m);
+
 %% Start
 write(picodaq_serial, [1 0], 'uint8');
 

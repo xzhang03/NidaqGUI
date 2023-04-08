@@ -11,6 +11,11 @@ function nanosec_setup()
 %% Firm ware version
 fver = 3.5;
 
+%% Use Picodaq
+usepicodaq = questdlg('Use PicoDAQ?', ...
+	'PicoDAQ', ...
+	'Yes','No', 'Yes');
+
 %% Path
 % Find nanosec
 nanosecpath = dir('nanosec.m');
@@ -39,7 +44,12 @@ end
 
 %% Adding folders to path
 fprintf('Adding folders to path: \n');
-folderlist = {'nanosecfun', 'nidaqfun', 'picodaqfun', 'genfun'};
+switch usepicodaq
+    case 'Yes'
+        folderlist = {'nanosecfun', 'nidaqfun', 'picodaqfun', 'genfun'};
+    case 'No'
+        folderlist = {'nanosecfun', 'nidaqfun', 'genfun'};
+end
 addpath(nanosecpath.folder);
 fprintf('Parent folder, ');
 for i = 1 : length(folderlist)
