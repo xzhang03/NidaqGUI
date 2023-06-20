@@ -55,7 +55,7 @@ nicfg.omnibox.enable = true;
 
 % Modes
 % Two-color photometry
-nicfg.tcp.enable = false; % Default true.
+nicfg.tcp.enable = true; % Default true.
 nicfg.tcp.behaviorcycle = 10; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 
 % Change pulse cycles (CAUTION)
@@ -64,7 +64,7 @@ nicfg.tcp.pulsecycle2 = 100; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 m
 
 % Optophotometry (two colors)
 % Pulse width is fixed at 10 ms
-nicfg.optophotometry.enable = true; % Default false
+nicfg.optophotometry.enable = false; % Default false
 nicfg.optophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
 nicfg.optophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.optophotometry.cycle = 10; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
@@ -92,7 +92,7 @@ nicfg.scoptophotometry.pulsewidth = 20; % Pulth width in ms. E.g., 10 means 10 m
 % Scheduler
 nicfg.scheduler.enable = true; % Default false
 nicfg.scheduler.delay = 10; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
-nicfg.scheduler.ntrains = 50; % Number of trains. Default 10.
+nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external input. This will enable manualoverride above.
 
@@ -134,17 +134,17 @@ nicfg.optodelayTTL.cuedur = [2 4 8 16]; % Delay in 100 ms. E.g., 10 means 1 seco
 % Action: Opto start => action delay => action window
 % Delivery (conditional): Opto start => delivery delay => delivery window start => delivery (if action) => timeout (if no delivery)
 % If action and devliveries have the same delay, that means food devlivery happens as soon as a lick
-nicfg.optodelayTTL.conditional = [true, false, false, false]; %true TTL delivery is conditional or not. If so, pin 10 must be hooked up with an active-high input. Input comes during the delay window will allow for subsequent pulse output.
+nicfg.optodelayTTL.conditional = [false, false, false, false]; %true TTL delivery is conditional or not. If so, pin 10 must be hooked up with an active-high input. Input comes during the delay window will allow for subsequent pulse output.
 nicfg.optodelayTTL.actiondelay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.actiondur = 20; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 nicfg.optodelayTTL.deliverydur = [50 50 50 50]; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 
 % Multiple trial types
-nicfg.optodelayTTL.ntrialtypes = 4; % Multiple trial types (Max is 4)
+nicfg.optodelayTTL.ntrialtypes = 2; % Multiple trial types (Max is 4)
 nicfg.optodelayTTL.trialfreq = [3 3 3 3]; % Relative weights of trial frequency
 
-nicfg.optodelayTTL.type1.cuetype = 'Buzzer'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
-nicfg.optodelayTTL.type1.RGB = [0 0 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
+nicfg.optodelayTTL.type1.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
+nicfg.optodelayTTL.type1.RGB = [0 7 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type1.rewardtype = 'Native'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type1.DIOport = 0; % Only used in DIO
 
