@@ -94,8 +94,8 @@ end
         pause(0.1);
         arduinoWrite(serialin, [254 0]);
         pause(0.3);
-        if serialin.BytesAvailable > 20
-            ver = arduinoRead(serialin, serialin.BytesAvailable, 'uint8');
+        if arduinoGetBytes(serialin) > 20
+            ver = arduinoRead(serialin, arduinoGetBytes(serialin), 'uint8');
         end
         fprintf('Nanosec firmware version: %s\n', char(ver'));
         arduinoClose(serialin);
@@ -109,7 +109,7 @@ end
         pause(0.3);
         vec = [];
         ind = 0;
-        while serialin.BytesAvailable > 0
+        while arduinoGetBytes(serialin) > 0
             ind = ind + 1;
             vec(ind) = arduinoRead(serialin, 1, 'uint8');
         end
@@ -125,7 +125,7 @@ end
         pause(0.3);
         vec = [];
         ind = 0;
-        while serialin.BytesAvailable > 0
+        while arduinoGetBytes(serialin) > 0
             ind = ind + 1;
             vec(ind) = arduinoRead(serialin, 1, 'uint8');
         end
@@ -139,7 +139,7 @@ end
         pause(0.1);
         vec = [];
         ind = 0;
-        while serialin.BytesAvailable > 0
+        while arduinoGetBytes(serialin) > 0
             ind = ind + 1;
             vec(ind) = arduinoRead(serialin, 1, 'uint8');
         end
@@ -153,8 +153,8 @@ end
         pause(0.1);
         arduinoWrite(serialin, [64 type]);
         pause(0.3);
-        if serialin.BytesAvailable > 20
-            RNG = arduinoRead(serialin, serialin.BytesAvailable, 'uint8');
+        if arduinoGetBytes(serialin) > 20
+            RNG = arduinoRead(serialin, arduinoGetBytes(serialin), 'uint8');
         end
         disp(RNG);
         arduinoClose(serialin);

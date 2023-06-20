@@ -21,6 +21,6 @@ pause(2);
 omniboxparse(nicfg)
 
 %% Close
-fclose(nicfg.arduino_serial);
+arduinoClose(nicfg.arduino_serial);
 
 end

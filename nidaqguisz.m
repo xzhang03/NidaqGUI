@@ -326,7 +326,7 @@ if nicfg.active
         pause(1);
 
         % Finish collecting data on the esrial buffer
-        while nicfg.arduino_serial.BytesAvailable >= 4
+        while arduinoGetBytes(nicfg.arduino_serial) >= 4
             d = arduinoReadQuad(nicfg.arduino_serial);
             
             % Parse serial
