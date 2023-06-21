@@ -1,5 +1,5 @@
 function clearallserial()
-fclose(instrfind);
+arduinoClose(instrfind);
 
 end
 
