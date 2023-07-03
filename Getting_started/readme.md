@@ -58,7 +58,7 @@ Here is how to parse it:
 ## 4. Reflash firmwares
 If you need to reflash firmware, please see this [page](https://github.com/xzhang03/NidaqGUI/tree/master/Arduino/nanosec) for instructions. Note that you make sure that the '#define' flags match what you expect (e.g., choose Nanosec box vs tester), before you compile.
 
-Below are the pin assignments in the tester mode (matching the numbers on the tester PCB):
+Below are the pin assignments in the **tester mode** (matching the numbers on the tester PCB):
   1. Pin 2: Ch1 pulse
   2. Pin 3: Ch2 pulse
   3. Pin 4: Tristate pin (only used for same-color optophotometry)
