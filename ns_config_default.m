@@ -7,7 +7,7 @@ nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev1';        % Device name
 nicfg.NidaqChannels    = 0;%4;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
-nicfg.NidaqDigitalChannels = 1;         % Set the number of digital channels on Port0 to record, starting at Line0
+nicfg.NidaqDigitalChannels = 0;         % Set the number of digital channels on Port0 to record, starting at Line0
 nicfg.NidaqFrequency   = 2500;          % Set the recording frequency for the nidaq
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
 nicfg.usepicoDAQ       = false;          % Use picoDAQ
@@ -23,7 +23,7 @@ nicfg.ChannelNames     = {'PD1', 1, 'Ch1in', 2, 'camera', 3, 'ensure', 4, 'PD2',
 nicfg.DigitalChannelNames = { ...
                          };
 
-nicfg.serverupload = true;
+nicfg.serverupload = false;
 nicfg.serveradd = {...
     'SZ', '\\anastasia\data\photometry';...
     'AL', '\\sweetness\Fiber Photometry';...

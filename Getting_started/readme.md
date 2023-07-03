@@ -73,12 +73,60 @@ Below are the pin assignments in the tester mode (matching the numbers on the te
   12. Pin 23: Unused
   
 ## 5. Doing the first experiment
-If everything checks out above, run the following command to start an experiment:
+#### 1. If everything checks out above, run the following command to start an experiment:
 ```MATLAB
 nanosec();
 ```
 You should be greeted with a simple UI below:
+
 ![UI](./maingui.png)
 
+If you click on the "Menu", you should see a few options:
 
+![UI2](./maingui_menu.png)
 
+Click on "Load Config", you can choose which config file to load into computer RAM. Each config is meant for a different experiemnt, so you are doing different experiments each day, you just need to switch configs as opposed to re-adjusting the parameters with a config. The tester is used to make sure that your configs work before deploying. To edit a config, simply click on the [ns_config] name on the right of "Menu".
+
+#### 2. Starting from "ns_config_default.m", here are the minimal number of things you will need to change to do an experiment.
+  1. Change the path to a folder that exists on your computer.
+  ```MATLAB
+  nicfg.BasePath = 'C:\Users\andermannlab\Documents\MATLAB\temp\'; 
+  ```
+  2. Change the COM number to your nanosec/tester.
+  ```Matlab
+  nicfg.ArduinoCOM = 21;
+  ```
+  3. If you have a nidaq connected (with data acquistiion toolbox as well as nimax installed). Change the nidaq name, channel numbers, digital channel numbers (X series only), and nidaq channel names (for book-keeping). If you don't have a nidaq connected at the moment, set nicfg.NidaqChannels = 0.
+  ```Matlab
+  nicfg.NidaqDevice = 'Dev1'; 
+  nicfg.NidaqChannels = 8;
+  nicfg.NidaqDigitalChannels = 0;
+  nicfg.ChannelNames = {'PD1', 1, 'Ch1in', 2, 'camera', 3, 'ensure', 4, 'PD2', 5, 'lick', 6, ...
+                        'Ch2in', 7,  'Buzz', 8};
+  ```
+  4. If you use picoDAQ, flag picoDAQ as true and set the picodaq COM.
+  ```MATLAB
+  nicfg.usepicoDAQ  = true;
+  nicfg.picDAQparams = {'daqcom', 'COM28', 'frequency', nicfg.NidaqFrequency};
+  ```
+  5. You should be able to change mouse name and run number on the main gui, and click "UPLOAD SETTING". This step uploads the code to the nanosec RAM, from which the actualy experiements draw information.
+  6. You should be able to click "Start/Stop" to initiate a run. The onboard LED of teensy should flash at 30 Hz. That's the camera pulse. You can stop by clicking "Start/Stop" again. It may take a few seconds to respond, especially if Nidaq is enabled.
+
+## 6. Sample wiring diagram
+A minimal wiring diagram for experiments.
+![wiring](./Sample_setup.png)
+  
+## 7. Additional info
+### 1. How do I get camera pulses. 
+You can use the "CAM_OUT" BNC to get the cam pulse from nanosec.
+
+### 2. How do I use the running encoder.
+You can use a 4-channel audio cable to connect the audio jacks on the encoder module and on nanosec ("ENCODER"). Please note that you will have to use the encoder from this repo. Your old ones would not work and could damage Nanosec.
+
+## Where do I go from here?
+  1. To get a general idea of the system, read [this](https://github.com/xzhang03/NidaqGUI/blob/master/README.md).
+  2. To understand the configs beyond this point, read [here](https://github.com/xzhang03/NidaqGUI/tree/master/Configs). 
+  3. To undertand the firmware code, read [here](https://github.com/xzhang03/NidaqGUI/tree/master/Arduino/nanosec).
+  4. To use other modules, go to the folders [here](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs).
+  5. What I use for analysis. [Here](https://github.com/xzhang03/Photometry_analysis)
+  
