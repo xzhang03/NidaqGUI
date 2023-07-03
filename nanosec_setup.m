@@ -10,6 +10,7 @@ function nanosec_setup()
 
 %% Firm ware version
 fver = 3.5;
+fprintf('Expected firmware version v%0.1f\n', fver);
 
 %% Use Picodaq
 usepicodaq = questdlg('Use PicoDAQ?', ...
