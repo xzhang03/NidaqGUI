@@ -1,6 +1,6 @@
 %% Open
 clear
-nidaq_config_sz_debug;
+ns_config_debug;
 nicfg.arduino_serial = serial(sprintf('COM%i', nicfg.ArduinoCOM), 'BaudRate', nicfg.baumrate);
 fopen(nicfg.arduino_serial);
 disp('Opened.')

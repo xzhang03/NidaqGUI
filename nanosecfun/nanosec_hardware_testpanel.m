@@ -75,6 +75,9 @@ while true
         case 9
             % Dump all serial buffer
             dump_buffer()
+        case 10
+            % Encoder test
+            enctest_30()
     end
 end
 
@@ -83,7 +86,7 @@ end
     function indx = funlist(ini)
         fn = {'Firmware Version', 'I2c scan', 'Test PWM RGB', 'Test DIO expander',...
             'Dump Nanosec state', 'Dump opto RNG',...
-            'Dump ITI RNG', 'Dump Trial type RNG', 'Dump all serial'};
+            'Dump ITI RNG', 'Dump Trial type RNG', 'Dump all serial', '30s_encoder_test'};
         [indx, ~] = listdlg('PromptString', sprintf('Select test %s', com),...
             'SelectionMode','single', 'InitialValue', ini, 'ListString',fn);
     end
@@ -175,6 +178,42 @@ end
         pause(0.1);
         arduinoWrite(serialin, [61 0]);
         pause(0.1);
+        arduinoClose(serialin);
+    end
+    
+    % Ping encoder
+    function val = ping_enc(serialtemp)
+        arduinoWrite(serialtemp, [5 0])
+        val = arduinoRead(serialtemp, 1, 'int32');
+    end
+
+    % Encoder test 30s
+    function enctest_30()
+        % Initialize
+        test_time = 30;
+        test_inc = 1;
+        c = 0;
+        
+        % Serial
+        disp('30s encoder test:')
+        serialin = serialinitial(com, baudrate);
+        pause(0.1);
+        tic;
+
+        % First read
+        val = ping_enc(serialin);
+        fprintf('%i: %i\n', c, val);
+        
+        % Continue read
+        while c < (test_time / test_inc)
+            if toc > test_inc
+                c = c + 1;
+                val = ping_enc(serialin);
+                fprintf('%i: %i\n', c, val);
+                tic;
+            end
+        end
+        
         arduinoClose(serialin);
     end
 end
