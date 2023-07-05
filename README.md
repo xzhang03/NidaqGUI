@@ -41,6 +41,8 @@ A Matlab UI is used to designate filename and start/stop, as well as to specify 
   3. **Same-color optophotometry mode only**: a tri-state buffer such as [74AHCT125](https://www.adafruit.com/product/1787). I also use the buffer as a unidirectional logic level shifter since Teensy4.0 cannot take 5V logic inputs. An opamp is preferred for true analog buffer.
   
 ## C. How to get started
+### From premade modules
+Please see [here](https://github.com/xzhang03/NidaqGUI/tree/master/Getting_started) for first steps. 
 
 ### From fresh Teensy
 1. Use one of the PCB printing services (e.g., [JLCPCB](https://jlcpcb.com/), [PCBWAY](https://www.pcbway.com/), [OSHPARK](https://oshpark.com/), [etc](https://pcbshopper.com/)). Upload the zip Gerber files from [here for example](https://github.com/xzhang03/NidaqGUI/blob/master/PCBs/Nanosec/Gerber_PCB_Omnibox%20v3.zip). The sizes are pre-set so just choose your quantity, color, etc... You are good to go with PCBs
