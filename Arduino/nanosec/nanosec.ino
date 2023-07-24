@@ -1,8 +1,11 @@
 // Third Gen photometry box: Nanosec v3.5
-// Handle almost everything you need for photometry
-// Needs a decent number of pins
-// Ongoing attempt to split up the code for better maintenance
+// Handle almost everything you need for photometry and behavior
+// Tested using Teensyduino with Arduino IDE 1.8.X
 // Stephen Zhang
+
+// ** Additional library not in Teensyduino **
+// Adafruit PWM Servo Driver Library (Adafruit, v2.4.1) and parent libraries
+// MCP23008 (Rob Tillaart, v0.1.4)
 
 /* 1. Two color photometry
  * 2. Optophotometry (switch on)
