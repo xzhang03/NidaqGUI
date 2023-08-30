@@ -1,7 +1,7 @@
-# I just received an Nanosec box. What do I do?
+# I just received a Nanosec box. What do I do?
 
 ## 0. What did I get?
-Below are items that you could have received. This guide mostly covers the nanosec box and tester. Please refer to the pages of the other components for details.
+Below are items that you may have received. This guide mostly covers the nanosec box and tester. Please refer to the pages of the other components for details.
 
   1. A nanosec box (with teensy 4.0 in the center). Hardware details are [here](https://github.com/xzhang03/NidaqGUI/tree/master/PCBs/Nanosec)
   2. A nanosec tester. This is a gadget that is functionally equivalent to a nanosec box but doesn't have any BNC connectors or audio jacks. It is meant to test the config files and timings before deploying to your photometry rigs. It uses on-PCB LEDS to indicate when each digital pulse is sent out and uses buttons to mimic natural inputs (e.g., licking). Hardware details are [here](https://github.com/xzhang03/TeensyTester). Some pins are changed when compiling the code for a tester (see Section 4 below).
