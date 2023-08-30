@@ -22,15 +22,15 @@ Below are items that you may have received. This guide mostly covers the nanosec
   1. When you plug in the micro USB on teensy, you should be able to see LED 2 and 3 blinking at **6 ms, 50 Hz pulses** each. This is the default two-color photometry mode. Seeing the pulses does not mean your firmware vesion is up-to-date but it has some firmware there.
   
 ## 2. Installing Nanosec software
-  1. Clone the repo to your MATLAB path of interest. Do not add any folder to path yet.
-  2. Navigate to the main folder, and run the following function. You can run section-by-section if you'd like.
+  1. Clone the repo to your MATLAB path of interest. Do not add any folder to MATLAB path yet.
+  2. Navigate to the main folder, and run the following function. You can run it section-by-section if you'd like.
 	  ```MATLAB
 	  nanosec_setup();
 	  ```
   3. Please note the expected **firmware version (e.g., v3.5)**.
   4. Choose no on "Use PicoDAQ?" if you do not have one.
-  5. If you see this message "Matlab is old. Please copy 'nanosecfun\old' to overwrite 'nanosecfun'." That means you are using an early version of matlab, which requires different functions. Please copy the files and overwrite. You can do this after finishing running this function. The folder "old" should never be in MATLAB paths.
-  6. The program will add the appropriate folders to MATLAB paths. When you see "Nanosec settings saved", this step is succesfully completed.
+  5. If you see this message "Matlab is old. Please copy 'nanosecfun\old' to overwrite 'nanosecfun'." That means you are using an early version of Matlab, which requires different functions. Please copy the files and overwrite as instructed. You can do this after finishing running nanosec_setup(). The folder "nanosecfun\old" should never be in MATLAB paths.
+  6. The program will add the appropriate folders to MATLAB paths. When you see "Nanosec settings saved", this step has been successfully completed.
   
 ## 3. COMs and firmwares
 ### 1. Get COMs
@@ -38,7 +38,7 @@ Each serial hardware has a COM that is assigned by the computer. It generally do
 ```MATLAB
 arduinoList()
 ```
-If you see nothing, check that the USB cable is usable and plugged in correctly. You do not need proper firmware to be assigned a COM port. If you see multiple COMs, unplug your Nanosec/tester and run the command again. Whichever COM port that has disappeared is the correct one.
+If you see nothing, check that the USB cable is usable and plugged in correctly. You do not need proper firmware to be assigned a COM port. If you see multiple COMs, unplug your Nanosec/tester and run the command again. Whichever COM port has disappeared is the correct one.
 
 ### 2. Get onboard firmware versions
 Once you know the COM number (say "COM22"), run nanosecver(com) like below:
@@ -48,10 +48,10 @@ nanosecver('COM22');
 You should hear back a string of text such as
  >Nanosec firmware version: v3.50PA498 Mar 27 2023 15:38:25.
 
-Here is how to parse it:
+Here is how to parse the message:
   1. 'v3.50' is the version, which should match the expected version above in Section 2.
-  2. 'P' means PCB nanosec. If you use tester, it should say 'T'. 'P' and 'T' versions differ in Pin assignments and should match the PCBs.
-  3. 'A' means non-debug firmware. If you see anything else, you will need to reflash the firmware (Section 4 below).
+  2. 'P' means PCB nanosec. If you use a tester, it should say 'T'. 'P' and 'T' versions differ in Pin assignments and should match the PCBs.
+  3. 'A' means a debug firmware. If you see anything else, you will need to reflash the firmware (Section 4 below).
   4. '498' is the CPU speed, 498 MHz. Keeping this number below 500 MHz decreases the CPU temperature.
   5. The rest is the compilation date and time.
   
@@ -85,7 +85,7 @@ If you click on the "Menu", you should see a few options:
 
 ![UI2](./maingui_menu.png)
 
-Click on "Load Config", you can choose which config file to load into computer RAM. Each config is meant for a different experiemnt, so you are doing different experiments each day, you just need to switch configs as opposed to re-adjusting the parameters with a config. The tester is used to make sure that your configs work before deploying. To edit a config, simply click on the [ns_config] name on the right of "Menu".
+Click on "Load Config", you can choose which config file to load into computer RAM. Each config is meant for a different experiemnt, so you are doing different experiments each day, you just need to switch configs as opposed to re-adjusting the parameters within the same config. The tester is used to make sure that your configs work before deploying. To edit a config, simply click on the [ns_config] name on the right of "Menu".
 
 #### 2. Starting from "ns_config_default.m", here are the minimal number of things you will need to change to do an experiment.
   1. Change the path to a folder that exists on your computer.
