@@ -22,7 +22,7 @@ function varargout = nidaqguisz(varargin)
 
 % Edit the above text to modify the response to help nidaqguisz
 
-% Last Modified by GUIDE v2.5 27-Mar-2023 14:15:08
+% Last Modified by GUIDE v2.5 29-Mar-2024 13:54:14
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
