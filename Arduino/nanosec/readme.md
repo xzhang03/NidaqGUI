@@ -26,6 +26,10 @@ Starting at version v3.3, this code is split up into parts. The main code is nan
 ## Upload
 Please use arduino IDE to upload the code (need [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html) for Arduino Version before 2.0). This code is written on Teensy 4.0 but Teensy 4.1 is workable.
 
+## Additional libraries (not in teensyduino)
+1. Adafruit PWM Servo Driver Library (Adafruit, v2.4.1) and parent libraries
+2. MCP23008 (Rob Tillaart, v0.1.4), must be v2.0 or before
+
 ## CPU clock speed
 The code now runs Teensy 4.0 at 450 MHz. Dropping CPU clock from 600 MHz to 450 MHz lowers CPU voltage and makes the hardware run cooler (source: PJRC forum). You can change this value.
 

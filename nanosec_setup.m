@@ -48,6 +48,7 @@ fprintf('Adding folders to path: \n');
 switch usepicodaq
     case 'Yes'
         folderlist = {'nanosecfun', 'nidaqfun', 'picodaqfun', 'genfun'};
+        msgbox('Please be sure that nicfg.usepicoDAQ is set to true in config files', 'picoDAQ');
     case 'No'
         folderlist = {'nanosecfun', 'nidaqfun', 'genfun'};
 end

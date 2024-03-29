@@ -102,7 +102,7 @@ uicontrol(hpan, 'Style', 'pushbutton', 'Position', toploc - [0 300 0 0], 'String
     
         if nicfg.usepicoDAQ
             % Serial initialize
-            picodaq_serial = previewpicoDAQ(nicfg.picDAQparams);
+            picodaq_serial = previewpicoDAQ(nicfg.picoDAQparams);
             
             % Over-write frequency
             write(picodaq_serial, [2 ratecontrol.UserData/100], 'uint8');

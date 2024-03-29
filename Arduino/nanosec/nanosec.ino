@@ -5,7 +5,7 @@
 
 // ** Additional library not in Teensyduino **
 // Adafruit PWM Servo Driver Library (Adafruit, v2.4.1) and parent libraries
-// MCP23008 (Rob Tillaart, v0.1.4)
+// MCP23008 (Rob Tillaart, v0.1.4), must be before v2.0
 
 /* 1. Two color photometry
  * 2. Optophotometry (switch on)
