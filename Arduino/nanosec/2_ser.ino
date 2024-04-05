@@ -992,15 +992,17 @@ void showpara(void){
   
   // Photometry
   Serial.println("============== TCP ==============");
-  Serial.print("Ch1 photometry cycle time (us): ");
-  Serial.println(cycletime_photom_1);
-  Serial.print("Ch1 photometry on time (us): ");
-  Serial.println(pulsewidth_1);
-  Serial.print("Ch2 photometry cycle time (us): ");
-  Serial.println(cycletime_photom_2);
-  Serial.print("Ch2 photometry on time (us): ");
-  Serial.println(pulsewidth_2);
-
+  Serial.print("Ch1 TCP cycle time (us): ");
+  Serial.println(cycletime_photom_1_tcp);
+  Serial.print("Ch1 TCP on time (us): ");
+  Serial.println(pulsewidth_1_tcp);
+  Serial.print("Ch2 TCP cycle time (us): ");
+  Serial.println(cycletime_photom_2_tcp);
+  Serial.print("Ch2 TCP on time (us): ");
+  Serial.println(pulsewidth_2_tcp);
+  Serial.print("TCP behavior train cycle (s): ");
+  Serial.println(tcptrain_cycle / fps);
+  
   // Opto
   Serial.println("============== Optophoto ==============");
   Serial.print("Opto freq (Hz): ");
@@ -1011,6 +1013,10 @@ void showpara(void){
   Serial.println(train_cycle / fps);
   Serial.print("Pulse width (ms): ");
   Serial.println(pulsewidth_2_opto/1000);
+  Serial.print("Ch1 optophoto cycle time (us): ");
+  Serial.println(cycletime_photom_1_opto);
+  Serial.print("Ch2 optophoto cycle time (us): ");
+  Serial.println(cycletime_photom_2_opto);
   Serial.print("Opto-photometry overlap: ");
   Serial.println(optophotooverlap);
 
@@ -1026,10 +1032,11 @@ void showpara(void){
   Serial.println(sctrain_cycle / fps);
   Serial.print("Pulse width (ms): ");
   Serial.println(pulsewidth_1_scopto/1000);
+  Serial.print("Ch1 scoptophoto cycle time (us): ");
+  Serial.println(cycletime_photom_1_scopto);
+  Serial.print("Ch2 scoptophoto cycle time (us): ");
+  Serial.println(cycletime_photom_2_scopto);
   
-  Serial.print("TCP behavior train cycle (s): ");
-  Serial.println(tcptrain_cycle / fps);
-
   // Scheduler
   Serial.println("============== Scheduler ==============");
   Serial.print("Scheduler enabled: ");
