@@ -196,9 +196,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-
-
 % --- Executes on button press in togglebutton1.
 function togglebutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to togglebutton1 (see GCBO)
