@@ -2,9 +2,9 @@ function picocallback(src, ~, fid)
 
 % Read and write
 if src.NumBytesAvailable > src.UserData.bytecheck
-%     tic
+    % tic
     data = read(src, src.BytesAvailableFcnCount, 'int32');
-%     toc;
+    % toc;
     fwrite(fid, data, 'int32');
 end
 
