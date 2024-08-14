@@ -46,7 +46,7 @@ end
 %% Save
 Fs = openDAQ.frequency;
 frequency = openDAQ.frequency;
-save(openDAQ.path, 'data', 'Fs', 'frequency', 'timestamps', 'channelnames', 'omniboxsetting', 'configfp');
+save(openDAQ.path, 'data', 'Fs', 'frequency', 'timestamps', 'channelnames', 'omniboxsetting', 'configfp', '-v7.3');
 
 delete(openDAQ.logpath);
 end
