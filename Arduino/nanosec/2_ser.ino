@@ -1131,9 +1131,10 @@ void showpara(void){
   Serial.print("Current trial type to edit: ");
   Serial.println(trialtype_edit);
   for (byte ip = 0; ip < maxtrialtypes; ip++){
+    Serial.print("----------- ");
     Serial.print("Trial type: ");
     Serial.print(ip);
-    Serial.println(": ");
+    Serial.println(" -----------");
     Serial.print("IO: ");
     switch (ip){
       case 0:
