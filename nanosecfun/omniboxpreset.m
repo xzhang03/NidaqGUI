@@ -18,7 +18,13 @@ nicfg.arduino_serial = serialinitial(com, nicfg.baumrate);
 pause(2);
 
 %% Parse
-omniboxparse(nicfg)
+try omniboxparse(nicfg)
+catch me
+    disp(me.message);
+    disp(me.stack(1))
+    arduinoClose(nicfg.arduino_serial);
+    error('Parsing config file failed, most likely due to missing fields. See above.')
+end
 
 %% Close
 arduinoClose(nicfg.arduino_serial);

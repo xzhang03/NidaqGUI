@@ -21,10 +21,10 @@ const byte ch2_output[4] = {6, 7, 8, 9};
 const byte ledpin = 25;
 
 // Def pin to set maxes (dip switches)
-const byte defpin1 = 10; // Channel 1 high bit
-const byte defpin2 = 11; // Channel 1 low bit
-const byte defpin3 = 12; // Channel 2 high bit
-const byte defpin4 = 13; // Channel 2 low bit
+const byte defpin1 = 13; // Channel 1 high bit
+const byte defpin2 = 12; // Channel 1 low bit
+const byte defpin3 = 11; // Channel 2 high bit
+const byte defpin4 = 10; // Channel 2 low bit
 
 // channels
 const byte max_ch = 4;
@@ -42,6 +42,10 @@ volatile bool resettimer = false;
 // Timers
 long int t0, t1;
 long int ipi = 50; // Interpulse interval 50 us
+
+// Serial
+char s1;
+char s2;
 
 // Operation core
 void setup() {
@@ -63,6 +67,7 @@ void setup() {
   pinMode(defpin2, INPUT_PULLDOWN);
   pinMode(defpin3, INPUT_PULLDOWN);
   pinMode(defpin4, INPUT_PULLDOWN);
+  pinMode(ledpin, OUTPUT);
   
   if (useDefpin){
     byte df1 = digitalRead(defpin1);
@@ -78,7 +83,32 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ch2_input), ch2_send, RISING);
   attachInterrupt(digitalPinToInterrupt(ch1_input2), ch1_shift, FALLING);
   attachInterrupt(digitalPinToInterrupt(ch2_input2), ch2_shift, FALLING);
-  
+
+  // Self check ch1
+  uint16_t timercheck = 200;
+  for (uint8_t ind = 4; ind > 0; ind--){
+    if (ch1_max >= ind){
+      digitalWrite(ledpin, HIGH);
+      delay(timercheck);
+      digitalWrite(ledpin, LOW);
+      delay(timercheck);
+    }
+    else{
+      delay(timercheck*2);
+    }
+  }
+  // Self check ch2
+  for (uint8_t ind = 4; ind > 0; ind--){
+    if (ch2_max >= ind){
+      digitalWrite(ledpin, HIGH);
+      delay(timercheck);
+      digitalWrite(ledpin, LOW);
+      delay(timercheck);
+    }
+    else{
+      delay(timercheck*2);
+    }
+  }
   t0 = micros();
 }
 
@@ -103,10 +133,10 @@ void loop() {
 
 // I2c core
 void setup1(){
-  if (debug){
+  #if debug
     Serial.begin(9600);
     Serial.println("Debug mode.");
-  }
+  #endif
   
   // Wire
   if (usei2c){
@@ -117,26 +147,70 @@ void setup1(){
     Wire.onRequest(echomax);
   }
   
-  pinMode(ledpin, OUTPUT);
+  
 }
 
 void loop1(){
-  if (debug){
+  #if (debug)
     if (Serial.available() > 1){
-      Serial.read();
-      Serial.read();
-      Serial.print("I got ");
-      Serial.print(m, BIN);
-      Serial.print(" = ");
-      Serial.print((m >> 4) & 0b00001111, BIN);
-      Serial.print(" + ");
-      Serial.print(m & 0b00001111, BIN);
-      Serial.print(", meaning: ");
-      Serial.print(ch1_max);
-      Serial.print(" & ");
-      Serial.println(ch2_max);
+      s1 = Serial.read();
+      s2 = Serial.read();
+
+      switch (s1){
+        case 'i':
+          {
+            Serial.print("I got ");
+            Serial.print(m, BIN);
+            Serial.print(" = ");
+            Serial.print((m >> 4) & 0b00001111, BIN);
+            Serial.print(" + ");
+            Serial.print(m & 0b00001111, BIN);
+            Serial.print(", meaning: ");
+            Serial.print(ch1_max);
+            Serial.print(" & ");
+            Serial.println(ch2_max);
+            break;
+          }
+          
+        case 'd':
+          {
+            byte df1_debug = digitalRead(defpin1);
+            byte df2_debug = digitalRead(defpin2);
+            byte df3_debug = digitalRead(defpin3);
+            byte df4_debug = digitalRead(defpin4);
+            byte ch1_max_debug = df1_debug * 2 + df2_debug + 1;
+            byte ch2_max_debug = df3_debug * 2 + df4_debug + 1;
+            Serial.println("DIP switch readings:");
+            Serial.print("Def 1 (Ch1 HIGH): ");
+            Serial.println(df1_debug);
+            Serial.print("Def 2 (Ch1 LOW): ");
+            Serial.println(df2_debug);
+            Serial.print("Def 3 (Ch2 HIGH): ");
+            Serial.println(df3_debug);
+            Serial.print("Def 4 (Ch2 LOW): ");
+            Serial.println(df4_debug);
+            Serial.print("Ch1 MAX (debug): ");
+            Serial.println(ch1_max_debug);
+            Serial.print("Ch2 MAX (debug): ");
+            Serial.println(ch2_max_debug);
+            break;
+          }
+
+        default:
+          {
+            Serial.print("Ch1 MAX (real): ");
+            Serial.println(ch1_max);
+            Serial.print("Ch2 MAX (real): ");
+            Serial.println(ch2_max);
+            Serial.println("i: I2c dump");
+            Serial.println("d: DIP reads");
+            Serial.println("m: Menu");
+            break;
+          }
+      }
+      
     }
-  }
+  #endif
 }
 
 void updatemax(int idk){

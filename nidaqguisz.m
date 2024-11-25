@@ -22,7 +22,7 @@ function varargout = nidaqguisz(varargin)
 
 % Edit the above text to modify the response to help nidaqguisz
 
-% Last Modified by GUIDE v2.5 27-Mar-2023 14:15:08
+% Last Modified by GUIDE v2.5 29-Mar-2024 14:06:04
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -109,6 +109,13 @@ end
 
 handles.MouseName.String = nicfg.MouseName;
 
+% Enable picodaq test panel or not
+if nicfg.usepicoDAQ
+    handles.picodaq_test_panel.Enable = 'on';
+else
+    handles.picodaq_test_panel.Enable = 'off';
+end
+
 if isfield(nicfg, 'arduino_serial')
     nicfg = rmfield(nicfg, 'arduino_serial');
 end
@@ -120,9 +127,6 @@ end
 if ~isfield(nicfg, 'serverupload')
     nicfg.serverupload = true;
 end
-
-
-
 
 
 % UIWAIT makes nidaqguisz wait for user response (see UIRESUME)
@@ -190,9 +194,6 @@ function Runs_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-
 
 
 % --- Executes on button press in togglebutton1.
@@ -510,6 +511,16 @@ run(handles.loadconfig.UserData.fp);
 global nicfg
 nanosec_hardware_testpanel(nicfg.ArduinoCOM);
 
+% --------------------------------------------------------------------
+function picodaq_test_panel_Callback(hObject, eventdata, handles)
+% hObject    handle to picodaq_test_panel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+run(handles.loadconfig.UserData.fp);
+global nicfg
+
+it = find(strcmpi(nicfg.picoDAQparams, 'daqcom'));
+picodaq_testpanel(nicfg.picoDAQparams{it+1});
 
 % --------------------------------------------------------------------
 function reset_serial_Callback(hObject, eventdata, handles)
@@ -517,3 +528,6 @@ function reset_serial_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 clearallserial();
+
+
+

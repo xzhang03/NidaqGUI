@@ -9,7 +9,7 @@ function nanosec_setup()
 
 
 %% Firm ware version
-fver = 3.5;
+fver = 3.51;
 fprintf('Expected firmware version v%0.1f\n', fver);
 
 %% Use Picodaq
@@ -48,6 +48,7 @@ fprintf('Adding folders to path: \n');
 switch usepicodaq
     case 'Yes'
         folderlist = {'nanosecfun', 'nidaqfun', 'picodaqfun', 'genfun'};
+        msgbox('Please be sure that nicfg.usepicoDAQ is set to true in config files', 'picoDAQ');
     case 'No'
         folderlist = {'nanosecfun', 'nidaqfun', 'genfun'};
 end

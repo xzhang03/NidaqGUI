@@ -6,7 +6,7 @@ Use case 1: 465 nm and 405 nm photometry + 625 Chrimson stimulation. Using the n
 The shifter channel count is set using the dip switch. The switch definitions and the truth table for each channel are below:
 | Switch 1  | 2 | 3 | 4 |
 | ------------- | ------------- | ------------- | ------------- |
-| Ch2 LOW  | Ch2 HIGH  | Ch1 LOW  | Ch2 HIGH  |
+| Ch1 HIGH  | Ch1 LOW  | Ch2 HIGH  | Ch2 LOW  |
 
 
 | HIGH bit (H)  | LOW bit (L) | Output channels (H*2 + L + 1) |

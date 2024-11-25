@@ -1,8 +1,11 @@
 // Third Gen photometry box: Nanosec v3.5
-// Handle almost everything you need for photometry
-// Needs a decent number of pins
-// Ongoing attempt to split up the code for better maintenance
+// Handle almost everything you need for photometry and behavior
+// Tested using Teensyduino with Arduino IDE 1.8.X
 // Stephen Zhang
+
+// ** Additional library not in Teensyduino **
+// Adafruit PWM Servo Driver Library (Adafruit, v2.4.1) and parent libraries
+// MCP23008 (Rob Tillaart, v0.1.4), must be before v2.0
 
 /* 1. Two color photometry
  * 2. Optophotometry (switch on)
@@ -43,7 +46,7 @@
 //
 
 // =============== Version ===============
-#define nsver "v3.50"
+#define nsver "v3.51"
 
 // =============== Hardware ===============
 // Now running teensy 4.0 at 450 Mhz (2.2 ns step)
@@ -54,7 +57,7 @@ extern "C" uint32_t set_arm_clock(uint32_t frequency);
 
 // ================ PCB ================
 #define PCB true
-#define TeensyTester false //
+#define TeensyTester false//
  
 // =============== Debug ===============
 #define debugmode false // Master switch for all serial debugging
@@ -70,7 +73,7 @@ bool ftest1 = false;
 
 // =============== Modes ===============
 // Photometry mode
-bool optophotommode = false; // Green + red
+bool optophotommode = false; // Green + red 
 bool tcpmode = true; //
 bool samecoloroptomode = false; // Green + blue (same led for photometry and opto);
 bool useencoder = true;
@@ -231,7 +234,7 @@ void loop() {
 
   // ======================================== P2 ========================================
   // 2. First pulse ends, gap before second pulse
-  else if ((t1 >= (pulsewidth_1)) && (t1 < (cycletime_photom_1))){
+  else if ((t1 >= (pulsewidth_1)) && (t1 <= (cycletime_photom_1))){
     // Happens multiple times per cycle (twice actually for uno, might be getting close to the limit)
     // Serial.println(t1);
     

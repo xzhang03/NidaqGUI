@@ -12,8 +12,9 @@ p  = inputParser;
 % DAQ
 addOptional(p, 'daqcom', 'COM1');
 addOptional(p, 'frequency', 2500); % DAQ sampling frequency, must be multiples of 100;
-addOptional(p, 'databuffer', 7500); % Save to harddrive every X bytes of data recorded (must be multiples of 6).
+addOptional(p, 'databuffer', 12000); % Save to harddrive every X bytes of data recorded (must be multiples of 6). Each time point is 6 uint32s.
 addOptional(p, 'fda', 8); % Signal amplitude suppression by fully-diff amplifier, multiply this value at the end.
+addOptional(p, 'timeout', 2); % Timeout default 10 s
 
 % ADC
 addOptional(p, 'adcfreqmod', 2); % ADC raw freq = 32K / 2 ^ n. E.g., 2 means 8 kSPS.
@@ -107,6 +108,9 @@ configureCallback(picodaq_serial, 'byte', p.databuffer, @(src, event)picocallbac
 %% Set reading frequency
 m = 2.5;
 picodaq_serial.UserData = struct('bytecheck', p.databuffer * m);
+
+%% Set timeout
+picodaq_serial.Timeout = p.timeout;
 
 %% Start
 write(picodaq_serial, [1 0], 'uint8');

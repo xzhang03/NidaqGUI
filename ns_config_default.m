@@ -11,7 +11,7 @@ nicfg.NidaqDigitalChannels = 0;         % Set the number of digital channels on 
 nicfg.NidaqFrequency   = 2500;          % Set the recording frequency for the nidaq
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
 nicfg.usepicoDAQ       = false;          % Use picoDAQ
-nicfg.picDAQparams     = {'daqcom', 'COM28', 'frequency', nicfg.NidaqFrequency}; % Parameters to be parsed
+nicfg.picoDAQparams     = {'daqcom', 'COM28', 'frequency', nicfg.NidaqFrequency}; % Parameters to be parsed
 nicfg.RunningFrequency = 30;         % Set the frequency at which running is recorded
 nicfg.DigitalString    = 'Port0/Line'; % Set a digital channel to be recorded, blank means no digital channels
 nicfg.AImode           = 'SingleEnded'; % 'Differential', 'SingleEnded', 'SingleEndedNonReferenced'. Nidaq only
@@ -69,8 +69,8 @@ nicfg.optophotometry.overlap = false; % If overlap is true, opto and photometry 
 % that matters.
 % 2. The final pulse frequency is determined by these values as well as freq
 % mod above
-nicfg.optophotometry.pulsecycle1 = 60; % Pulse cycle 1 in X * 100 us. E.g., 65 means 6.5 ms. Default 65 (6.5 ms)
-nicfg.optophotometry.pulsecycle2 = 140; % Pulse cycle 1 in X * 100 us. E.g., 135 means 13.5 ms. Default 135 (13.5 ms)
+nicfg.optophotometry.pulsecycle1 = 65; % Pulse cycle 1 in X * 100 us. E.g., 65 means 6.5 ms. Default 65 (6.5 ms)
+nicfg.optophotometry.pulsecycle2 = 135; % Pulse cycle 1 in X * 100 us. E.g., 135 means 13.5 ms. Default 135 (13.5 ms)
 
 % Same-color optophotometry
 % Variable pulse width. 20 ms means always on
