@@ -28,4 +28,4 @@ If you bridge VDC, the system power will be coming from the DC jack. No power is
 ### VDC + V1 mode (second most common)
 If you bridge both VDC and V1, you are using DC jack voltage to power the chip as well as any downstream devices. Please make sure V0 is not bridged in this configuration.
 
-![Schematic](./Schematic_I2C%20repeater_2023-01-03.png)
+![Schematic](./Schematic_I2C-repeater_2024-11-25.png)
