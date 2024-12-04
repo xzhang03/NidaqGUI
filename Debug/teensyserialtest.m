@@ -1,35 +1,33 @@
 %% Open
 clear
 ns_config_debug;
-nicfg.arduino_serial = serial(sprintf('COM%i', nicfg.ArduinoCOM), 'BaudRate', nicfg.baumrate);
-fopen(nicfg.arduino_serial);
+nicfg.arduino_serial = serialport(sprintf('COM%i', nicfg.ArduinoCOM), nicfg.baumrate);
 disp('Opened.')
 
 %% Parse
-nidaq_config_sz_debug;
+ns_config_debug;
 omniboxparse(nicfg)
 
-
 %% Get summary (run serial debug after)
-fwrite(nicfg.arduino_serial, uint8([9 0]));
+write(nicfg.arduino_serial, [9 0], 'uint8');
 
 %% Serial debug
 vec = [];
 ind = 0;
-while nicfg.arduino_serial.BytesAvailable > 0
+while nicfg.arduino_serial.NumBytesAvailable > 0
     ind = ind + 1;
-    vec(ind) = fread(nicfg.arduino_serial, 1, 'uint8');
+    vec(ind) = read(nicfg.arduino_serial, 1, 'uint8');
 end
 char(vec)
 
 %% Bytes
-nicfg.arduino_serial.BytesAvailable
+nicfg.arduino_serial.NumBytesAvailable
 
 %% Type cast
 typecast(int32(val),'uint8')
 
 %% run
-fwrite(nicfg.arduino_serial, uint8([1 0]));
+write(nicfg.arduino_serial, [1 0], 'uint8');
 disp('Running')
 
 %% read
@@ -54,12 +52,14 @@ typecast(int32(val), 'uint8')
 
 
 %% stop
-fwrite(nicfg.arduino_serial, uint8([0 0]));
-val = fread(nicfg.arduino_serial, 1, 'int32');
-disp(val);
+write(nicfg.arduino_serial, [0 0], 'uint8');
+% val = read(nicfg.arduino_serial, 1, 'int32');
+val = read(nicfg.arduino_serial, nicfg.arduino_serial.NumBytesAvailable, 'uint8');
+% disp(val);
+char(val)
 
 %% Close
-fclose(nicfg.arduino_serial);
+delete(nicfg.arduino_serial);
 disp('Closed.')
 
 %% Reset

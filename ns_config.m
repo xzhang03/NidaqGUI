@@ -91,6 +91,13 @@ nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external input. This will enable manualoverride above.
 
+% Scheduler indicator
+nicfg.scheduler.indicator.enable = true;
+nicfg.scheduler.indicator.preopto = [0 0 3 1]; % [R G B doubler], 0-3 for R, B, G
+nicfg.scheduler.indicator.inopto = [0 3 0 1];
+nicfg.scheduler.indicator.postopto = [3 0 0 1];
+nicfg.scheduler.indicator.switchoffmode = 0; % 0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto
+
 % Hardware Opto RNG (determines a train goes through or not)
 % (Scheduler only and does not apply to the listening mode)
 % May implement RNG values imported from Matlab in the future

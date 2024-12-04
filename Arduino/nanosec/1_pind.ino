@@ -37,8 +37,14 @@ void pin_ini(void){
   digitalWrite(inoptopin, LOW);
   digitalWrite(postoptopin, LOW);
 
-  if (debugpins && usescheduler){
-    digitalWrite(schedulerpin, HIGH);
-    digitalWrite(preoptopin, HIGH);
+  if (usescheduler){
+    #if debugpins
+      digitalWrite(schedulerpin, HIGH);
+      digitalWrite(preoptopin, HIGH);
+    #endif
+
+    if (useschedulerindicator){
+      shedulerindicator(preoptocolor);
+    }
   }
 }

@@ -17,11 +17,15 @@ void sche_preopto(void){
     inpreopto = false;
     inopto = true;
 
-    if (debugpins){
+    #if (debugpins)
       digitalWrite(preoptopin, LOW);
       digitalWrite(inoptopin, HIGH);
       digitalWrite(postoptopin, LOW);
-    }
+    #endif
+
+    if (useschedulerindicator){
+      shedulerindicator(inoptocolor);
+    } 
     
     if ((debugmode || serialdebug) && showscheduler){
       Serial.println("Stim is enabled. Entering opto phase.");
@@ -52,13 +56,67 @@ void schedulerdisable(void){
   inopto = false;
   inpostopto = true;
 
-  if (debugpins){
+  #if (debugpins)
     digitalWrite(preoptopin, LOW);
     digitalWrite(inoptopin, LOW);
     digitalWrite(postoptopin, HIGH);
+  #endif
+
+  if (useschedulerindicator){
+    shedulerindicator(postoptocolor);
   }
   
   if ((debugmode || serialdebug) && showscheduler){
     Serial.println("Stim is disabled. Entering post-opto phase.");
   }
+}
+
+void shedulerindicator(byte color){
+  const uint16_t cscale[8] = {0, 3, 11, 35, 114, 374, 1223, 3998}; // Color scale (log scale, is 4096)
+
+  // Turn off
+  if (color == 0){
+    // Color input = 0 means turn off everything
+    pwm.setPin(0, 0, false);
+    pwm.setPin(1, 0, false);
+    pwm.setPin(2, 0, false);
+    return;
+  }
+
+  // Turn on
+  // Get color
+  byte Rv = ((color >> 4) & 0b11);
+  if (Rv > 0){
+    Rv = Rv+ (bitRead(color, 6) << 2); // Red value
+  }
+  
+  byte Gv = ((color >> 2) & 0b11);
+  if (Gv > 0){
+    Gv = Gv + (bitRead(color, 6) << 2); // Green value
+  }
+  
+  byte Bv = ((color) & 0b11);
+  if (Bv > 0){
+    Bv = Bv + (bitRead(color, 6) << 2); // Green value;
+  }
+
+  #if serialdebug
+    Serial.print("Rv: ");
+    Serial.print(Rv);
+    Serial.print(" ");
+    Serial.println(cscale[Rv]);
+    Serial.print("Gv: ");
+    Serial.print(Gv);
+    Serial.print(" ");
+    Serial.println(cscale[Gv]);
+    Serial.print("Bv: ");
+    Serial.print(Bv);
+    Serial.print(" ");
+    Serial.println(cscale[Bv]);
+  #endif
+
+  // Write color
+  pwm.setPin(0, cscale[Rv], false);
+  pwm.setPin(1, cscale[Gv], false);
+  pwm.setPin(2, cscale[Bv], false);
 }

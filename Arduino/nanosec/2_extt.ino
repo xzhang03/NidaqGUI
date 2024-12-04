@@ -26,10 +26,14 @@ void externalttltrig(void){
       foodttlactionwait = true;
     }
 
-    if (debugpins){
+    #if (debugpins)
       digitalWrite(preoptopin, LOW);
       digitalWrite(inoptopin, HIGH);
       digitalWrite(postoptopin, LOW);
+    #endif
+
+    if (useschedulerindicator){
+      shedulerindicator(inoptocolor);
     }
     
     if ((debugmode || serialdebug) && showscheduler){

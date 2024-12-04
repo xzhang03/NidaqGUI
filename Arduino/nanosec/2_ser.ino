@@ -119,6 +119,28 @@ void parseserial(){
       if (usescheduler){
         stimenabled = false;
         schedulerrunning = false;
+
+        if (useschedulerindicator){
+          // What to do with indicator when the run is stopped
+          // 0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto
+          switch (switchoff_indicator){
+            case 0:
+              shedulerindicator(0);
+              break;
+            case 1:
+              break;
+            case 2:
+              shedulerindicator(preoptocolor);
+              break;
+            case 3:
+              shedulerindicator(inoptocolor);
+              break;
+            case 4:
+              shedulerindicator(postoptocolor);
+              break;
+          }
+        }
+        
       }
       if (usecue){
         noTone(audiopin);
@@ -201,11 +223,15 @@ void parseserial(){
           rng(rngvec_ITI, rng_cycle_max , rng_cycle_min, maxrngind);
         }
         
-        if (debugpins){
+        #if (debugpins)
           digitalWrite(schedulerpin, HIGH);
           digitalWrite(preoptopin, HIGH);
           digitalWrite(inoptopin, LOW);
           digitalWrite(postoptopin, LOW);
+        #endif
+
+        if (useschedulerindicator){
+          shedulerindicator(preoptocolor);
         }
       }
       else{
@@ -224,12 +250,16 @@ void parseserial(){
         }
         
         
-        if (debugpins){
+        #if (debugpins)
           digitalWrite(schedulerpin, LOW);
           digitalWrite(preoptopin, LOW);
           digitalWrite(inoptopin, LOW);
           digitalWrite(postoptopin, LOW);
-        }      
+        #endif    
+
+        if (useschedulerindicator){
+          shedulerindicator(0);
+        }
       }
       break;
 
@@ -378,20 +408,45 @@ void parseserial(){
       if (usescheduler){
         stimenabled = false;
 
-        if (debugpins){
+        #if (debugpins)
           digitalWrite(schedulerpin, HIGH);
           digitalWrite(preoptopin, HIGH);
           digitalWrite(inoptopin, LOW);
           digitalWrite(postoptopin, LOW);
+        #endif
+
+        if (useschedulerindicator){
+          // What to do with indicator when the run is stopped
+          // 0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto
+          switch (switchoff_indicator){
+            case 0:
+              shedulerindicator(0);
+              break;
+            case 1:
+              break;
+            case 2:
+              shedulerindicator(preoptocolor);
+              break;
+            case 3:
+              shedulerindicator(inoptocolor);
+              break;
+            case 4:
+              shedulerindicator(postoptocolor);
+              break;
+          }
         }
       }
       else{
         stimenabled = true;
-        if (debugpins){
+        #if (debugpins)
           digitalWrite(schedulerpin, LOW);
           digitalWrite(preoptopin, LOW);
           digitalWrite(inoptopin, LOW);
           digitalWrite(postoptopin, LOW);
+        #endif
+
+        if (useschedulerindicator){
+          shedulerindicator(0);
         }
       }
       schedulerrunning = false;
@@ -955,9 +1010,34 @@ void parseserial(){
       // 68: Test MCP23008 [t]
       testMCP23008();
       break;
+
+    case 69:
+      // 69: Turn on scheduler indicator (PCA9685) (n = 1 yes, 0 no)[u]
+      useschedulerindicator = (n == 1);
+      break;
+
+    case 70:
+      // 70: Preopto PCA9685 color [0 Shared_bit R R G G B B] [v]
+      preoptocolor = n;
+      break;
+
+    case 71:
+      // 71: Inopto PCA9685 color [0 Shared_bit R R G G B B] [w]
+      inoptocolor = n;
+      break;
+
+    case 72:
+      // 72: Postopto PCA9685 color [0 Shared_bit R R G G B B] [x]
+      postoptocolor = n;
+      break;
+
+    case 73:
+      // 73: Stop-recording PCA9685 color (0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto)[y]
+      switchoff_indicator = n;
+      break;
   }
 
-  if (debugpins){
+  #if (debugpins)
     if (!serialpinon){
       serialpinon = true;
       digitalWrite(serialpin, HIGH);
@@ -966,7 +1046,7 @@ void parseserial(){
       serialpinon = false;
       digitalWrite(serialpin, LOW);
     }
-  }
+  #endif
 }
 
 // Show all parameters
@@ -1064,6 +1144,17 @@ void showpara(void){
   Serial.print(",");
   Serial.print(rng_cycle_max);
   Serial.println(")");
+
+  // Scheduler
+  Serial.println("============== Schedule Indicator ==============");
+  Serial.print("Use schedule indicator: ");
+  Serial.println(useschedulerindicator);
+  Serial.print("Pre-opto color: ");
+  Serial.println(preoptocolor);
+  Serial.print("In-opto color: ");
+  Serial.println(inoptocolor);
+  Serial.print("Post-opto color: ");
+  Serial.println(postoptocolor);
   
   // Cam
   Serial.println("============== Camera ==============");

@@ -158,9 +158,6 @@ if nicfg.scheduler.enable
     % Mode
     disp('Scheduler -> On');
     
-    % Scheduler
-    arduinoWrite(nicfg.arduino_serial, [15 1]);
-    
     % Delay (passing time in seconds)
     b = floor(nicfg.scheduler.delay / 256);
     a = nicfg.scheduler.delay - b * 256;
@@ -214,6 +211,40 @@ if nicfg.scheduler.enable
     
     % Randomize ITI max seconds
     arduinoWrite(nicfg.arduino_serial, [42 nicfg.scheduler.randomITI_max]);
+    
+    % Scheduler indicator
+    if isfield(nicfg.scheduler, 'indicator')
+        if nicfg.scheduler.indicator.enable
+            % Enable
+            arduinoWrite(nicfg.arduino_serial, [69 1]);
+    
+            % Colors
+            preopto_color = uint8(nicfg.scheduler.indicator.preopto);
+            inopto_color = uint8(nicfg.scheduler.indicator.inopto);
+            postopto_color = uint8(nicfg.scheduler.indicator.postopto);
+    
+            preopto_color_byte = ...
+                bitshift(preopto_color(1),4) + bitshift(preopto_color(2),2) + preopto_color(3) + bitshift(preopto_color(4),6);
+            inopto_color_byte = ...
+                bitshift(inopto_color(1),4) + bitshift(inopto_color(2),2) + inopto_color(3) + bitshift(inopto_color(4),6);
+            postopto_color_byte = ...
+                bitshift(postopto_color(1),4) + bitshift(postopto_color(2),2) + postopto_color(3) + bitshift(postopto_color(4),6);
+            
+            arduinoWrite(nicfg.arduino_serial, [70 preopto_color_byte]);
+            arduinoWrite(nicfg.arduino_serial, [71 inopto_color_byte]);
+            arduinoWrite(nicfg.arduino_serial, [72 postopto_color_byte]);
+            arduinoWrite(nicfg.arduino_serial, [73 nicfg.scheduler.indicator.switchoffmode]);
+        else
+            % Disable
+            arduinoWrite(nicfg.arduino_serial, [69 0]);
+        end
+    else
+        % Disable
+        arduinoWrite(nicfg.arduino_serial, [69 0]);
+    end
+
+    % Scheduler
+    arduinoWrite(nicfg.arduino_serial, [15 1]);
 else
     % No Scheduler
     arduinoWrite(nicfg.arduino_serial, [15 0]);

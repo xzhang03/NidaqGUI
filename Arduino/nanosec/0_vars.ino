@@ -69,6 +69,15 @@ byte itrain = 0; // Current number of trains
 bool manualon = false;
 bool listenpol = true; // Polarity for listen mode false = active low, true = active high. Either way, it has to be 3.3V logic
 
+// ============ Scheduler indicator ============
+// This uses the same PCA9685 module as the PWM trial cue at the moment. Do not use the two at the same time
+// May split out different adddresses in the future (in the 2_i2c tab)
+bool useschedulerindicator = false;
+byte preoptocolor =  0B01000011; // [0 Shared_bit R R G G B B], shared bit is applied to all of R, G, B of this byte
+byte inoptocolor =   0B01001100;
+byte postoptocolor = 0B01110000;
+byte switchoff_indicator = 0; // 0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto
+
 // ============ Hardware RNG ============
 // RNG is only used in scheduler mode (and not in listening mode)
 // RNG is used to control whether a train of stimulation (optophotometry or scoptophotometry) passes

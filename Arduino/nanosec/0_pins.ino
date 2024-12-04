@@ -37,10 +37,10 @@ const byte serialpin = 24; // Parity signal for serial pin
   const byte inoptopin = 8; // preopto
   const byte postoptopin = 9; // preopto
 #else
-  const byte schedulerpin = 7; // On when scheduler is used
-  const byte preoptopin = 8; // preopto
-  const byte inoptopin = 11; // preopto
-  const byte postoptopin = 12; // preopto
+  const byte schedulerpin = 5; // On when scheduler is used
+  const byte preoptopin = 7; // preopto
+  const byte inoptopin = 8; // preopto
+  const byte postoptopin = 9; // preopto
 #endif
 bool serialpinon = false;
 

@@ -7,6 +7,8 @@
 // Adafruit PWM Servo Driver Library (Adafruit, v2.4.1) and parent libraries
 // MCP23008 (Rob Tillaart, v0.1.4), must be before v2.0
 
+// To lower cpu temperature, upload with 450 Mhz CPU speed selected
+
 /* 1. Two color photometry
  * 2. Optophotometry (switch on)
  * 3. Same-color optophotometry (analogy input control intensity)
@@ -46,7 +48,7 @@
 //
 
 // =============== Version ===============
-#define nsver "v3.51"
+#define nsver "v3.52"
 
 // =============== Hardware ===============
 // Now running teensy 4.0 at 450 Mhz (2.2 ns step)
