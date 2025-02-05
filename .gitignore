@@ -29,3 +29,8 @@ Debugconfig
 # =========================
 # Operating System Files
 # =========================
+
+ns_config*.m
+!ns_config.m
+!ns_config_debug.m
+!ns_config_default.m
