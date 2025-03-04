@@ -23,50 +23,50 @@ void parseserial(){
     // Initialize echo
     
     case 255:
+      // 255: status update (n = variable)
       echo[0] = 0;
       echo[1] = 0;
       echo[2] = 0;
       echo[3] = 0;
     
-     // 255: status update (n = variable)
-     switch (n){
-      case 0:
-        // Echo back scheduler info
-        echo[3] = 1;
-        
-        // Scheduler
-        if (!usescheduler){
-          echo[2] = 1; // Echo back [0 0 1 1] as no scheduler
-        }
-        else if (inpreopto){
-          echo[2] = 2; // Echo back [0 0 2 1] as preopto
-        }
-        else if (inpostopto){
-          echo[2] = 3;; // Echo back [0 0 3 1] as postopto
-        }
-        else {
-          echo[0] = itrain;
-          echo[1] = ntrain; // first byte shows n train, second byte shows itrain
-        }
-        break;
-
-      case 38:
-        // Echo back rng info
-        echo[3] = 2;
-        echo[2] = useRNG; // Echo back [X X 0 2] as no RNG
-        echo[1] = usescheduler; // Echo back [X 0 X 2] as no RNG
-        echo[0] = trainpass;
-        break;
-
-      case 39:
-        // Echo back pass chance
-        echo[3] = 3;
-        echo[0] = threshrng;
-        break;
-     }
-     Serial.write(echo, 4);
-     break;
-
+      switch (n){
+        case 0:
+          // Echo back scheduler info
+          echo[3] = 1;
+          
+          // Scheduler
+          if (!usescheduler){
+            echo[2] = 1; // Echo back [0 0 1 1] as no scheduler
+          }
+          else if (inpreopto){
+            echo[2] = 2; // Echo back [0 0 2 1] as preopto
+          }
+          else if (inpostopto){
+            echo[2] = 3;; // Echo back [0 0 3 1] as postopto
+          }
+          else {
+            echo[0] = itrain;
+            echo[1] = ntrain; // first byte shows n train, second byte shows itrain
+          }
+          break;
+  
+        case 38:
+          // Echo back rng info
+          echo[3] = 2;
+          echo[2] = useRNG; // Echo back [X X 0 2] as no RNG
+          echo[1] = usescheduler; // Echo back [X 0 X 2] as no RNG
+          echo[0] = trainpass;
+          break;
+  
+        case 39:
+          // Echo back pass chance
+          echo[3] = 3;
+          echo[0] = threshrng;
+          break;
+       }
+       Serial.write(echo, 4);
+       break;
+    
     case 254:
       Serial.print(nsver);
       #if TeensyTester // Tester - T, PCB - P, hand soldered - H
@@ -100,7 +100,12 @@ void parseserial(){
         SCB_AIRCR = 0x05FA0004;
       }
       break;
-      
+
+    case 252:
+      // 252: Universal identifier
+      Serial.print("I'm nanosec.");
+      break;
+    
     case 0:
       // End pulsing
       pulsing = false;
@@ -1034,6 +1039,11 @@ void parseserial(){
     case 73:
       // 73: Stop-recording PCA9685 color (0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto)[y]
       switchoff_indicator = n;
+      break;
+
+    case 74:
+      // 74: Test food TTLs (150-ms on/150-ms off, n = cycles) [z]
+      testfoodttls(n);
       break;
   }
 

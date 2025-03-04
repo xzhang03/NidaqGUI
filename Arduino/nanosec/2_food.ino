@@ -460,3 +460,15 @@ bool checklicks(uint16_t trialio){
   }
   return lickout;
 }
+
+// Test food
+// This code is blocking, unfortunately.
+void testfoodttls(uint8_t testclicks){
+  uint16_t itestfoodttls;
+  for (itestfoodttls = 0; itestfoodttls < testclicks; itestfoodttls++){
+    digitalWrite(foodTTLpin, HIGH);
+    delay(150);
+    digitalWrite(foodTTLpin, LOW);
+    delay(150);
+  } 
+}

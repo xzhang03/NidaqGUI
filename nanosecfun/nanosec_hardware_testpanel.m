@@ -50,34 +50,37 @@ while true
         case 2
             % I2c scan
             disp('I2c scan:');
-            i2c_scan()
+            i2c_scan();
         case 3
             % PWM RGB module
-            testPCA9685()
+            testPCA9685();
         case 4
             % DIO expander module
-            testMCP23008()
+            testMCP23008();
         case 5
             % Dump Nanosec state
-            nanosec_state()
+            nanosec_state();
         case 6
             % Dump opto RNG
             disp('Opto RNG of last experiment:');
-            dump_rng(0)
+            dump_rng(0);
         case 7
             % Dump ITI RNG
             disp('ITI RNG of last experiment:');
-            dump_rng(1)
+            dump_rng(1);
         case 8
             % Dump trial type RNG
             disp('Trial type RNG of last experiment:');
-            dump_rng(2)
+            dump_rng(2);
         case 9
             % Dump all serial buffer
-            dump_buffer()
+            dump_buffer();
         case 10
             % Encoder test
-            enctest_30()
+            enctest_30();
+        case 11
+            % Food TTL test
+            foodttltest();
     end
 end
 
@@ -86,7 +89,8 @@ end
     function indx = funlist(ini)
         fn = {'Firmware Version', 'I2c scan', 'Test PWM RGB', 'Test DIO expander',...
             'Dump Nanosec state', 'Dump opto RNG',...
-            'Dump ITI RNG', 'Dump Trial type RNG', 'Dump all serial', '30s_encoder_test'};
+            'Dump ITI RNG', 'Dump Trial type RNG', 'Dump all serial', '30s_encoder_test',...
+            'Food TTL test'};
         [indx, ~] = listdlg('PromptString', sprintf('Select test %s (Nanosec)', com),...
             'SelectionMode','single', 'InitialValue', ini, 'ListString',fn);
     end
@@ -214,6 +218,19 @@ end
             end
         end
         
+        arduinoClose(serialin);
+    end
+
+    % Food TTL test
+    function foodttltest()
+        nclicks = num2str(10);
+        clicksui = inputdlg('How many pulses (150 ms on/150 ms off)?', 'Pulses', [1 40], {nclicks});
+        nclicks = str2double(clicksui{1});
+        fprintf('Sending %i clicks\n', nclicks);
+        serialin = serialinitial(com, baudrate);
+        pause(0.1);
+        arduinoWrite(serialin, [74 nclicks]);
+        pause(0.1);
         arduinoClose(serialin);
     end
 end

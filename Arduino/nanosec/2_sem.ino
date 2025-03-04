@@ -5,6 +5,7 @@
 // 0: stop pulse
 // 5: Quad encoder position
 // 9: Show all parameters
+// 252: Universal identifier
 // 253: reboot (n = 104)
 // 254: version
 // 255: status update (n = variable)
@@ -67,6 +68,7 @@
 // 48: Opto then Food (n = 1 yes, 0 no) [`]
 // 49: Lead time before opto (n s) [a]
 // 51: Adding lead time before opto (+ n * 256 s) [c]
+// 74: Test food TTLs (150-ms on/150-ms off, n = cycles) [z]
 
 // ====== Food TTL Conditional ======
 // 22: Conditional or not (n = 1 yes, 0 no) [F]
@@ -100,7 +102,7 @@
 
 
 
-// 74: [z]
+
 // 75: [{]
 // 76: [|]
 // 77: [}]
