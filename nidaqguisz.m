@@ -387,11 +387,22 @@ if nicfg.active
         end
 
         % Make server file address
-        nidaqpath_server = fullfile(serveradd, nicfg.MouseName, ...
-                sprintf('%s_%s', datestamp(),nicfg.MouseName), [nidaqfn, '.mat']);
-        if nicfg.RecordRunning    
-            arduinopath_server = fullfile(serveradd, nicfg.MouseName, ...
-                    sprintf('%s_%s', datestamp(),nicfg.MouseName), [arduinofn, '.mat']);
+        if nicfg.mousedate
+            % Mouse_Date
+            nidaqpath_server = fullfile(serveradd, nicfg.MouseName, ...
+                    sprintf('%s_%s', nicfg.MouseName, datestamp()), [nidaqfn, '.mat']);
+            if nicfg.RecordRunning    
+                arduinopath_server = fullfile(serveradd, nicfg.MouseName, ...
+                        sprintf('%s_%s', nicfg.MouseName, datestamp()), [arduinofn, '.mat']);
+            end
+        else
+            % Date_Mouse
+            nidaqpath_server = fullfile(serveradd, nicfg.MouseName, ...
+                    sprintf('%s_%s', datestamp(), nicfg.MouseName), [nidaqfn, '.mat']);
+            if nicfg.RecordRunning    
+                arduinopath_server = fullfile(serveradd, nicfg.MouseName, ...
+                        sprintf('%s_%s', datestamp(), nicfg.MouseName), [arduinofn, '.mat']);
+            end
         end
 
         % Make mouse folder if needed
@@ -400,10 +411,20 @@ if nicfg.active
         end
 
         % Make day folder if needed
-        if exist(fullfile(serveradd, nicfg.MouseName, ...
-                sprintf('%s_%s', datestamp(),nicfg.MouseName)), 'dir') ~= 7
-            mkdir(fullfile(serveradd, nicfg.MouseName),...
-                sprintf('%s_%s', datestamp(),nicfg.MouseName));
+        if nicfg.mousedate
+            % Mouse_Date
+            if exist(fullfile(serveradd, nicfg.MouseName, ...
+                    sprintf('%s_%s', nicfg.MouseName, datestamp())), 'dir') ~= 7
+                mkdir(fullfile(serveradd, nicfg.MouseName),...
+                    sprintf('%s_%s', nicfg.MouseName, datestamp()));
+            end
+        else
+            % Date_Mouse
+            if exist(fullfile(serveradd, nicfg.MouseName, ...
+                    sprintf('%s_%s', datestamp(),nicfg.MouseName)), 'dir') ~= 7
+                mkdir(fullfile(serveradd, nicfg.MouseName),...
+                    sprintf('%s_%s', datestamp(),nicfg.MouseName));
+            end
         end
 
         % Copy nidaq file if does not exist

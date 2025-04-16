@@ -2,11 +2,11 @@ global nicfg
 
 % Set the up the nidaq recording
 nicfg.BasePath         = 'C:\Users\andermannlab\Documents\MATLAB\temp\';       % Set the path in which data will be saved
-nicfg.ArduinoCOM       = -1;%5;             % Set the COM port for the Arduino, < 0 means off
+nicfg.ArduinoCOM       = 5;             % Set the COM port for the Arduino, < 0 means off
 nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev1';        % Device name
-nicfg.NidaqChannels    = 8;%4;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
+nicfg.NidaqChannels    = 8;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
 nicfg.NidaqDigitalChannels = 1;         % Set the number of digital channels on Port0 to record, starting at Line0
 nicfg.NidaqFrequency   = 2500;          % Set the recording frequency for the nidaq
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
@@ -30,6 +30,7 @@ nicfg.DigitalChannelNames = { ...
                          };
 
 nicfg.serverupload = true;
+nicfg.mousedate = true;                 % Set the order of mouse vs date
 nicfg.serveradd = {...
     'SZ', '\\anastasia\data\photometry';...
     'AL', '\\sweetness\Fiber Photometry';...
