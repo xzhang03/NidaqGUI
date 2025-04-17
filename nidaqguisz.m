@@ -234,6 +234,10 @@ if nicfg.active
     nicfg.MouseName = get(handles.MouseName, 'String'); % returns contents of Enter_ROI as a double
     nicfg.Run = str2double(get(handles.Runs, 'String')); % returns contents of Enter_ROI as a double
     
+    % Get time
+    starttime.local = datetime();
+    Nist_Time = tcpclient('time.nist.gov',13);
+    
     % Reset arduino
     if (ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1) && ~isfield(nicfg, 'arduino_serial')
         disp('Starting Arduino...');
@@ -272,9 +276,9 @@ if nicfg.active
         end
     end
     
-    % Get time
-    starttime.local = datetime();
-    Nist_Time = tcpclient('time.nist.gov',13);
+    % Grab time (already set at the start of the experiment)
+    starttime.nist = read(Nist_Time);
+    starttime.nist = char(starttime.nist);
     
     tic;
     disp('Iterating');
@@ -324,10 +328,6 @@ if nicfg.active
     % Debug about aliasing
 %     disp(nicfg.arduino_serial.BytesAvailable);
     
-    % Grab time (already set at the start of the experiment)
-    starttime.nist = read(Nist_Time);
-    starttime.nist = char(starttime.nist);
-
     % Stop camera pulsing
     if ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1
         arduinoWrite(nicfg.arduino_serial, [0 0]);
