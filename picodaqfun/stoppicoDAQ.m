@@ -1,10 +1,13 @@
-function stoppicoDAQ(openDAQ, channelnames, omniboxsetting, configfp) %#ok<*INUSD>
+function stoppicoDAQ(openDAQ, channelnames, omniboxsetting, configfp, starttime) %#ok<*INUSD>
 % Stop a picoDAQ session
 
-if nargin < 4
-    configfp = ''; %#ok<*NASGU>
-    if nargin < 3
-        omniboxsetting = [];
+if nargin < 5
+    starttime = '';
+    if nargin < 4
+        configfp = ''; %#ok<*NASGU>
+        if nargin < 3
+            omniboxsetting = [];
+        end
     end
 end
 
@@ -46,7 +49,7 @@ end
 %% Save
 Fs = openDAQ.frequency;
 frequency = openDAQ.frequency;
-save(openDAQ.path, 'data', 'Fs', 'frequency', 'timestamps', 'channelnames', 'omniboxsetting', 'configfp', '-v7.3');
+save(openDAQ.path, 'data', 'Fs', 'frequency', 'timestamps', 'channelnames', 'omniboxsetting', 'configfp', 'starttime', '-v7.3');
 
 delete(openDAQ.logpath);
 end

@@ -272,6 +272,10 @@ if nicfg.active
         end
     end
     
+    % Get time
+    starttime.local = datetime();
+    Nist_Time = tcpclient('time.nist.gov',13);
+    
     tic;
     disp('Iterating');
     tstart = clock;
@@ -320,6 +324,10 @@ if nicfg.active
     % Debug about aliasing
 %     disp(nicfg.arduino_serial.BytesAvailable);
     
+    % Grab time (already set at the start of the experiment)
+    starttime.nist = read(Nist_Time);
+    starttime.nist = char(starttime.nist);
+
     % Stop camera pulsing
     if ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1
         arduinoWrite(nicfg.arduino_serial, [0 0]);
@@ -352,7 +360,7 @@ if nicfg.active
             position = nicfg.arduino_data;
             speed = runningSpeed(position, nicfg.RunningFrequency);
             configfp = handles.loadconfig.UserData.fp;
-            save(arduinopath, 'position', 'speed', 'pcount', 'pind', 'configfp');
+            save(arduinopath, 'position', 'speed', 'pcount', 'pind', 'configfp', 'starttime');
         end
     end
     
@@ -363,12 +371,12 @@ if nicfg.active
             omnisetting = nicfg;
             omnisetting = rmfield(omnisetting, 'nidaq_session');
             configfp = handles.loadconfig.UserData.fp;
-            stoppicoDAQ(nicfg.nidaq_session, nicfg.ChannelNames, omnisetting, configfp)
+            stoppicoDAQ(nicfg.nidaq_session, nicfg.ChannelNames, omnisetting, configfp, starttime)
         else
             omnisetting = nicfg;
             omnisetting = rmfield(omnisetting, 'nidaq_session');
             configfp = handles.loadconfig.UserData.fp;
-            stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames, omnisetting, configfp);
+            stopNidaq(nicfg.nidaq_session, nicfg.ChannelNames, omnisetting, configfp, starttime);
         end
     end
     

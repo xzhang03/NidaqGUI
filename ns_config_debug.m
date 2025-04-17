@@ -2,7 +2,7 @@ global nicfg
 
 % Set the up the nidaq recording
 nicfg.BasePath         = 'C:\Users\steph\OneDrive\Documents\MATLAB\temp';       % Set the path in which data will be saved
-nicfg.ArduinoCOM       = 57;%5;             % Set the COM port for the Arduino, < 0 means off
+nicfg.ArduinoCOM       = 3;%5;             % Set the COM port for the Arduino, < 0 means off
 nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev2';        % Device name
@@ -85,20 +85,20 @@ nicfg.optophotometry.pulsecycle2 = 135; % Pulse cycle 1 in X * 100 us. E.g., 135
 % Same-color optophotometry
 % Variable pulse width. 20 ms means always on
 nicfg.scoptophotometry.enable = true; % Default false
-nicfg.scoptophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
-nicfg.scoptophotometry.trainlength = 5; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
-nicfg.scoptophotometry.cycle = 5; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
-nicfg.scoptophotometry.pulsewidth = 20; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10.
+nicfg.scoptophotometry.freqmod = 1; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
+nicfg.scoptophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
+nicfg.scoptophotometry.cycle = 60; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
+nicfg.scoptophotometry.pulsewidth = 19; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10.
 
 % Scheduler
 nicfg.scheduler.enable = true; % Default false
-nicfg.scheduler.delay = 10; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
+nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external input. This will enable manualoverride above.
 
 % Scheduler indicator
-nicfg.scheduler.indicator.enable = true;
+nicfg.scheduler.indicator.enable = false;
 nicfg.scheduler.indicator.preopto = [0 0 3 1]; % [R G B doubler], 0-3 for R, B, G
 nicfg.scheduler.indicator.inopto = [0 3 0 1];
 nicfg.scheduler.indicator.postopto = [3 0 0 1];
