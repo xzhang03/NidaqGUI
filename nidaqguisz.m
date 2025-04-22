@@ -22,7 +22,7 @@ function varargout = nidaqguisz(varargin)
 
 % Edit the above text to modify the response to help nidaqguisz
 
-% Last Modified by GUIDE v2.5 29-Mar-2024 14:06:04
+% Last Modified by GUIDE v2.5 22-Apr-2025 09:08:39
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -559,4 +559,9 @@ function reset_serial_Callback(hObject, eventdata, handles)
 clearallserial();
 
 
-
+% --------------------------------------------------------------------
+function ping_serial_Callback(hObject, eventdata, handles)
+% hObject    handle to ping_serial (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+pingCOMs();

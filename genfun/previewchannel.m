@@ -41,7 +41,7 @@ end
 
 
 %% Initialize figure
-hfig = figure('Name', 'Preview');
+hfig = figure('Name', 'Preview', 'CloseRequestFcn',@myCloseReq);
 subplot(1,6,2:6);
 % plot(rand(100,1))
 
@@ -92,6 +92,7 @@ startbutton = uicontrol(hpan, 'Style', 'pushbutton', 'Position', toploc - [0 275
 uicontrol(hpan, 'Style', 'pushbutton', 'Position', toploc - [0 300 0 0], 'String',...
     'Stop', 'FontSize', 10, 'callback', @stoppreview);
 
+
 %% Start
     function startpreview(src,~)
         % Specifics
@@ -140,13 +141,24 @@ uicontrol(hpan, 'Style', 'pushbutton', 'Position', toploc - [0 300 0 0], 'String
     function stoppreview(~,~)
         if nicfg.usepicoDAQ
             write(startbutton.UserData, [0 0], 'uint8');
-            flush(startbutton.UserData,"input");
+            flush(startbutton.UserData, "input");
             configureCallback(startbutton.UserData, 'off');
             delete(startbutton.UserData);
         else
             startbutton.UserData.stop;
             delete(startbutton.UserData);
         end
+    end
+
+    function myCloseReq(src,event)
+        if isvalid(startbutton.UserData)
+            try
+                stoppreview();
+            catch
+                disp('Unable to stop preview. Please check COM.')
+            end
+        end
+        delete(src);
     end
 
 %% Plot

@@ -17,6 +17,14 @@ usepicodaq = questdlg('Use PicoDAQ?', ...
 	'PicoDAQ', ...
 	'Yes','No', 'Yes');
 
+%% Ping serials
+pingserials = questdlg('Ping serial ports?', ...
+	'Ping Serial', ...
+	'Yes','No', 'Yes');
+if strcmpi(pingserials, 'Yes')
+    pingCOMs();
+end
+
 %% Path
 % Find nanosec
 nanosecpath = dir('nanosec.m');
@@ -61,7 +69,6 @@ for i = 1 : length(folderlist)
     else
         fprintf('%s\n', folderlist{i});
     end
-    
 end
 
 %% Save path

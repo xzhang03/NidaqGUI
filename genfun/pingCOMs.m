@@ -6,6 +6,7 @@ COMs = arduinoList;
 ncoms = length(COMs);
 baudrate = 19200;
 
+fprintf('Pinging %i port(s)...\n', ncoms);
 for i = 1 : ncoms
     com = COMs{i};
     serialin = serialinitial(com, baudrate);
@@ -21,5 +22,5 @@ for i = 1 : ncoms
     
     arduinoClose(serialin);
 end
-
+fprintf('Done.\n');
 end
