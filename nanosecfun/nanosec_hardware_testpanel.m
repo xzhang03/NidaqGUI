@@ -81,6 +81,9 @@ while true
         case 11
             % Food TTL test
             foodttltest();
+        case 12
+            % Cam TTL test
+            camttltest();
     end
 end
 
@@ -90,7 +93,7 @@ end
         fn = {'Firmware Version', 'I2c scan', 'Test PWM RGB', 'Test DIO expander',...
             'Dump Nanosec state', 'Dump opto RNG',...
             'Dump ITI RNG', 'Dump Trial type RNG', 'Dump all serial', '30s_encoder_test',...
-            'Food TTL test'};
+            'Food TTL test', 'Cam TTL test'};
         [indx, ~] = listdlg('PromptString', sprintf('Select test %s (Nanosec)', com),...
             'SelectionMode','single', 'InitialValue', ini, 'ListString',fn);
     end
@@ -230,6 +233,28 @@ end
         serialin = serialinitial(com, baudrate);
         pause(0.1);
         arduinoWrite(serialin, [74 nclicks]);
+        pause(0.1);
+        arduinoClose(serialin);
+    end
+
+    % Cam TTL test
+    function camttltest()
+        % Start
+        serialin = serialinitial(com, baudrate);
+        pause(0.1);
+        arduinoWrite(serialin, [75 0]);
+        pause(0.1);
+        arduinoClose(serialin);
+        
+        % Tell it to stop
+        answer = questdlg('Click STOP to stop cam pulses', ...
+	        'Stop Cam Pulsing', ...
+	        'Stop','Stop');
+
+        % Stop
+        serialin = serialinitial(com, baudrate);
+        pause(0.1);
+        arduinoWrite(serialin, [75 0]);
         pause(0.1);
         arduinoClose(serialin);
     end

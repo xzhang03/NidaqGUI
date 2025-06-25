@@ -9,6 +9,7 @@
 // 253: reboot (n = 104)
 // 254: version
 // 255: status update (n = variable)
+// 75: Turn on cam pulsing (send any serial to stop) [{]
 
 // ========== Opto & photom ==========
 // 3: TCP mode (n = 0 TCP, n = 1 optophotometry, n = 2 samecolor optophotometry)
@@ -103,7 +104,7 @@
 
 
 
-// 75: [{]
+
 // 76: [|]
 // 77: [}]
 // 78: [~]

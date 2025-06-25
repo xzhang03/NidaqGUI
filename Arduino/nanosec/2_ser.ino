@@ -1045,6 +1045,22 @@ void parseserial(){
       // 74: Test food TTLs (150-ms on/150-ms off, n = cycles) [z]
       testfoodttls(n);
       break;
+
+     case 75:
+      // 75: Turn on cam pulsing (send any serial to stop) [{]
+      pulsing_test = true;
+      while (pulsing_test){
+        tnow = micros();
+        camerapulse_test();
+        if (Serial.available() >= 2){
+          m = Serial.read();
+          n = Serial.read();
+          pulsing_test = false;
+        }
+        delayMicroseconds(100);
+      }
+      camerapulse_test();
+      break;
   }
 
   #if (debugpins)

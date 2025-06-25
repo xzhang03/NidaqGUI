@@ -51,3 +51,36 @@ void camerapulse(void){
     }
   }
 }
+
+// Debug cam pulse
+void camerapulse_test(void){
+  if (pulsing_test){
+    if ((tnow - pulsetime) >= cycletime){
+      if (!onoff){
+        pulsetime = micros();
+        
+        // Serial.println(pos);
+        digitalWrite(cam_pin, HIGH);
+        digitalWrite(led_pin, HIGH);
+        onoff = true;
+
+      }
+    }
+    else if ((tnow - pulsetime) >= ontime){
+      if (onoff){
+        digitalWrite(cam_pin, LOW);
+        digitalWrite(led_pin, LOW);
+        onoff = false;
+
+      }
+    }
+  }
+  else {
+    if (onoff){
+      digitalWrite(cam_pin, LOW);
+      digitalWrite(led_pin, LOW);
+      onoff = false;
+
+    }
+  }
+}

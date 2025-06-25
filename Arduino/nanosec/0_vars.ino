@@ -7,6 +7,7 @@ unsigned long int pulsetime = 0;
 
 // cam trig variables
 bool pulsing = false;
+bool pulsing_test = false; 
 byte freq = 30; // Pulse at 30 Hz (default)
 unsigned int ontime = 2000; // On for 2 ms
 unsigned long cycletime = 1000000 / freq;
