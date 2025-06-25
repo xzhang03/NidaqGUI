@@ -2,22 +2,19 @@ global nicfg
 
 % Set the up the nidaq recording
 nicfg.BasePath         = 'C:\Users\steph\OneDrive\Documents\MATLAB\temp';       % Set the path in which data will be saved
-nicfg.ArduinoCOM       = 3;%5;             % Set the COM port for the Arduino, < 0 means off
+nicfg.ArduinoCOM       = 8;%5;             % Set the COM port for the Arduino, < 0 means off
 nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev2';        % Device name
-nicfg.NidaqChannels    = 0;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
+nicfg.NidaqChannels    = 8;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
 nicfg.NidaqDigitalChannels = 0;         % Set the number of digital channels on Port0 to record, starting at Line0
-nicfg.NidaqFrequency   = 2500;          % Set the recording frequency for the nidaq
+nicfg.NidaqFrequency   = 1000;          % Set the recording frequency for the nidaq
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
 nicfg.usepicoDAQ       = true;          % Use picoDAQ
-nicfg.picoDAQparams     = {'daqcom', 'COM4', 'frequency', nicfg.NidaqFrequency}; % Parameters to be parsed
+nicfg.picoDAQparams     = {'daqcom', 'COM7', 'frequency', nicfg.NidaqFrequency, 'adcfreqmod', 3, 'databuffer', 4800}; % Parameters to be parsed
 nicfg.RunningFrequency = 30;         % Set the frequency at which running is recorded
 nicfg.DigitalString    = 'Port0/Line'; % Set a digital channel to be recorded, blank means no digital channels
 nicfg.AImode           = 'SingleEnded'; % 'Differential', 'SingleEnded', 'SingleEndedNonReferenced'. Nidaq only
-% nicfg.AImode           = {0, 'Differential'; 1, 'Differential'; 2, 'Differential'; 3, 'Differential';....
-%                           4, 'Differential'; 5, 'Differential'; 6, 'SingleEnded'; 7, 'SingleEnded';...
-%                           14, 'SingleEnded'; 15, 'SingleEnded'};
 nicfg.ChannelNames     = { ...
                             'PD1', 1, ...
                             'Ch1in', 2, ...
@@ -46,6 +43,7 @@ nicfg.serveradd = {...
 
 % =========================================================================
 nicfg.MouseName = 'DB00';
+nicfg.Rig = '';
 
 %% Version 3 Omnibox
 % optophotometry, same-color-optophotometry, encoder-setup, Scheduler, opto-delayed TTL

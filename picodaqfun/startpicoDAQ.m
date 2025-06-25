@@ -12,7 +12,7 @@ p  = inputParser;
 % DAQ
 addOptional(p, 'daqcom', 'COM1');
 addOptional(p, 'frequency', 2500); % DAQ sampling frequency, must be multiples of 100;
-addOptional(p, 'databuffer', 12000); % Save to harddrive every X bytes of data recorded (must be multiples of 6). Each time point is 6 uint32s.
+addOptional(p, 'databuffer', 12000); % Save to harddrive every X bytes of data recorded (must be multiples of 24). Each time point is 6 uint32s (24 bytes).
 addOptional(p, 'fda', 8); % Signal amplitude suppression by fully-diff amplifier, multiply this value at the end.
 addOptional(p, 'timeout', 2); % Timeout default 10 s
 

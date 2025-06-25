@@ -42,6 +42,7 @@ nicfg.serveradd = {...
 
 % =========================================================================
 nicfg.MouseName = 'SZ00';
+nicfg.Rig = '';
 
 %% Version 3 Omnibox
 % optophotometry, same-color-optophotometry, encoder-setup, Scheduler, opto-delayed TTL

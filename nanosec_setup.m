@@ -9,7 +9,7 @@ function nanosec_setup()
 
 
 %% Firm ware version
-fver = 3.51;
+fver = 3.53;
 fprintf('Expected firmware version v%0.1f\n', fver);
 
 %% Use Picodaq
@@ -21,9 +21,7 @@ usepicodaq = questdlg('Use PicoDAQ?', ...
 pingserials = questdlg('Ping serial ports?', ...
 	'Ping Serial', ...
 	'Yes','No', 'Yes');
-if strcmpi(pingserials, 'Yes')
-    pingCOMs();
-end
+pingcoms = strcmpi(pingserials, 'Yes');
 
 %% Path
 % Find nanosec
@@ -60,6 +58,7 @@ switch usepicodaq
     case 'No'
         folderlist = {'nanosecfun', 'nidaqfun', 'genfun'};
 end
+
 addpath(nanosecpath.folder);
 fprintf('Parent folder, ');
 for i = 1 : length(folderlist)
@@ -69,6 +68,10 @@ for i = 1 : length(folderlist)
     else
         fprintf('%s\n', folderlist{i});
     end
+end
+
+if pingcoms
+    pingCOMs();
 end
 
 %% Save path
