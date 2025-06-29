@@ -6,7 +6,7 @@ nicfg.ArduinoCOM       = 8;%5;             % Set the COM port for the Arduino, <
 nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev2';        % Device name
-nicfg.NidaqChannels    = 8;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
+nicfg.NidaqChannels    = 0;             % Set the number of NIDAQ channels to record (e.g. 6 means 0:5)
 nicfg.NidaqDigitalChannels = 0;         % Set the number of digital channels on Port0 to record, starting at Line0
 nicfg.NidaqFrequency   = 1000;          % Set the recording frequency for the nidaq
 nicfg.useMLlibrary     = false;          % Use monkeylogic library
@@ -54,7 +54,7 @@ nicfg.omnibox.enable = true;
 
 % Modes
 % Two-color photometry
-nicfg.tcp.enable = false; % Default true.
+nicfg.tcp.enable = true; % Default true.
 nicfg.tcp.behaviorcycle = 10; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 
 % Change pulse cycles (CAUTION)
@@ -82,16 +82,16 @@ nicfg.optophotometry.pulsecycle2 = 135; % Pulse cycle 1 in X * 100 us. E.g., 135
 
 % Same-color optophotometry
 % Variable pulse width. 20 ms means always on
-nicfg.scoptophotometry.enable = true; % Default false
+nicfg.scoptophotometry.enable = false; % Default false
 nicfg.scoptophotometry.freqmod = 1; % Frequency is actually 50/X. E.g., 5 means 10 Hz. Default 5 (10 Hz).
 nicfg.scoptophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
-nicfg.scoptophotometry.cycle = 60; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
+nicfg.scoptophotometry.cycle = 10; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 nicfg.scoptophotometry.pulsewidth = 19; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10.
 
 % Scheduler
 nicfg.scheduler.enable = true; % Default false
-nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
-nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
+nicfg.scheduler.delay = 10; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
+nicfg.scheduler.ntrains = 16; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external input. This will enable manualoverride above.
 
@@ -123,7 +123,7 @@ nicfg.scheduler.randomITI_max = 40; % Highest value of ITI (exclusive, in second
 % TTL pulses that happen X seconds after each opto train onset (for food
 % delivery or synchronizing).
 % Delivery (unconditional): Opto start => delivery delay => delivery
-nicfg.optodelayTTL.enable = false; % Default false
+nicfg.optodelayTTL.enable = true; % Default false
 nicfg.optodelayTTL.delay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s). Max 65535 (6553.5s).
 nicfg.optodelayTTL.pulsewidth = [15 30 60 100]; % Pulsewidth in X * 10 ms. E.g., 15 means 150 ms pulses. Default is 15 (150 ms).
 nicfg.optodelayTTL.cycle = [30 60 120 200]; % Pulse cycle in X * 10 ms. E.g., 30 means 300 ms pulses. Default is 30 (300 ms).
@@ -133,7 +133,7 @@ nicfg.optodelayTTL.lead = 4; % How many seconds is the food TTL armed before an 
 
 % Opto-delayed TTL buzzer
 % Cue: Opto start => buzzer delay => buzzer duration
-nicfg.optodelayTTL.cueenable = false; % Buzzer or not (default false)
+nicfg.optodelayTTL.cueenable = true; % Buzzer or not (default false)
 nicfg.optodelayTTL.cuedelay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.cuedur = [2 4 8 16]; % Delay in 100 ms. E.g., 10 means 1 seconds. Default 10 (1s)
 
@@ -148,6 +148,8 @@ nicfg.optodelayTTL.deliverydur = [50 50 50 50]; % Duration in 100 ms. E.g., 50 m
 % Multiple trial types
 nicfg.optodelayTTL.ntrialtypes = 1; % Multiple trial types (Max is 4)
 nicfg.optodelayTTL.trialfreq = [3 3 3 3]; % Relative weights of trial frequency
+nicfg.optodelayTTL.overwritetrialtypes = true;
+nicfg.optodelayTTL.manualtrialtypes = [0 0 0 1 1 1 2 2 2 3 3 3 0 1 2 3]; % Must have 4 x n entries
 
 nicfg.optodelayTTL.type1.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
 nicfg.optodelayTTL.type1.RGB = [0 7 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
@@ -160,7 +162,7 @@ nicfg.optodelayTTL.type2.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type2.DIOport = 0; % Only used in DIO
 
 nicfg.optodelayTTL.type3.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
-nicfg.optodelayTTL.type3.RGB = [0 5 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
+nicfg.optodelayTTL.type3.RGB = [0 5 5]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type3.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type3.DIOport = 1; % Only used in DIO
 

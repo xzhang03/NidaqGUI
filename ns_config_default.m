@@ -147,6 +147,7 @@ nicfg.optodelayTTL.deliverydur = [50 50 50 50]; % Duration in 100 ms. E.g., 50 m
 % Multiple trial types
 nicfg.optodelayTTL.ntrialtypes = 1; % Multiple trial types (Max is 4)
 nicfg.optodelayTTL.trialfreq = [3 0 0 0]; % Relative weights of trial frequency
+nicfg.optodelayTTL.determtrialtypes = false;
 
 nicfg.optodelayTTL.type1.cuetype = 'Buzzer'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
 nicfg.optodelayTTL.type1.RGB = [0 0 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.

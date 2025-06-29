@@ -359,6 +359,31 @@ if nicfg.optodelayTTL.enable
     
     % Action period duration
     arduinoWrite(nicfg.arduino_serial, [34 nicfg.optodelayTTL.actiondur]);
+
+    % Overwrite trial types (deterministic instead of probablistic, only in scheduler mode)
+    if isfield(nicfg.optodelayTTL, 'overwritetrialtypes') 
+        if nicfg.optodelayTTL.overwritetrialtypes && nicfg.scheduler.enable
+            lowtt = length(nicfg.optodelayTTL.manualtrialtypes);
+            if lowtt ~= round(lowtt/4)*4
+                fprintf('Overwrite trial types need to have lengths of 4 x n. Auto-padding with trial 0.\n');
+                nicfg.optodelayTTL.manualtrialtypes = cat(2, nicfg.optodelayTTL.manualtrialtypes, zeros(1, 4 - lowtt + floor(lowtt/4)*4));
+                lowtt = length(nicfg.optodelayTTL.manualtrialtypes);
+            end
+
+            for iowtt = 1 : floor(lowtt/4)
+                ttypes2write = nicfg.optodelayTTL.manualtrialtypes((iowtt-1)*4+1 : iowtt*4);
+                ttypes2writebyte = uint8(ttypes2write(1) * 64 + ttypes2write(2) * 16 + ttypes2write(3) * 4 + ttypes2write(4));
+                arduinoWrite(nicfg.arduino_serial, [76 iowtt-1]);
+                arduinoWrite(nicfg.arduino_serial, [77 ttypes2writebyte]);
+            end
+        else
+            % Probablistic
+            arduinoWrite(nicfg.arduino_serial, [76 255]);
+        end
+    else
+        % Default probablistic
+        arduinoWrite(nicfg.arduino_serial, [76 255]);
+    end
     
     % Sequence of opto and TTL (default: opto-> TTL)
     if isfield(nicfg.optodelayTTL, 'optothenTTL')

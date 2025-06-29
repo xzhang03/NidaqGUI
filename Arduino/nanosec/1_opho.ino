@@ -55,7 +55,8 @@ void optophoto_p1(void){
         // Get randomized ITI. This affects scopto.
         train_cycle = rngvec_ITI[itrain] * fps;
       }
-      
+
+      itrain_dtt = itrain; // Advance for deterministic trailtypes
       itrain++; // Advance train count
 
       if ((debugmode || serialdebug) && showscheduler){

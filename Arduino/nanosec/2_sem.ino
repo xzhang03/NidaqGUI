@@ -83,6 +83,8 @@
 // 65: Trial IO upper byte (n = MSB)[q]
 // 66: Trial IO lower byte (n = LSB)[r]
 // 67: Trial frequency weight (n = weight)[s]
+// 76: RNG vs deterministic Trial type (n = 255 for RNG, n = 0 for writing Trials 0-3, n = 1 for writing Trials 4-7,...)[|]
+// 77: Determineist trial type ([+0 MSB, +0 LSB, +1 MSB, +1 LSB, +2 MSB, +2 LSB, +3 MSB, +3 LSB])[}]
 
 // ============= Encoder =============
 // 23: Encoder useage (n = 1 yes, 0 no) [G]
@@ -105,6 +107,4 @@
 
 
 
-// 76: [|]
-// 77: [}]
 // 78: [~]

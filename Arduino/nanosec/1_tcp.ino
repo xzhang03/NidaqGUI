@@ -18,6 +18,7 @@ void tcp_p1(void){
     // Once per train
     if (usefoodpulses && optothenfood && pulsing){
       // Only applies to opto-then-food here
+      itrain_dtt = itrain; // Advance for deterministic trailtypes
       armfoodttl(); // Arm food ttl
     }
 

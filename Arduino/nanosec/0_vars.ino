@@ -153,6 +153,11 @@ byte foodpulses_vec[maxtrialtypes] = {5, 5, 5, 5}; // Number of food ttl pulses 
 unsigned int deliverydur_vec[maxtrialtypes] = {5000, 5000, 5000, 5000};
 bool foodttlconditional_vec[maxtrialtypes] = {false, false, false, false};
 
+// ============ Deterministic multiple trial types ============
+byte trialrngwrite = 255; // 255 (default): Use ENG. 0: Write Trial 0-3 RNG, 1: Trial Trial 4-7 RNG,...
+byte detvec_trialtype[maxrngind]; // Initialize array for RNG trial typ
+byte itrain_dtt = 0; // Current number of trains for deterministic trialtypes
+
 // ============== I2c ==============
 bool usei2c = true;
 

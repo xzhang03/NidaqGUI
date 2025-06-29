@@ -186,7 +186,10 @@ void parseserial(){
 
       // Multiple trial types
       if (usefoodpulses){
-        rng(rngvec_trialtype, freq_cumvec[ntrialtypes-1] , 0, maxrngind);
+        if (trialrngwrite == 255){
+          // If using RNG (trialrngwrite = 255), as opposed to deterministic (trialrngwrite = 0-254).
+          rng(rngvec_trialtype, freq_cumvec[ntrialtypes-1] , 0, maxrngind);
+        }
       }
 
       if (foodttlconditional){
@@ -209,6 +212,7 @@ void parseserial(){
       if (usescheduler){
         ipreoptopulse = 0;
         itrain = 0;
+        itrain_dtt = 0;
         inpreopto = true;
         inopto = false;
         inpostopto = false;
@@ -949,7 +953,7 @@ void parseserial(){
       break;
     
     case 64:
-      // 64: Report RNG (n = 0 ITI, 1 opto, 2 trialtype)[p]
+      // 64: Report RNG (n = 0 opto, 1 ITI, 2 RNG trialtype, 3 deterministic trialtype)[p]
       switch (n){
         case 0:
           Serial.write(rngvec, maxrngind);
@@ -959,6 +963,9 @@ void parseserial(){
           break;
         case 2:
           Serial.write(rngvec_trialtype, maxrngind);
+          break;
+        case 3:
+          Serial.write(detvec_trialtype, maxrngind);
           break;
       }
       break;
@@ -1060,6 +1067,20 @@ void parseserial(){
         delayMicroseconds(100);
       }
       camerapulse_test();
+      break;
+
+    case 76:
+      // 76: RNG vs deterministic Trial type (n = 255 for RNG, n = 0 for writing Trials 0-3, n = 1 for writing Trials 4-7,...)[|]
+      trialrngwrite = n;
+      if (debugmode){
+        Serial.print("RNG vs deterministic trial type: ");
+        Serial.println(n);
+      }
+      break;
+
+    case 77:
+      // 77: Determineist trial type ([+0 MSB, +0 LSB, +1 MSB, +1 LSB, +2 MSB, +2 LSB, +3 MSB, +3 LSB])[}]
+      overwrite_ttype(detvec_trialtype, trialrngwrite, n);
       break;
   }
 
@@ -1247,6 +1268,8 @@ void showpara(void){
   Serial.println(ntrialtypes);
   Serial.print("Current trial type to edit: ");
   Serial.println(trialtype_edit);
+  Serial.print("RNG (255) vs determiniestic trial type write (0-254): ");
+  Serial.println(trialrngwrite);
   for (byte ip = 0; ip < maxtrialtypes; ip++){
     Serial.print("----------- ");
     Serial.print("Trial type: ");

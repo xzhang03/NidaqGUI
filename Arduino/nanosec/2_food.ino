@@ -242,30 +242,48 @@ void foodttl(void){
 
 byte gettrialtype(void){
   byte trialtypenow = 1;
-  
-  if (ntrialtypes == 1){
-    trialtypenow = 0;
-    trialio = trialio0;
-  }
-  else{
-    if (rngvec_trialtype[itrain] < freq_cumvec[0]){
+
+  if (trialrngwrite == 255){
+    // Trial-by-trial determination of RNG'ed trial types 
+    if (ntrialtypes == 1){
       trialtypenow = 0;
       trialio = trialio0;
     }
-    else if (rngvec_trialtype[itrain] < freq_cumvec[1]){
-      trialtypenow = 1;
+    else{
+      if (rngvec_trialtype[itrain] < freq_cumvec[0]){
+        trialtypenow = 0;
+        trialio = trialio0;
+      }
+      else if (rngvec_trialtype[itrain] < freq_cumvec[1]){
+        trialtypenow = 1;
+        trialio = trialio1;
+      }
+      else if (rngvec_trialtype[itrain] < freq_cumvec[2]){
+        trialtypenow = 2;
+        trialio = trialio2;
+      }
+      else if (rngvec_trialtype[itrain] < freq_cumvec[3]){
+        trialtypenow = 3;
+        trialio = trialio3;
+      }
+    }
+  }
+  else {
+    // Deterministic trial type
+    trialtypenow = detvec_trialtype[itrain_dtt];
+    if (trialtypenow == 0){
+      trialio = trialio0;
+    }
+    else if (trialtypenow == 1){
       trialio = trialio1;
     }
-    else if (rngvec_trialtype[itrain] < freq_cumvec[2]){
-      trialtypenow = 2;
+    else if (trialtypenow == 2){
       trialio = trialio2;
     }
-    else if (rngvec_trialtype[itrain] < freq_cumvec[3]){
-      trialtypenow = 3;
+    else if (trialtypenow == 3){
       trialio = trialio3;
     }
   }
-  
   return trialtypenow;
 }
 

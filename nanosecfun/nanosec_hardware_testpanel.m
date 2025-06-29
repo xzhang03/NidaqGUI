@@ -73,15 +73,19 @@ while true
             disp('Trial type RNG of last experiment:');
             dump_rng(2);
         case 9
+            % Dump trial type RNG
+            disp('Deterministic trial types:');
+            dump_rng(3);
+        case 10
             % Dump all serial buffer
             dump_buffer();
-        case 10
+        case 11
             % Encoder test
             enctest_30();
-        case 11
+        case 12
             % Food TTL test
             foodttltest();
-        case 12
+        case 13
             % Cam TTL test
             camttltest();
     end
@@ -91,9 +95,9 @@ end
     % UI
     function indx = funlist(ini)
         fn = {'Firmware Version', 'I2c scan', 'Test PWM RGB', 'Test DIO expander',...
-            'Dump Nanosec state', 'Dump opto RNG',...
-            'Dump ITI RNG', 'Dump Trial type RNG', 'Dump all serial', '30s_encoder_test',...
-            'Food TTL test', 'Cam TTL test'};
+            'Dump Nanosec state', 'Dump opto RNG', 'Dump ITI RNG', 'Dump trial type RNG',...
+            'Dump deterministic trial types', 'Dump all serial', '30s_encoder_test', 'Food TTL test',...
+            'Cam TTL test'};
         [indx, ~] = listdlg('PromptString', sprintf('Select test %s (Nanosec)', com),...
             'SelectionMode','single', 'InitialValue', ini, 'ListString',fn);
     end
