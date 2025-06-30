@@ -57,7 +57,7 @@ freqsum = sum(freqs);
 
 %% Plot
 ys = [1.3 1.2 1.1];
-figure('Position', [2300 600 1800 420])
+figure('Position', [50 200 1800 420])
 for iplot = 1 : 4
     subplot(1,4,iplot)
     hold on
