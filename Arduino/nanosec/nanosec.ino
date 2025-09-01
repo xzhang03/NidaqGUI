@@ -48,7 +48,7 @@
 //
 
 // =============== Version ===============
-#define nsver "v3.55"
+#define nsver "v3.56"
 
 // =============== Hardware ===============
 // Now running teensy 4.0 at 450 Mhz (2.2 ns step)
