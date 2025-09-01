@@ -54,8 +54,8 @@ byte scopto_per = 5; // Number of photometry pulses per opto pulse (AO). Can be:
 byte sctrain_length = 10; // Number of photometry pulses per stim period (BO). Duration is  BO / (50 / AO).
 unsigned long sctrain_cycle = 30 * 50; // First number is in seconds. How often does the train come on. 
 unsigned int pulsewidth_1_scopto = 10000; // in micro secs (ch1)
-const unsigned long cycletime_photom_1_scopto = 20000; // in micro secs (Ch1)
-const unsigned long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrelevant
+unsigned long cycletime_photom_1_scopto = 20000; // in micro secs (Ch1)
+unsigned long cycletime_photom_2_scopto = 0; // in micro secs (Ch2). Irrelevant
 bool tristatepinpol = false; // Polarity for the tristatepin (1 = active high, 0 = active low). Default active low.
 
 // TCP (no real opto for behavioral purpose only)

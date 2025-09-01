@@ -57,6 +57,10 @@ nicfg.omnibox.enable = true;
 nicfg.tcp.enable = true; % Default true.
 nicfg.tcp.behaviorcycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 
+% Change pulse cycles (CAUTION)
+nicfg.tcp.pulsecycle1 = 100; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
+nicfg.tcp.pulsecycle2 = 100; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
+
 % Optophotometry (two colors)
 % Variable pulse width. Variable pulse cycle (only use for pure optomode)
 nicfg.optophotometry.enable = false; % Default false
@@ -85,6 +89,10 @@ nicfg.scoptophotometry.freqmod = 5; % Frequency is actually 50/X. E.g., 5 means 
 nicfg.scoptophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means 10 pulses per train. Default 10.
 nicfg.scoptophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
+
+% Change pulse cycles (CAUTION)
+nicfg.scoptophotometry.pulsecycle1 = 200; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
+nicfg.scoptophotometry.pulsecycle2 = 0; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
 
 % Scheduler
 nicfg.scheduler.enable = false; % Default false
