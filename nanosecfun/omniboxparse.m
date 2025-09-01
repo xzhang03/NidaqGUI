@@ -130,6 +130,26 @@ if nicfg.scoptophotometry.enable
     % Mode
     disp('Mode -> Same-color optophotometry');
     
+    % Pulse cycle 1
+    if isfield(nicfg.scoptophotometry, 'pulsecycle1')
+        b = floor(nicfg.scoptophotometry.pulsecycle1 / 256);
+        a = nicfg.scoptophotometry.pulsecycle1 - b * 256;
+        arduinoWrite(nicfg.arduino_serial, [78 a]);
+        if b > 0
+            arduinoWrite(nicfg.arduino_serial, [80 b]);
+        end
+    end
+    
+    % Pulse cycle 2
+    if isfield(nicfg.scoptophotometry, 'pulsecycle2')
+        b = floor(nicfg.scoptophotometry.pulsecycle2 / 256);
+        a = nicfg.scoptophotometry.pulsecycle2 - b * 256;
+        arduinoWrite(nicfg.arduino_serial, [79 a]);
+        if b > 0
+            arduinoWrite(nicfg.arduino_serial, [81 b]);
+        end
+    end
+
     % Frequency
     arduinoWrite(nicfg.arduino_serial, [10 nicfg.scoptophotometry.freqmod]);
     
