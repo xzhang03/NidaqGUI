@@ -32,6 +32,10 @@
 // 54: Cycle 2 for TCP (only changed for pure TCP experiments; cycle = n * 100 us) [f]
 // 57: Add Cycle 1 for TCP (cycle = cycle + n * 256 * 100 us) [i]
 // 58: Add Cycle 2 for TCP (cycle = cycle + n * 256 * 100 us) [j]
+// 78: Cycle 1 for SCoptophotometry (only changed for pure scopto experiments; cycle = n * 100 us) [~]
+// 79: Cycle 2 for SCoptophotometry (only changed for pure scopto experiments; cycle = n * 100 us) []
+// 80: Add Cycle 1 for scopto (cycle = cycle + n * 256 * 100 us) []
+// 81: Add Cycle 2 for scopto (cycle = cycle + n * 256 * 100 us) []
 
 // ============ Scheduler ============
 // 15: Use scheduler (n = 1 yes, 0 no) [?]
@@ -103,8 +107,27 @@
 // 61: Test PCA9685 [m]
 // 68: Test MCP23008 [t]
 
-
-
-
-
-// 78: [~]
+// 82: 
+// 83: 
+// 84: 
+// 85: 
+// 86: 
+// 87: 
+// 88: 
+// 89: 
+// 90: 
+// 91: 
+// 92: 
+// 93: 
+// 94: 
+// 95: 
+// 96: 
+// 97: 
+// 98: 
+// 99: 
+// 100: 
+// 101: 
+// 102: 
+// 103: 
+// 104: 
+// 105: 

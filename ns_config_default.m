@@ -87,6 +87,10 @@ nicfg.scoptophotometry.trainlength = 10; % Opto pulses per train. E.g., 10 means
 nicfg.scoptophotometry.cycle = 30; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 nicfg.scoptophotometry.pulsewidth = 10; % Pulth width in ms. E.g., 10 means 10 ms pulses. Default 10. Going above 19 may cause issues.
 
+% Change pulse cycles (CAUTION)
+nicfg.scoptophotometry.pulsecycle1 = 200; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
+nicfg.scoptophotometry.pulsecycle2 = 0; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
+
 % Scheduler
 nicfg.scheduler.enable = false; % Default false
 nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 65535s.

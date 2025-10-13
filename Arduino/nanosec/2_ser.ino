@@ -1082,6 +1082,54 @@ void parseserial(){
       // 77: Determineist trial type ([+0 MSB, +0 LSB, +1 MSB, +1 LSB, +2 MSB, +2 LSB, +3 MSB, +3 LSB])[}]
       overwrite_ttype(detvec_trialtype, trialrngwrite, n);
       break;
+
+    case 78:
+      // 78: Cycle 1 for SCoptophotometry (only changed for pure scopto experiments; cycle = n * 100 us) [~]
+      cycletime_photom_1_scopto = n * 100;
+      cycletime_photom_1 = cycletime_photom_1_scopto; // in micro secs (Ch1)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
+      
+      if (debugmode){
+        Serial.print("New scopto cycle 1 (us): ");
+        Serial.println(cycletime_photom_1_scopto);
+      }
+      break;
+
+    case 79:
+      // 79: Cycle 2 for SCoptophotometry (only changed for pure scopto experiments; cycle = n * 100 us) []
+      cycletime_photom_2_scopto = n * 100;
+      cycletime_photom_2 = cycletime_photom_2_scopto; // in micro secs (Ch2)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
+      
+      if (debugmode){
+        Serial.print("New scopto cycle 2 (us): ");
+        Serial.println(cycletime_photom_2_scopto);
+      }
+      break;
+
+    case 80:
+      // 80: Add Cycle 1 for scopto (cycle = cycle + n * 256 * 100 us) []
+      cycletime_photom_1_scopto = cycletime_photom_1_scopto + n * 100 * 256;
+      cycletime_photom_1 = cycletime_photom_1_scopto; // in micro secs (Ch1)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
+      
+      if (debugmode){
+        Serial.print("New scopto cycle 1 (us): ");
+        Serial.println(cycletime_photom_1_scopto);
+      }
+      break;
+
+    case 81:
+      // 81: Add Cycle 2 for scopto (cycle = cycle + n * 256 * 100 us) []
+      cycletime_photom_2_scopto = cycletime_photom_2_scopto + n * 100 * 256;
+      cycletime_photom_2 = cycletime_photom_2_scopto; // in micro secs (Ch2)
+      fps = 1000000 / (cycletime_photom_1 + cycletime_photom_2);
+      
+      if (debugmode){
+        Serial.print("New scopto cycle 2 (us): ");
+        Serial.println(cycletime_photom_2_scopto);
+      }
+      break;
   }
 
   #if (debugpins)
