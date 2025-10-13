@@ -5,7 +5,7 @@ function nidaqfixlog(defaultpath, recordingmode)
 if nargin < 2
     recordingmode = 'sz';
     if nargin < 1
-        defaultpath = '\\anastasia\data\photometry\';
+        defaultpath = 'D:\Shared';
     end
 end
 
@@ -26,7 +26,7 @@ switch recordingmode
         end
 end
 
-% Get file
+%% Get file
 [fn, fp] = uigetfile(fullfile(defaultpath,'.bin'), 'Select data file.');
 
 % Output file
@@ -38,7 +38,7 @@ f1 = fopen(fullfile(fp,fn), 'r');
 fclose(f1);
 
 
-% Restructure data
+%% Restructure data
 timestamps = data(1, :);
 data = data(2:end, :);
 

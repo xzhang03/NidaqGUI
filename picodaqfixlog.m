@@ -3,7 +3,7 @@ function picodaqfixlog(defaultpath)
 % nidaqfixlog(defaultpath)
 
 if nargin < 1
-    defaultpath = '\\anastasia\data\photometry\';
+    defaultpath = 'D:\Shared';
 end
 
 %% Get config
