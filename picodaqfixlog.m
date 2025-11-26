@@ -3,7 +3,7 @@ function picodaqfixlog(defaultpath)
 % nidaqfixlog(defaultpath)
 
 if nargin < 1
-    defaultpath = 'D:\Shared';
+    defaultpath = '\\zhanglab.cns.nyu.edu\server\photometry\';
 end
 
 %% Get config
