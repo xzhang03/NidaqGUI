@@ -50,7 +50,7 @@
 // 70: Preopto PCA9685 color [0 Shared_bit R R G G B B] [v]
 // 71: Inopto PCA9685 color [0 Shared_bit R R G G B B] [w]
 // 72: Postopto PCA9685 color [0 Shared_bit R R G G B B] [x]
-// 73: Stop-recording PCA9685 color (0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto)[y]
+// 73: Post-recording PCA9685 color (0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto)[y]
 
 // ============ Hardware RNG ============
 // 38: use RNG or not (n = 1 yes, 0 no) [V]
@@ -80,6 +80,8 @@
 // 33: Action period delay (n * 100 ms) [Q]
 // 34: Action period duration (n * 100 ms) [R]
 // 35: Delivery period duration (n * 100 ms) [S]
+// 82: Use food RNG (n = 1 yes, 0 no)
+// 83: Food RNG pass chance (n = 0-100);
 
 // ====== Multi trial type ======
 // 62: Max trial types (n = 1-4)[n]

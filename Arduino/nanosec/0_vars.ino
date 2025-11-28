@@ -1,5 +1,3 @@
-
-
 // ====== Camera, audio, and encoder ======
 // time variables for camera
 unsigned long int pulsetime = 0;
@@ -88,7 +86,9 @@ byte switchoff_indicator = 0; // 0: off, 1: stay, 2: preopto, 3: inopto, 4: post
 const byte maxrng = 100; // Max value RNG = (0 - X)
 byte threshrng = 30; // Below this is pass (0 - thresh)
 byte rngvec[maxrngind]; // Initialize array
+byte rngvec_food[maxrngind]; // Initialize array
 bool trainpass = true;
+bool foodpass = true;
 
 // Randomize ITI
 byte rng_cycle_min = 30; // Min cycle when ITI is randomized (in seconds, assuming 20 ms pulse cycle)
@@ -108,6 +108,8 @@ bool optothenfood = true; // Set false is foodthenopto
 bool inputttl = false; // Animal licked
 bool foodttlwait = false; // In waiting for delivery
 bool foodttlon = false;
+bool usefoodRNG = false; // Affects both pavlovian and conditional
+byte foodRNGpassthresh = 100;
 
 // ======== Food TTL Conditional ========
 // Cue: Opto start => cue delay => cue duration

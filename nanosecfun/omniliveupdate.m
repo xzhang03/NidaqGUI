@@ -16,10 +16,13 @@ function str = omniliveupdate(echoscheduler, echoRNG)
     strType = sprintf("T%i", echoRNG(2)+1);
     
     % RNG
-    if echoRNG(3) == 0
+    if echoRNG(3) == 0 % No RNG
         strRNG = '';
-    else
+    elseif echoRNG(3) == 1 % opto RNG
         strRNG = sprintf("RNG: %i", echoRNG(1));
+    else
+        % echoRNG(3)== 2 means food RNG
+        strRNG = sprintf("FoodRNG: %i", echoRNG(1));
     end
     
     str = sprintf('%s. %s. %s', str, strType, strRNG);

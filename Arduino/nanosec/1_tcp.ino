@@ -23,6 +23,10 @@ void tcp_p1(void){
     }
 
     if (schedulerrunning){
+      if (usefoodRNG){
+        // Food RNG
+        foodpass = rngvec_food[itrain] < foodRNGpassthresh;
+      }
       if (randomiti){
         // Get randomized ITI. This affects scopto.
         tcptrain_cycle = rngvec_ITI[itrain] * fps;
@@ -35,7 +39,10 @@ void tcp_p1(void){
         Serial.print(itrain);
         Serial.print("/");
         Serial.println(ntrain);
-
+        if (usefoodRNG){
+          Serial.print("Food RNG says = ");
+          Serial.println(foodpass);
+        }
         if (randomiti){
           Serial.print("RNG says next cycle is (s): ");
           Serial.println(tcptrain_cycle / fps);

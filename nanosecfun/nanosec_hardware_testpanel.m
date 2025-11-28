@@ -88,6 +88,10 @@ while true
         case 13
             % Cam TTL test
             camttltest();
+        case 14
+            % Dump trial type RNG
+            disp('Food RNG of last experiment:');
+            dump_rng(4);
     end
 end
 
@@ -97,7 +101,7 @@ end
         fn = {'Firmware Version', 'I2c scan', 'Test PWM RGB', 'Test DIO expander',...
             'Dump Nanosec state', 'Dump opto RNG', 'Dump ITI RNG', 'Dump trial type RNG',...
             'Dump deterministic trial types', 'Dump all serial', '30s_encoder_test', 'Food TTL test',...
-            'Cam TTL test'};
+            'Cam TTL test', 'Dump food RNG'};
         [indx, ~] = listdlg('PromptString', sprintf('Select test %s (Nanosec)', com),...
             'SelectionMode','single', 'InitialValue', ini, 'ListString',fn);
     end

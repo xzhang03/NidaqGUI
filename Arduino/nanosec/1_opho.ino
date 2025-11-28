@@ -48,7 +48,11 @@ void optophoto_p1(void){
       // In scheduler and RNG mode is on
       // This affects optophotometry only
       if (useRNG){
+        // Food RNG
         trainpass = rngvec[itrain] < threshrng;
+      }
+      if (usefoodRNG){
+        foodpass = rngvec_food[itrain] < foodRNGpassthresh;
       }
 
       if (randomiti){
@@ -69,6 +73,11 @@ void optophoto_p1(void){
           Serial.print("RNG says train pass = ");
           Serial.println(trainpass);
         }
+        if (usefoodRNG){
+          Serial.print("Food RNG says = ");
+          Serial.println(foodpass);
+        }
+
 
         if (randomiti){
           Serial.print("RNG says next cycle is (s): ");

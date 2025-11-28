@@ -1,4 +1,4 @@
-// Third Gen photometry box: Nanosec v3.5
+// Third Gen photometry box: Nanosec v3.6
 // Handle almost everything you need for photometry and behavior
 // Tested using Teensyduino with Arduino IDE 1.8.X
 // Stephen Zhang
@@ -48,7 +48,7 @@
 //
 
 // =============== Version ===============
-#define nsver "v3.56"
+#define nsver "v3.6"
 
 // =============== Hardware ===============
 // Now running teensy 4.0 at 450 Mhz (2.2 ns step)
@@ -174,7 +174,7 @@ void loop() {
     foodttl();
   }
 
-  // Slow serial echo of trial and RNG ifo
+  // Slow serial echo of trial and RNG info
   slowserialecho();
   
   // photometry

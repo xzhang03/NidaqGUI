@@ -225,6 +225,12 @@ void parseserial(){
           // Generate array
           rng(rngvec, maxrng, 0, maxrngind);
         }
+        
+        // Food RNG
+        if (usefoodRNG){
+          // Generate array
+          rng(rngvec_food, maxrng, 0, maxrngind);
+        }
 
         // RNG ITI
         if (randomiti){
@@ -953,7 +959,7 @@ void parseserial(){
       break;
     
     case 64:
-      // 64: Report RNG (n = 0 opto, 1 ITI, 2 RNG trialtype, 3 deterministic trialtype)[p]
+      // 64: Report RNG (n = 0 opto, 1 ITI, 2 RNG trialtype, 3 deterministic trialtype, 4 food RNG)[p]
       switch (n){
         case 0:
           Serial.write(rngvec, maxrngind);
@@ -966,6 +972,9 @@ void parseserial(){
           break;
         case 3:
           Serial.write(detvec_trialtype, maxrngind);
+          break;
+        case 4:
+          Serial.write(rngvec_food, maxrngind);
           break;
       }
       break;
@@ -1130,6 +1139,24 @@ void parseserial(){
         Serial.println(cycletime_photom_2_scopto);
       }
       break;
+
+    case 82:
+      // 82: Use food RNG (n = 1 yes, 0 no)
+      usefoodRNG = (n == 1);
+      if (debugmode){
+        Serial.print("Use food RNG: ");
+        Serial.println(usefoodRNG);
+      }
+      break;
+
+    case 83:
+      // 83: Food RNG pass chance (n = 0-100);
+      foodRNGpassthresh = n;
+      if (debugmode){
+        Serial.print("Food RNG pass chance: ");
+        Serial.println(foodRNGpassthresh);
+      }
+      break;
   }
 
   #if (debugpins)
@@ -1289,7 +1316,11 @@ void showpara(void){
   Serial.println(optothenfood);
   Serial.print("Complement delay before the opto start (s): ");
   Serial.println(nfoodpulsedelay_complement / fps);
-
+  Serial.print("Use food RNG: ");
+  Serial.println(usefoodRNG);
+  Serial.print("Food RNG pass chance: ");
+  Serial.println(foodRNGpassthresh);
+        
   // Food TTL Cue
   Serial.println("========== Food TTL Cue ========");
   Serial.print("Food TTL cue: ");
@@ -1360,6 +1391,8 @@ void showpara(void){
   Serial.println(cycletime_slow);
 }
 
+// Scheduler word is [X X X 1]
+// RNG word is [X X X 2]
 void slowserialecho(void){
   // Echoing back trial info on a schedule
   // Only when pulsing
@@ -1369,6 +1402,7 @@ void slowserialecho(void){
       echotime_slow = tnowmillis;
 
       // Echo back scheduler info
+      // Scheduler word is [X X X 1]
       echo[0] = 0;
       echo[1] = 0;
       echo[2] = 0;
@@ -1393,10 +1427,23 @@ void slowserialecho(void){
       Serial.write(echo, 4);
 
       // Echo back RNG info
+      // RNG word is [X X X 2]
       echo[3] = 2; // Don't change
-      echo[2] = useRNG; // Echo back [X X 0 X] as no RNG
       echo[1] = trialtype; 
-      echo[0] = trainpass;
+
+      // Echo back [X X 0 2] as no RNG, [X X 1 2] as opto RNG, [X X 2 2 as food RNG]
+      if (useRNG){
+        echo[2] = 1; // [X X 1 2] as opto RNG, 
+        echo[0] = trainpass;
+      }
+      else if (usefoodRNG){
+        echo[2] = 2; // [X X 2 2 as food RNG]
+        echo[0] = foodpass;
+      }
+      else{
+        echo[2] = 0; // Echo back [X X 0 2] as no RNG
+        echo[0] = 0;
+      }
       Serial.write(echo, 4);
     }
   }

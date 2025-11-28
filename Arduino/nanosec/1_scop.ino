@@ -54,7 +54,11 @@ void scoptophoto_p1(void){
         // Figure out if current train passes
         trainpass = rngvec[itrain] < threshrng;
       }
-
+      if (usefoodRNG){
+        // Food RNG
+        foodpass = rngvec_food[itrain] < foodRNGpassthresh;
+      }
+      
       if (randomiti){
         // Get randomized ITI. This affects scopto.
         sctrain_cycle = rngvec_ITI[itrain] * fps;
@@ -73,7 +77,10 @@ void scoptophoto_p1(void){
           Serial.print("RNG says train pass = ");
           Serial.println(trainpass);
         }
-
+        if (usefoodRNG){
+          Serial.print("Food RNG says = ");
+          Serial.println(foodpass);
+        }
         if (randomiti){
           Serial.print("RNG says next cycle is (s): ");
           Serial.println(sctrain_cycle / fps);

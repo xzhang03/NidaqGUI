@@ -2,7 +2,7 @@ global nicfg
 
 % Set the up the nidaq recording
 nicfg.BasePath         = 'C:\Users\steph\OneDrive\Documents\MATLAB\temp';       % Set the path in which data will be saved
-nicfg.ArduinoCOM       = 8;%5;             % Set the COM port for the Arduino, < 0 means off
+nicfg.ArduinoCOM       = 7;%5;             % Set the COM port for the Arduino, < 0 means off
 nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev2';        % Device name
@@ -128,10 +128,10 @@ nicfg.scheduler.randomITI_max = 40; % Highest value of ITI (exclusive, in second
 % delivery or synchronizing).
 % Delivery (unconditional): Opto start => delivery delay => delivery
 nicfg.optodelayTTL.enable = true; % Default false
-nicfg.optodelayTTL.delay = 20; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s). Max 65535 (6553.5s).
+nicfg.optodelayTTL.delay = 10; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s). Max 65535 (6553.5s).
 nicfg.optodelayTTL.pulsewidth = [15 30 60 100]; % Pulsewidth in X * 10 ms. E.g., 15 means 150 ms pulses. Default is 15 (150 ms).
 nicfg.optodelayTTL.cycle = [30 60 120 200]; % Pulse cycle in X * 10 ms. E.g., 30 means 300 ms pulses. Default is 30 (300 ms).
-nicfg.optodelayTTL.trainlength = [8 4 2 1]; % Pulse train length. E.g., 5 means 5 pulses. Default is 5.
+nicfg.optodelayTTL.trainlength = [5 4 2 1]; % Pulse train length. E.g., 5 means 5 pulses. Default is 5.
 nicfg.optodelayTTL.optothenTTL = true; % Sets the sequence: opto->food or food->opto. Has to be true in listen mode. Default true (opto => food).
 nicfg.optodelayTTL.lead = 4; % How many seconds is the food TTL armed before an opto train. This does not affect the cue/actoin/reward delays above. Default 4s. Max 65535s.
 
@@ -139,23 +139,26 @@ nicfg.optodelayTTL.lead = 4; % How many seconds is the food TTL armed before an 
 % Cue: Opto start => buzzer delay => buzzer duration
 nicfg.optodelayTTL.cueenable = true; % Buzzer or not (default false)
 nicfg.optodelayTTL.cuedelay = 0; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
-nicfg.optodelayTTL.cuedur = [20 4 8 16]; % Delay in 100 ms. E.g., 10 means 1 seconds. Default 10 (1s)
+nicfg.optodelayTTL.cuedur = [10 4 8 16]; % Delay in 100 ms. E.g., 10 means 1 seconds. Default 10 (1s)
 
 % Action: Opto start => action delay => action window
 % Delivery (conditional): Opto start => delivery delay => delivery window start => delivery (if action) => timeout (if no delivery)
 % If action and devliveries have the same delay, that means food devlivery happens as soon as a lick
 nicfg.optodelayTTL.conditional = [true, false, false, false]; %true TTL delivery is conditional or not. If so, pin 10 must be hooked up with an active-high input. Input comes during the delay window will allow for subsequent pulse output.
 nicfg.optodelayTTL.actiondelay = 0; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
-nicfg.optodelayTTL.actiondur = 20; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
+nicfg.optodelayTTL.actiondur = 10; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 nicfg.optodelayTTL.deliverydur = [50 50 50 50]; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
+nicfg.optodelayTTL.useRNG = true;
+nicfg.optodelayTTL.RNGpasschance = 50;
+
 
 % Multiple trial types
 nicfg.optodelayTTL.ntrialtypes = 1; % Multiple trial types (Max is 4)
 nicfg.optodelayTTL.trialfreq = [3 3 3 3]; % Relative weights of trial frequency
-nicfg.optodelayTTL.overwritetrialtypes = true;
+nicfg.optodelayTTL.overwritetrialtypes = false;
 nicfg.optodelayTTL.manualtrialtypes = [0 0 0 1 1 1 2 2 2 3 3 3 0 1 2 3]; % Must have 4 x n entries
 
-nicfg.optodelayTTL.type1.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
+nicfg.optodelayTTL.type1.cuetype = 'Buzzer'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
 nicfg.optodelayTTL.type1.RGB = [0 7 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type1.rewardtype = 'Native'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type1.DIOport = 0; % Only used in DIO

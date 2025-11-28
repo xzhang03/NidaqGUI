@@ -379,6 +379,14 @@ if nicfg.optodelayTTL.enable
     
     % Action period duration
     arduinoWrite(nicfg.arduino_serial, [34 nicfg.optodelayTTL.actiondur]);
+    
+    % RNG of triggering food
+    if isfield(nicfg.optodelayTTL, 'useRNG')
+        arduinoWrite(nicfg.arduino_serial, [82 nicfg.optodelayTTL.useRNG]);
+        if nicfg.optodelayTTL.useRNG
+            arduinoWrite(nicfg.arduino_serial, [83 nicfg.optodelayTTL.RNGpasschance]);
+        end
+    end
 
     % Overwrite trial types (deterministic instead of probablistic, only in scheduler mode)
     if isfield(nicfg.optodelayTTL, 'overwritetrialtypes') 

@@ -142,7 +142,23 @@ void foodttl(void){
       if (foodttlconditional){
         // Trying to get out of the waiting period (happens when detection or time out (below)
         if (inputttl){
-          foodpulses_left = foodpulses;
+          // Conditional and licked
+          // Check RNG
+          if (usefoodRNG){
+            if (foodpass){
+              // RNG passed
+              foodpulses_left = foodpulses;
+            }
+            else{
+              // RNG did not pass
+              foodpulses_left = 0;
+            }
+          }
+          else{
+            // No food rng
+            foodpulses_left = foodpulses;
+          }
+          
           foodttlwait = false;
           foodttlon = false;
           tfood1 = tfood0; // % Setup cycle time for the actual delivery
@@ -156,7 +172,22 @@ void foodttl(void){
       }
       else{
         // Unconditional
-        foodpulses_left = foodpulses;
+        // Check RNG
+        if (usefoodRNG){
+          if (foodpass){
+            // RNG passed
+            foodpulses_left = foodpulses;
+          }
+          else{
+            // RNG did not pass
+            foodpulses_left = 0;
+          }
+        }
+        else{
+          // No food rng
+          foodpulses_left = foodpulses;
+        }
+        
         foodttlwait = false;
         foodttlon = false;
         tfood1 = tfood0; // % Setup cycle time for the actual delivery
@@ -241,7 +272,7 @@ void foodttl(void){
 // 1-0: 2 bit DIO port number (DIO delivery mode only)
 
 byte gettrialtype(void){
-  byte trialtypenow = 1;
+  byte trialtypenow = 0;
 
   if (trialrngwrite == 255){
     // Trial-by-trial determination of RNG'ed trial types 
