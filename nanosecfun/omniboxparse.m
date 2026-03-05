@@ -472,5 +472,23 @@ else
     arduinoWrite(nicfg.arduino_serial, [44 0]);
 end
 
+%% Ping i2cs
+% Ping i2c connectivity
+arduinoWrite(nicfg.arduino_serial, [84 0]);
+while arduinoGetBytes(nicfg.arduino_serial) < 2
+    % Wait for 2 bytes
+end
+i2cconnectivity = arduinoRead(nicfg.arduino_serial, 1, 'uint16');
+if bitget(i2cconnectivity,2) == 0 && bitget(i2cconnectivity,1) == 0
+    fprintf('I2c PWM connected.\n')
+else
+    fprintf('No I2c PWM.\n')
+end
+if bitget(i2cconnectivity,6) == 0 && bitget(i2cconnectivity,5) == 0
+    fprintf('I2c DIO connected.\n')
+else
+    fprintf('No I2c DIO.\n')
+end
+
 end
 

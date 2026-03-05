@@ -1157,6 +1157,14 @@ void parseserial(){
         Serial.println(foodRNGpassthresh);
       }
       break;
+
+    case 84:
+      // 84: Ping known i2c address
+      {
+        uint16_t i2cpingdata = i2cPing();
+        Serial.write((byte *) &i2cpingdata, 2);
+      }
+      break;
   }
 
   #if (debugpins)

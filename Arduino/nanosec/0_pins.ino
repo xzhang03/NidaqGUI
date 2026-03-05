@@ -49,7 +49,7 @@ bool serialpinon = false;
 #include <Encoder.h>
 #if PCB
   // PCB
-  Encoder myEnc(17,16); // pick your pins, reverse for sign flip
+  Encoder myEnc(17,16); // (17, 16) means left-side encoder, wire pointing forward
 #else
   // Proto
   Encoder myEnc(18,19); // pick your pins, reverse for sign flip

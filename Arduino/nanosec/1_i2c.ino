@@ -35,6 +35,21 @@ void i2c_init(void){
   #endif
 }
 
+// Ping existing i2cs
+uint16_t i2cPing(void){
+  uint16_t error = 0B1000000000000000;
+  #if usePCA9685
+    Wire.beginTransmission(PCA9685add);
+    byte errorPCA = Wire.endTransmission();
+  #endif
+  #if useMCP23008
+    Wire.beginTransmission(MCP23008add);
+    byte errorMCP = Wire.endTransmission();
+  #endif
+  error = error + errorPCA + (errorMCP << 4);
+  return error;
+}
+
 // Test PCA9685
 void testPCA9685(void){
   for (byte iled = 0; iled < 3; iled++){

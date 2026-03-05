@@ -74,6 +74,8 @@
 // 49: Lead time before opto (n s) [a]
 // 51: Adding lead time before opto (+ n * 256 s) [c]
 // 74: Test food TTLs (150-ms on/150-ms off, n = cycles) [z]
+// 82: Use food RNG (n = 1 yes, 0 no)
+// 83: Food RNG pass chance (n = 0-100);
 
 // ====== Food TTL Conditional ======
 // 22: Conditional or not (n = 1 yes, 0 no) [F]
@@ -108,10 +110,8 @@
 // 60: Scan i2c addresses [l]
 // 61: Test PCA9685 [m]
 // 68: Test MCP23008 [t]
+// 84: Ping known i2c address
 
-// 82: 
-// 83: 
-// 84: 
 // 85: 
 // 86: 
 // 87: 
