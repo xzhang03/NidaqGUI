@@ -369,6 +369,9 @@ void docueon(uint16_t trialio, uint8_t trialtype){
         MCP.digitalWrite(6, bitRead(trialio, 11));
         MCP.digitalWrite(7, bitRead(trialio, 12));
       #endif
+      #if universalcuemarker
+        digitalWrite(audiopin, HIGH);
+      #endif
       break;
 
     case 2:
@@ -394,6 +397,10 @@ void docueon(uint16_t trialio, uint8_t trialtype){
             MCP.digitalWrite(7, HIGH);
             break;
         }
+      #endif
+
+      #if universalcuemarker
+        digitalWrite(audiopin, HIGH);
       #endif
       break;
   }
@@ -434,6 +441,9 @@ void docueoff(uint16_t trialio){
         MCP.digitalWrite(6, 0);
         MCP.digitalWrite(7, 0);
       #endif
+      #if universalcuemarker
+        digitalWrite(audiopin, LOW);
+      #endif
       break;
 
     case 2:
@@ -449,6 +459,10 @@ void docueoff(uint16_t trialio){
         MCP.digitalWrite(5, LOW);
         MCP.digitalWrite(6, LOW);
         MCP.digitalWrite(7, LOW);
+      #endif
+
+      #if universalcuemarker
+        digitalWrite(audiopin, LOW);
       #endif
       break;
       

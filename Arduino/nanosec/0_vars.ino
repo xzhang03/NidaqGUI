@@ -137,6 +137,7 @@ bool actionperiodon = false;
 
 // ============ Multiple trial types ============
 #define maxtrialtypes 4
+#define universalcuemarker true // Set true to use the buzzer BNC as a universal trial cue marker
 byte trialtype = 0; // Trial type to use
 byte trialtype_edit = 0; // Trial type to edit
 byte ntrialtypes = 1; // If more than 1, RNG kicks in
