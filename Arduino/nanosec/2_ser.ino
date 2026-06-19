@@ -941,7 +941,9 @@ void parseserial(){
 
     case 61:
       // 61: Test PCA9685 [m]
+      digitalWrite(led_pin, HIGH);
       testPCA9685();
+      digitalWrite(led_pin, LOW);
       break;
 
     case 62:
@@ -1029,7 +1031,9 @@ void parseserial(){
 
     case 68:
       // 68: Test MCP23008 [t]
+      digitalWrite(led_pin, HIGH);
       testMCP23008();
+      digitalWrite(led_pin, LOW);
       break;
 
     case 69:
