@@ -25,6 +25,7 @@ void i2c_init(void){
   
   #if usePCA9685
     pwm.begin();
+    pwm.setOscillatorFrequency(25000000);
     pwm.setPWMFreq(1600);  // This is the maximum PWM frequency
   #endif
 

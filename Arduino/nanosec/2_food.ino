@@ -449,9 +449,18 @@ void docueoff(uint16_t trialio){
     case 2:
       // External pwm
       #if usePCA9685
-        pwm.setPin(0, 0, false);
-        pwm.setPin(1, 0, false);
-        pwm.setPin(2, 0, false);
+        byte Rv = (trialio >> 10) & 0b111 ; // Red value
+        byte Gv = (trialio >> 7) & 0b111 ; // Green value
+        byte Bv = (trialio >> 4) & 0b111 ; // Green value
+        if (Rv > 0){
+          pwm.setPin(0, 0, false);
+        }
+        if (Gv > 0){
+          pwm.setPin(1, 0, false);
+        }
+        if (Gv > 0){
+          pwm.setPin(2, 0, false);
+        }
       #endif
       
       #if useMCP23008
