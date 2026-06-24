@@ -5,7 +5,7 @@
 
 ## Schematics
 
-![Schematics](./Schematic_Omnibox-v3_2024-11-25.png)
+![Schematics](./Schematic_Omnibox-v3_2026-06-24.png)
 
 ## Footprint
 
