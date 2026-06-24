@@ -46,11 +46,11 @@
 // 17: Enable manual scheduler override [A]
 // 27: Listening mode on or off (n = 1 yes, 0 no). Will turn on manual override [K]
 // 28: Listen mode polarity (1 = active high, 0 = active low) [L]
-// 69: Turn on scheduler indicator (PCA9685) (n = 1 yes, 0 no)[u]
-// 70: Preopto PCA9685 color [0 Shared_bit R R G G B B] [v]
-// 71: Inopto PCA9685 color [0 Shared_bit R R G G B B] [w]
-// 72: Postopto PCA9685 color [0 Shared_bit R R G G B B] [x]
-// 73: Post-recording PCA9685 color (0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto)[y]
+// 69: Turn on scheduler indicator (PCA9685/PWMINT) (n = 2 PWMINT, 1 PCA9685, 0 no)[u]
+// 70: Preopto PCA9685/PWMINT color [0 Shared_bit R R G G B B] [v]
+// 71: Inopto PCA9685/PWMINT color [0 Shared_bit R R G G B B] [w]
+// 72: Postopto PCA9685/PWMINT color [0 Shared_bit R R G G B B] [x]
+// 73: Post-recording PCA9685/PWMINT color (0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto)[y]
 
 // ============ Hardware RNG ============
 // 38: use RNG or not (n = 1 yes, 0 no) [V]
@@ -92,7 +92,7 @@
 // 66: Trial IO lower byte (n = LSB)[r]
 // 67: Trial frequency weight (n = weight)[s]
 // 76: RNG vs deterministic Trial type (n = 255 for RNG, n = 0 for writing Trials 0-3, n = 1 for writing Trials 4-7,...)[|]
-// 77: Determineist trial type ([+0 MSB, +0 LSB, +1 MSB, +1 LSB, +2 MSB, +2 LSB, +3 MSB, +3 LSB])[}]
+// 77: Deterministic trial type ([+0 MSB, +0 LSB, +1 MSB, +1 LSB, +2 MSB, +2 LSB, +3 MSB, +3 LSB])[}]
 
 // ============= Encoder =============
 // 23: Encoder useage (n = 1 yes, 0 no) [G]

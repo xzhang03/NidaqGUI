@@ -26,8 +26,12 @@ const byte foodTTLinput = 22; // input TTL for conditional food pulses (active h
 const byte led_pin = 13; // onboard led
 
 
-const byte i2csda = 18; // Reserve for future i2c
-const byte i2cscl = 19; // Reserve for future i2c
+const byte i2csda = 18; // Reserve for i2c
+const byte i2cscl = 19; // Reserve for i2c
+
+// 4 More pins: 5 7 8 9
+// In RGB pwm cue: R - 7, G - 8, B - 9
+const byte extrapins[4] = {5, 7, 8, 9};
 
 // ============= debugpins =============
 const byte serialpin = 24; // Parity signal for serial pin
@@ -37,10 +41,10 @@ const byte serialpin = 24; // Parity signal for serial pin
   const byte inoptopin = 8; // preopto
   const byte postoptopin = 9; // preopto
 #else
-  const byte schedulerpin = 5; // On when scheduler is used
-  const byte preoptopin = 7; // preopto
-  const byte inoptopin = 8; // preopto
-  const byte postoptopin = 9; // preopto
+  const byte schedulerpin = 27; // On when scheduler is used
+  const byte preoptopin = 28; // preopto
+  const byte inoptopin = 29; // preopto
+  const byte postoptopin = 30; // preopto
 #endif
 bool serialpinon = false;
 
@@ -54,3 +58,17 @@ bool serialpinon = false;
   // Proto
   Encoder myEnc(18,19); // pick your pins, reverse for sign flip
 #endif
+
+// Available pins (normal mode)
+// 0 - reserved Rx
+// 1 - reserved Tx
+// 11 - reserved MOSI
+// 12 - reserved MISO
+// 14/A0
+// 20/A6 - used in tester
+// 23/A9
+// 25 - used in tester
+// 26 - used in tester
+// 31
+// 32
+// 33

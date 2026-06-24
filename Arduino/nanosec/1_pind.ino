@@ -8,7 +8,11 @@ void pin_ini(void){
   pinMode(tristatepin, OUTPUT);
   pinMode(foodTTLpin, OUTPUT);
   pinMode(audiopin, OUTPUT);
-
+  pinMode(extrapins[0], OUTPUT);
+  pinMode(extrapins[1], OUTPUT);
+  pinMode(extrapins[2], OUTPUT);
+  pinMode(extrapins[3], OUTPUT);
+  
   if (listenpol){
     pinMode(switchpin, INPUT_PULLDOWN); // active high
   }
@@ -43,7 +47,7 @@ void pin_ini(void){
       digitalWrite(preoptopin, HIGH);
     #endif
 
-    if (useschedulerindicator){
+    if (useschedulerindicator > 0){
       shedulerindicator(preoptocolor);
     }
   }

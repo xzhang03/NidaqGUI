@@ -234,9 +234,9 @@ if nicfg.scheduler.enable
     
     % Scheduler indicator
     if isfield(nicfg.scheduler, 'indicator')
-        if nicfg.scheduler.indicator.enable
+        if nicfg.scheduler.indicator.enable > 0
             % Enable
-            arduinoWrite(nicfg.arduino_serial, [69 1]);
+            arduinoWrite(nicfg.arduino_serial, [69 nicfg.scheduler.indicator.enable]);
     
             % Colors
             preopto_color = uint8(nicfg.scheduler.indicator.preopto);
@@ -337,6 +337,16 @@ if nicfg.optodelayTTL.enable
                 
             case 'PWMRGB'
                 trialio = bitset(trialio, 14);
+                if any(trialinfo.RGB > 7)
+                    trialinfo.RGB(trialinfo.RGB > 7) = 7;
+                    msgbox('RGB color intensity is capped at 7');
+                end
+                trialio = trialio + bitshift(trialinfo.RGB(1), 10)...
+                    + bitshift(trialinfo.RGB(2), 7) + bitshift(trialinfo.RGB(3), 4); % RGB
+
+            case 'PWMINT'
+                trialio = bitset(trialio, 14);
+                trialio = bitset(trialio, 16);
                 if any(trialinfo.RGB > 7)
                     trialinfo.RGB(trialinfo.RGB > 7) = 7;
                     msgbox('RGB color intensity is capped at 7');

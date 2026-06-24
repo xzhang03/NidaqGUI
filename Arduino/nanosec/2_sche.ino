@@ -23,7 +23,7 @@ void sche_preopto(void){
       digitalWrite(postoptopin, LOW);
     #endif
 
-    if (useschedulerindicator){
+    if (useschedulerindicator > 0){
       shedulerindicator(inoptocolor);
     } 
     
@@ -62,7 +62,7 @@ void schedulerdisable(void){
     digitalWrite(postoptopin, HIGH);
   #endif
 
-  if (useschedulerindicator){
+  if (useschedulerindicator > 0){
     shedulerindicator(postoptocolor);
   }
   
@@ -71,15 +71,28 @@ void schedulerdisable(void){
   }
 }
 
-void shedulerindicator(byte color){
-  const uint16_t cscale[8] = {0, 3, 11, 35, 114, 374, 1223, 3998}; // Color scale (log scale, is 4096)
 
+void shedulerindicator(byte color){
+  // 2 PWMINT, 1 PCA9685
+  const uint16_t cscale[8] = {0, 3, 11, 35, 114, 374, 1223, 3998}; // Color scale (log scale, max 4095). This is for external PWM (PCA9685).
+  const uint8_t cscale2[8] = {0, 4, 8, 16, 32, 64, 128, 255}; // Color scale (log scale, max 255). This is for internal RGB PWM.
+  
   // Turn off
   if (color == 0){
     // Color input = 0 means turn off everything
-    pwm.setPin(0, 0, false);
-    pwm.setPin(1, 0, false);
-    pwm.setPin(2, 0, false);
+    if (useschedulerindicator == 1){
+      pwm.setPin(0, 0, false);
+      pwm.setPin(1, 0, false);
+      pwm.setPin(2, 0, false);
+    }
+    else if (useschedulerindicator == 2){
+      pinMode(extrapins[1], OUTPUT);
+      digitalWrite(extrapins[1], LOW);
+      pinMode(extrapins[2], OUTPUT);
+      digitalWrite(extrapins[2], LOW);
+      pinMode(extrapins[3], OUTPUT);
+      digitalWrite(extrapins[3], LOW);
+    }
     return;
   }
 
@@ -101,22 +114,37 @@ void shedulerindicator(byte color){
   }
 
   #if serialdebug
+    Serial.print("Scheduler indicator mode: ")
+    Serial.println(useschedulerindicator);
     Serial.print("Rv: ");
     Serial.print(Rv);
     Serial.print(" ");
-    Serial.println(cscale[Rv]);
+    Serial.print(cscale[Rv]);
+    Serial.print(" | ");
+    Serial.println(cscale2[Rv]);
     Serial.print("Gv: ");
     Serial.print(Gv);
     Serial.print(" ");
-    Serial.println(cscale[Gv]);
+    Serial.print(cscale[Gv]);
+    Serial.print(" | ");
+    Serial.println(cscale2[Gv]);
     Serial.print("Bv: ");
     Serial.print(Bv);
     Serial.print(" ");
-    Serial.println(cscale[Bv]);
+    Serial.print(cscale[Bv]);
+    Serial.print(" | ");
+    Serial.println(cscale2[Bv]);
   #endif
 
   // Write color
-  pwm.setPin(0, cscale[Rv], false);
-  pwm.setPin(1, cscale[Gv], false);
-  pwm.setPin(2, cscale[Bv], false);
+  if (useschedulerindicator == 1){
+    pwm.setPin(0, cscale[Rv], false);
+    pwm.setPin(1, cscale[Gv], false);
+    pwm.setPin(2, cscale[Bv], false);
+  }
+  else if (useschedulerindicator == 2){
+    analogWrite(extrapins[1], cscale2[Rv]);
+    analogWrite(extrapins[2], cscale2[Gv]);
+    analogWrite(extrapins[3], cscale2[Bv]);
+  }
 }

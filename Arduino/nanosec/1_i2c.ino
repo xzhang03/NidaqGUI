@@ -11,6 +11,8 @@
 #endif
 
 // MCP23008 DIO expansion
+// MCP23008 Pins 0-3 reserved for outcome delivery
+// MCP23008 Pins 3-7 reserved for flags of trial types
 #define useMCP23008 true
 #define MCP23008add 0x20
 #if useMCP23008

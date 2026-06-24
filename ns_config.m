@@ -33,13 +33,7 @@ nicfg.serverupload = true;
 nicfg.mousedate = true;                 % Set the order of mouse vs date
 nicfg.serveradd = {...
     'SZ', '\\anastasia\data\photometry';...
-    'AL', '\\sweetness\Fiber Photometry';...
-    'KF', '\\sweetness\Fiber Photometry';...
-    'JR', '\\atlas\NIDAQ_run_LFP_etc\Ephys_Data';...
-    'MB', '\\atlas\NIDAQ_run_LFP_etc\Ephys_Data';...
-    'IS', '\\anastasia\data\photometry';...
-    'RE', '\\sweetness\Fiber Photometry';...
-    'KE', '\\sweetness\Fiber Photometry'};
+    };
 
 % =========================================================================
 nicfg.MouseName = 'SZ00';
@@ -95,7 +89,7 @@ nicfg.scoptophotometry.pulsecycle1 = 200; % Pulse cycle 1 in X * 100 us. E.g., 1
 nicfg.scoptophotometry.pulsecycle2 = 0; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
 
 % Scheduler
-nicfg.scheduler.enable = false; % Default false
+nicfg.scheduler.enable = 0; % 2 PWMINT (native), 1 PWMRGB (i2c), 0 off
 nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 65535s.
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
@@ -156,22 +150,22 @@ nicfg.optodelayTTL.ntrialtypes = 1; % Multiple trial types (Max is 4). Only this
 nicfg.optodelayTTL.trialfreq = [3 0 0 0]; % Relative weights of trial frequency
 nicfg.optodelayTTL.determtrialtypes = false;
 
-nicfg.optodelayTTL.type1.cuetype = 'Buzzer'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
+nicfg.optodelayTTL.type1.cuetype = 'Buzzer'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
 nicfg.optodelayTTL.type1.RGB = [0 0 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type1.rewardtype = 'Native'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type1.DIOport = 0; % Only used in DIO
 
-nicfg.optodelayTTL.type2.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
+nicfg.optodelayTTL.type2.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
 nicfg.optodelayTTL.type2.RGB = [7 0 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type2.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type2.DIOport = 0; % Only used in DIO
 
-nicfg.optodelayTTL.type3.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
+nicfg.optodelayTTL.type3.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
 nicfg.optodelayTTL.type3.RGB = [0 7 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type3.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type3.DIOport = 1; % Only used in DIO
 
-nicfg.optodelayTTL.type4.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB'
+nicfg.optodelayTTL.type4.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
 nicfg.optodelayTTL.type4.RGB = [0 0 7]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type4.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type4.DIOport = 2; % Only used in DIO

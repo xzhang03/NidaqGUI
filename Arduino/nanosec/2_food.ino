@@ -255,9 +255,11 @@ void foodttl(void){
 // Get trial IO
 // Trial IO is a 16-bit integer with the following bit mapping
 // 15-13: Cue type (choose 1)
-// 15: 1 - PWM tone/LED cue, 0 - no
-// 14: 1 - digital cue using dio expander (MCP23008), 0 - no
-// 13: 1 - PWM cue using i2c led (PCA9685), 0 - no
+// Bit:                                        15  14  13
+// PWM tone/LED cue (1 channel):              [ 1   0   0]
+// Digital cue using dio expander (MCP23008): [ 0   1   0]
+// PWM cue using i2c led (PCA9685):           [ 0   0   1]
+// Internal RGB pwm (3 channels):             [ 1   0   1]
 
 // 12-4: i2c led mode only
 // 12-10: 3 bit of R intensty
@@ -321,22 +323,13 @@ byte gettrialtype(void){
 // Cue on
 // Type 1: tone PWM
 void docueon(uint16_t trialio, uint8_t trialtype){
-  byte cuetype = 0; // 0 - native pwm, 1 - MCP23008 DIO, 2 - external PWM
-  const uint16_t cscale[8] = {0, 3, 11, 35, 114, 374, 1223, 3998}; // Color scale (log scale, is 4096)
-  cueon = true;
-  
-  if (bitRead(trialio, 15) == 1){
-    cuetype = 0;
-  }
-  else if (bitRead(trialio, 14) == 1){
-    cuetype = 1;
-  }
-  else if (bitRead(trialio, 13) == 1){
-    cuetype = 2;
-  }
+  byte cuetype = getcuetype(trialio); // 0 - native pwm, 1 - MCP23008 DIO, 2 - external PWM, 3 - internal RGB pwm
+  const uint16_t cscale[8] = {0, 3, 11, 35, 114, 374, 1223, 3998}; // Color scale (log scale, max 4095). This is for external PWM (PCA9685).
+  const uint8_t cscale2[8] = {0, 4, 8, 16, 32, 64, 128, 255}; // Color scale (log scale, max 255). This is for internal RGB PWM.
   byte Rv = (trialio >> 10) & 0b111 ; // Red value
   byte Gv = (trialio >> 7) & 0b111 ; // Green value
   byte Bv = (trialio >> 4) & 0b111 ; // Green value
+  cueon = true;
   
   switch (cuetype){
     case 0:
@@ -344,6 +337,7 @@ void docueon(uint16_t trialio, uint8_t trialtype){
       tone(audiopin, audiofreq);
 
       #if useMCP23008
+        // Hardcoded trial type flags
         switch (trialtype){
           case 0:
             MCP.digitalWrite(4, HIGH);
@@ -383,6 +377,36 @@ void docueon(uint16_t trialio, uint8_t trialtype){
       #endif
       
       #if useMCP23008
+        // Hardcoded trial type flags
+        switch (trialtype){
+          case 0:
+            MCP.digitalWrite(4, HIGH);
+            break;
+          case 1:
+            MCP.digitalWrite(5, HIGH);
+            break;
+          case 2:
+            MCP.digitalWrite(6, HIGH);
+            break;
+          case 3:
+            MCP.digitalWrite(7, HIGH);
+            break;
+        }
+      #endif
+
+      #if universalcuemarker
+        digitalWrite(audiopin, HIGH);
+      #endif
+      break;
+
+    case 3:
+      // Internal pwm (using extra pins[1-3], i.e., pins 7, 8, 9)
+      analogWrite(extrapins[1], cscale2[Rv]);
+      analogWrite(extrapins[2], cscale2[Gv]);
+      analogWrite(extrapins[3], cscale2[Bv]);
+      
+      #if useMCP23008
+        // Hardcoded trial type flags
         switch (trialtype){
           case 0:
             MCP.digitalWrite(4, HIGH);
@@ -409,17 +433,11 @@ void docueon(uint16_t trialio, uint8_t trialtype){
 // Cue off
 // Type 1: tone PWM
 void docueoff(uint16_t trialio){
-  byte cuetype = 0; // 0 - native pwm, 1 - MCP23008 DIO, 2 - external PWM
+  byte cuetype = getcuetype(trialio); // 0 - native pwm, 1 - MCP23008 DIO, 2 - external PWM, 3 - internal RGB pwm
+  byte Rv = (trialio >> 10) & 0b111 ; // Red value
+  byte Gv = (trialio >> 7) & 0b111 ; // Green value
+  byte Bv = (trialio >> 4) & 0b111 ; // Green value
   cueon = false;
-  if (bitRead(trialio, 15) == 1){
-    cuetype = 0;
-  }
-  else if (bitRead(trialio, 14) == 1){
-    cuetype = 1;
-  }
-  else if (bitRead(trialio, 13) == 1){
-    cuetype = 2;
-  }
   
   switch (cuetype){
     case 0:
@@ -449,9 +467,6 @@ void docueoff(uint16_t trialio){
     case 2:
       // External pwm
       #if usePCA9685
-        byte Rv = (trialio >> 10) & 0b111 ; // Red value
-        byte Gv = (trialio >> 7) & 0b111 ; // Green value
-        byte Bv = (trialio >> 4) & 0b111 ; // Green value
         if (Rv > 0){
           pwm.setPin(0, 0, false);
         }
@@ -462,6 +477,33 @@ void docueoff(uint16_t trialio){
           pwm.setPin(2, 0, false);
         }
       #endif
+      
+      #if useMCP23008
+        MCP.digitalWrite(4, LOW);
+        MCP.digitalWrite(5, LOW);
+        MCP.digitalWrite(6, LOW);
+        MCP.digitalWrite(7, LOW);
+      #endif
+
+      #if universalcuemarker
+        digitalWrite(audiopin, LOW);
+      #endif
+      break;
+
+    case 3:
+      // Internal pwm
+      if (Rv > 0){
+        pinMode(extrapins[1], OUTPUT);
+        digitalWrite(extrapins[1], LOW);
+      }
+      if (Gv > 0){
+        pinMode(extrapins[2], OUTPUT);
+        digitalWrite(extrapins[2], LOW);
+      }
+      if (Gv > 0){
+        pinMode(extrapins[3], OUTPUT);
+        digitalWrite(extrapins[3], LOW);
+      }
       
       #if useMCP23008
         MCP.digitalWrite(4, LOW);
@@ -520,7 +562,7 @@ void dofoodoff(uint16_t trialio){
 // Type 1: digital read of food TTL pin
 bool checklicks(uint16_t trialio){
   bool lickout = false;
-  byte licktype = bitRead(trialio, 3); // 1 - active high, 0 - pavlovian
+  byte licktype = bitRead(trialio, 3); // 1 - active high, 0 - active low
   
   switch (licktype){
     case 1:
@@ -531,6 +573,35 @@ bool checklicks(uint16_t trialio){
       break;
   }
   return lickout;
+}
+
+// Get cue type
+// 15-13: Cue type (choose 1)
+// Bit:                                           15  14  13
+// 0. PWM tone/LED cue (1 channel):              [ 1   0   0]
+// 1. Digital cue using dio expander (MCP23008): [ 0   1   0]
+// 2. PWM cue using i2c led (PCA9685):           [ 0   0   1]
+// 3. Internal RGB pwm (3 channels):             [ 1   0   1]
+uint8_t getcuetype(uint16_t trialioprivate){
+  uint8_t cuetype;
+  switch ((trialioprivate >> 12) & 0B111){
+    case 0B100:
+      cuetype = 0;
+      break;
+    
+    case 0B010:
+      cuetype = 1;
+      break;
+
+    case 0B001:
+      cuetype = 2;
+      break;
+
+    case 0B101:
+      cuetype = 3;
+      break;
+  }  
+  return cuetype;
 }
 
 // Test food

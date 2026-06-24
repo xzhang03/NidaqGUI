@@ -125,7 +125,7 @@ void parseserial(){
         stimenabled = false;
         schedulerrunning = false;
 
-        if (useschedulerindicator){
+        if (useschedulerindicator > 0){
           // What to do with indicator when the run is stopped
           // 0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto
           switch (switchoff_indicator){
@@ -245,7 +245,7 @@ void parseserial(){
           digitalWrite(postoptopin, LOW);
         #endif
 
-        if (useschedulerindicator){
+        if (useschedulerindicator > 0){
           shedulerindicator(preoptocolor);
         }
       }
@@ -272,7 +272,7 @@ void parseserial(){
           digitalWrite(postoptopin, LOW);
         #endif    
 
-        if (useschedulerindicator){
+        if (useschedulerindicator > 0){
           shedulerindicator(0);
         }
       }
@@ -430,7 +430,7 @@ void parseserial(){
           digitalWrite(postoptopin, LOW);
         #endif
 
-        if (useschedulerindicator){
+        if (useschedulerindicator > 0){
           // What to do with indicator when the run is stopped
           // 0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto
           switch (switchoff_indicator){
@@ -460,7 +460,7 @@ void parseserial(){
           digitalWrite(postoptopin, LOW);
         #endif
 
-        if (useschedulerindicator){
+        if (useschedulerindicator > 0){
           shedulerindicator(0);
         }
       }
@@ -1037,22 +1037,22 @@ void parseserial(){
       break;
 
     case 69:
-      // 69: Turn on scheduler indicator (PCA9685) (n = 1 yes, 0 no)[u]
-      useschedulerindicator = (n == 1);
+      // 69: Turn on scheduler indicator (PCA9685/PWMINT) (n = 2 PWMINT, 1 PCA9685, 0 no)[u]
+      useschedulerindicator = n;
       break;
 
     case 70:
-      // 70: Preopto PCA9685 color [0 Shared_bit R R G G B B] [v]
+      // 70: Preopto PCA9685/PWMINT color [0 Shared_bit R R G G B B] [v]
       preoptocolor = n;
       break;
 
     case 71:
-      // 71: Inopto PCA9685 color [0 Shared_bit R R G G B B] [w]
+      // 71: Inopto PCA9685/PWMINT color [0 Shared_bit R R G G B B] [w]
       inoptocolor = n;
       break;
 
     case 72:
-      // 72: Postopto PCA9685 color [0 Shared_bit R R G G B B] [x]
+      // 72: Postopto PCA9685/PWMINT color [0 Shared_bit R R G G B B] [x]
       postoptocolor = n;
       break;
 
@@ -1281,7 +1281,7 @@ void showpara(void){
 
   // Scheduler
   Serial.println("============== Schedule Indicator ==============");
-  Serial.print("Use schedule indicator: ");
+  Serial.print("Schedule indicator usage: ");
   Serial.println(useschedulerindicator);
   Serial.print("Pre-opto color: ");
   Serial.println(preoptocolor);

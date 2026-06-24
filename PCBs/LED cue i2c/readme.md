@@ -1,5 +1,6 @@
 # RGB LED cue module (I2c, dimmable)
 This is an I2C version of LED cue delivery. The PCA9685 uses I2C interface with a default address of 0x40, which is further programmable by bridging A5 (MSB) - A0 (LSB). Channels 0, 1, 2 correspond to Red, Green, and Blue LEDs respectively, with 12 bit (0-4095) PWM precision. Library: https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library
+**Recent testing shows that this i2c module creates an EMP at the offset of cues.**
 
 ## Hookup guide
 ### 1. RGB module only.

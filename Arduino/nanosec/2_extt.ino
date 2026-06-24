@@ -32,7 +32,7 @@ void externalttltrig(void){
       digitalWrite(postoptopin, LOW);
     #endif
 
-    if (useschedulerindicator){
+    if (useschedulerindicator > 0){
       shedulerindicator(inoptocolor);
     }
     
