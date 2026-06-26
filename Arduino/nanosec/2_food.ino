@@ -328,7 +328,7 @@ void docueon(uint16_t trialio, uint8_t trialtype){
   const uint8_t cscale2[8] = {0, 4, 8, 16, 32, 64, 128, 255}; // Color scale (log scale, max 255). This is for internal RGB PWM.
   byte Rv = (trialio >> 10) & 0b111 ; // Red value
   byte Gv = (trialio >> 7) & 0b111 ; // Green value
-  byte Bv = (trialio >> 4) & 0b111 ; // Green value
+  byte Bv = (trialio >> 4) & 0b111 ; // Blue value
   cueon = true;
   
   switch (cuetype){
@@ -436,7 +436,7 @@ void docueoff(uint16_t trialio){
   byte cuetype = getcuetype(trialio); // 0 - native pwm, 1 - MCP23008 DIO, 2 - external PWM, 3 - internal RGB pwm
   byte Rv = (trialio >> 10) & 0b111 ; // Red value
   byte Gv = (trialio >> 7) & 0b111 ; // Green value
-  byte Bv = (trialio >> 4) & 0b111 ; // Green value
+  byte Bv = (trialio >> 4) & 0b111 ; // Blue value
   cueon = false;
   
   switch (cuetype){
@@ -500,7 +500,7 @@ void docueoff(uint16_t trialio){
         pinMode(extrapins[2], OUTPUT);
         digitalWrite(extrapins[2], LOW);
       }
-      if (Gv > 0){
+      if (Bv > 0){
         pinMode(extrapins[3], OUTPUT);
         digitalWrite(extrapins[3], LOW);
       }
