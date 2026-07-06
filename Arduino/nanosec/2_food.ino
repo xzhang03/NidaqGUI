@@ -57,13 +57,24 @@ void armfoodttl(void){
 }
 
 // Food TTL
+// Three stages, all timed independently off tfood0 (set once in armfoodttl()):
+//   Stage 1 - Cue:      [cuedelay, cuedelay+cuedur)              only if usecue
+//   Stage 2 - Action:   [actiondelay, actiondelay+actiondur)     only if foodttlconditional; may set inputttl
+//   Stage 3 - Delivery: wait sub-phase [nfoodpulsedelay, nfoodpulsedelay+deliverydur), then pulse sub-phase
+// The stages are not chained hand-off-style; each is just checked against tfood0 every call.
 void foodttl(void){
 //  unsigned int tfooddelta = (tnowmillis - tfood0);
 //  if ((tfooddelta % 100) == 0){
 //    Serial.println(tfooddelta);
 //  }
-  
-  // 1. Cue
+
+  foodttl_cue();
+  foodttl_action();
+  foodttl_delivery();
+}
+
+// Stage 1: Cue
+void foodttl_cue(void){
   if (usecue){
     if (foodttlcuewait){
       // In waiting
@@ -71,7 +82,7 @@ void foodttl(void){
         // First time trying to get out of the cue delay
         foodttlcuewait = false;
         docueon(trialio, trialtype); // Cue on default type 1
-        
+
         if ((debugmode || serialdebug) && showfoodttl){
           Serial.print("Cue on at (ms): ");
           Serial.println(tnowmillis);
@@ -83,7 +94,7 @@ void foodttl(void){
       if ((tnowmillis - tfood0) >= (cuedelay + cuedur)){
         // Cue long enough and time to turn off (default type 1)
         docueoff(trialio);
-        
+
         if ((debugmode || serialdebug) && showfoodttl){
           Serial.print("Cue off at (ms): ");
           Serial.println(tnowmillis);
@@ -91,8 +102,10 @@ void foodttl(void){
       }
     }
   }
+}
 
-  // 2. Action
+// Stage 2: Action window
+void foodttl_action(void){
   if (foodttlconditional){
     if (foodttlactionwait){
       // Waiting period for action
@@ -131,9 +144,11 @@ void foodttl(void){
       }
     }
   }
-  
-  // 3. Delivery (waiting period)
-  // In the waiting period for delivery
+}
+
+// Stage 3: Delivery (3a. waiting sub-phase, 3b. pulse-train sub-phase)
+void foodttl_delivery(void){
+  // 3a. Waiting period for delivery
   if (foodttlwait){
     // In waiting
     if (((tnowmillis - tfood0) >= nfoodpulsedelay) && ((tnowmillis - tfood0) < (nfoodpulsedelay + deliverydur))){
@@ -158,7 +173,7 @@ void foodttl(void){
             // No food rng
             foodpulses_left = foodpulses;
           }
-          
+
           foodttlwait = false;
           foodttlon = false;
           tfood1 = tfood0; // % Setup cycle time for the actual delivery
@@ -187,7 +202,7 @@ void foodttl(void){
           // No food rng
           foodpulses_left = foodpulses;
         }
-        
+
         foodttlwait = false;
         foodttlon = false;
         tfood1 = tfood0; // % Setup cycle time for the actual delivery
@@ -212,7 +227,7 @@ void foodttl(void){
     }
   }
 
-  // 4. Delivery (Out of the waiting period)
+  // 3b. Delivery pulse train (out of the waiting period)
   else{
     if (foodpulses_left > 0){
       // Still pulses left
@@ -220,7 +235,7 @@ void foodttl(void){
         // Beginning of each cycle
         tfood1 = tnowmillis;
         dofoodon(trialio); // Food delivery on
-        
+
         if ((debugmode || serialdebug) && showfoodttl){
           Serial.print("Food pulse on at (ms): ");
           Serial.print(tnowmillis);
@@ -229,7 +244,7 @@ void foodttl(void){
       else if (((tnowmillis - tfood1) >= (foodpulse_ontime)) && foodttlon){
         // Turn off
         dofoodoff(trialio); // Food delivery off
-        
+
         foodpulses_left--;
         if ((debugmode || serialdebug) && showfoodttl){
           Serial.print("-");
