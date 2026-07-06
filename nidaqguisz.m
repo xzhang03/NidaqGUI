@@ -259,6 +259,7 @@ if nicfg.active
     end
     
     % Start nidaq
+    nidaqpath = ''; % Stays empty if no nidaq channels are recorded this run
     if nicfg.NidaqChannels > 0
         nidaqpath = fullfile(nicfg.BasePath, sprintf('%s-%s-%03i-nidaq.mat', nicfg.MouseName, datestamp(), nicfg.Run));
         
@@ -351,6 +352,7 @@ if nicfg.active
     
     disp('Saving...');
     
+    arduinopath = ''; % Stays empty if running data is not recorded this run
     if ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1
         arduinoClose(nicfg.arduino_serial);
         nicfg = rmfield(nicfg, 'arduino_serial');
@@ -380,79 +382,7 @@ if nicfg.active
         end
     end
     
-    if (sum(strcmpi(nicfg.serveradd(:,1), nicfg.MouseName(1:2))) > 0) && nicfg.serverupload 
-        % If has a registered owner and wants to upload
-        % Determine owner
-        serveradd = nicfg.serveradd{strcmpi(nicfg.serveradd(:,1),...
-            nicfg.MouseName(1:2)),2};
-        
-        disp(['Copying files to server address: ', serveradd]);
-
-        % Grab file names
-        [~,nidaqfn,~] = fileparts(nidaqpath);
-        if nicfg.RecordRunning
-            [~,arduinofn,~] = fileparts(arduinopath); 
-        end
-
-        % Make server file address
-        if nicfg.mousedate
-            % Mouse_Date
-            nidaqpath_server = fullfile(serveradd, nicfg.MouseName, ...
-                    sprintf('%s_%s', nicfg.MouseName, datestamp()), [nidaqfn, '.mat']);
-            if nicfg.RecordRunning    
-                arduinopath_server = fullfile(serveradd, nicfg.MouseName, ...
-                        sprintf('%s_%s', nicfg.MouseName, datestamp()), [arduinofn, '.mat']);
-            end
-        else
-            % Date_Mouse
-            nidaqpath_server = fullfile(serveradd, nicfg.MouseName, ...
-                    sprintf('%s_%s', datestamp(), nicfg.MouseName), [nidaqfn, '.mat']);
-            if nicfg.RecordRunning    
-                arduinopath_server = fullfile(serveradd, nicfg.MouseName, ...
-                        sprintf('%s_%s', datestamp(), nicfg.MouseName), [arduinofn, '.mat']);
-            end
-        end
-
-        % Make mouse folder if needed
-        if exist(fullfile(serveradd, nicfg.MouseName), 'dir') ~= 7
-            mkdir(serveradd, nicfg.MouseName);
-        end
-
-        % Make day folder if needed
-        if nicfg.mousedate
-            % Mouse_Date
-            if exist(fullfile(serveradd, nicfg.MouseName, ...
-                    sprintf('%s_%s', nicfg.MouseName, datestamp())), 'dir') ~= 7
-                mkdir(fullfile(serveradd, nicfg.MouseName),...
-                    sprintf('%s_%s', nicfg.MouseName, datestamp()));
-            end
-        else
-            % Date_Mouse
-            if exist(fullfile(serveradd, nicfg.MouseName, ...
-                    sprintf('%s_%s', datestamp(),nicfg.MouseName)), 'dir') ~= 7
-                mkdir(fullfile(serveradd, nicfg.MouseName),...
-                    sprintf('%s_%s', datestamp(),nicfg.MouseName));
-            end
-        end
-
-        % Copy nidaq file if does not exist
-        if ~exist(nidaqpath_server, 'file')
-            copyfile(nidaqpath, nidaqpath_server);
-        elseif input('Nidaq file already exist. Overwrite? (1 = Yes, 0 = No): ') == 1
-            copyfile(nidaqpath, nidaqpath_server);
-        end
-
-        % Copy arduino file if does not exist
-        if nicfg.RecordRunning && (ischar(nicfg.ArduinoCOM) || nicfg.ArduinoCOM > -1)
-            if ~exist(arduinopath_server, 'file')
-                copyfile(arduinopath, arduinopath_server);
-            elseif input('Running file already exist. Overwrite? (1 = Yes, 0 = No): ') == 1
-                copyfile(arduinopath, arduinopath_server);
-            end
-        end
-    else
-        disp('Did not copy files to server');
-    end
+    uploadToServer(nicfg, nidaqpath, arduinopath);
     
     disp('Finished');
     

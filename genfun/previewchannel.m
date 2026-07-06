@@ -151,7 +151,7 @@ uicontrol(hpan, 'Style', 'pushbutton', 'Position', toploc - [0 300 0 0], 'String
     end
 
     function myCloseReq(src,event)
-        if isvalid(startbutton.UserData)
+        if ~isempty(startbutton.UserData) && isvalid(startbutton.UserData)
             try
                 stoppreview();
             catch
