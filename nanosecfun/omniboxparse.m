@@ -448,6 +448,12 @@ else
     arduinoWrite(nicfg.arduino_serial, [24 0]);
 end
 
+%% Camera
+% Pulse on time (optional, ms)
+if isfield(nicfg, 'pulsewidth')
+    arduinoWrite(nicfg.arduino_serial, [85 nicfg.pulsewidth]);
+end
+
 %% Encoder
 if nicfg.encoder.enable
     % Encoder

@@ -1169,6 +1169,15 @@ void parseserial(){
         Serial.write((byte *) &i2cpingdata, 2);
       }
       break;
+
+    case 85:
+      // 85: Camera pulse on time (n = ms)
+      ontime = n * 1000;
+      if (debugmode){
+        Serial.print("New camera pulse on time (ms): ");
+        Serial.println(n);
+      }
+      break;
   }
 
   #if (debugpins)

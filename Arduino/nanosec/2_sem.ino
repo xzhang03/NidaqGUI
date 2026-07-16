@@ -1,6 +1,7 @@
 // m table
 // ========== Operational ==========
 // 2: new cycle time (1000000/n, n in Hz)
+// 85: Camera pulse on time (n = ms)
 // 1: start pulse
 // 0: stop pulse
 // 5: Quad encoder position
@@ -112,8 +113,7 @@
 // 68: Test MCP23008 [t]
 // 84: Ping known i2c address
 
-// 85: 
-// 86: 
+// 86:
 // 87: 
 // 88: 
 // 89: 
