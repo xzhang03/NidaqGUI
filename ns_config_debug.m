@@ -2,7 +2,7 @@ global nicfg
 
 % Set the up the nidaq recording
 nicfg.BasePath         = 'C:\Users\steph\OneDrive\Documents\MATLAB\temp';       % Set the path in which data will be saved
-nicfg.ArduinoCOM       = 12;%5;             % Set the COM port for the Arduino, < 0 means off
+nicfg.ArduinoCOM       = 4;%5;             % Set the COM port for the Arduino, < 0 means off
 nicfg.RecordRunning    = true;         % Use quad encoder or not
 nicfg.baumrate         = 19200;         % Baumrate 9600 for v1, 19200 for v3
 nicfg.NidaqDevice      = 'Dev2';        % Device name
@@ -49,7 +49,7 @@ nicfg.omnibox.enable = true;
 % Modes
 % Two-color photometry
 nicfg.tcp.enable = true; % Default true.
-nicfg.tcp.behaviorcycle = 10; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
+nicfg.tcp.behaviorcycle = 5; % Train cycle in seconds. E.g., 30 means 30 seconds from start to start. Default 30.
 
 % Change pulse cycles (CAUTION)
 nicfg.tcp.pulsecycle1 = 100; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
@@ -88,16 +88,16 @@ nicfg.scoptophotometry.pulsecycle2 = 0; % Pulse cycle 1 in X * 100 us. E.g., 100
 
 % Scheduler
 nicfg.scheduler.enable = true; % Default false
-nicfg.scheduler.delay = 10; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
-nicfg.scheduler.ntrains = 16; % Number of trains. Default 10.
+nicfg.scheduler.delay = 5; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s.
+nicfg.scheduler.ntrains = 3; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default true.
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external input. This will enable manualoverride above.
 
 % Scheduler indicator
-nicfg.scheduler.indicator.enable = 2; % 2 PWMINT (native), 1 PWMRGB (i2c), 0 off
-nicfg.scheduler.indicator.preopto = [0 0 3 1]; % [R G B doubler], 0-3 for R, B, G
+nicfg.scheduler.indicator.enable = 0; % 2 PWMINT (native), 1 PWMRGB (i2c), 0 off
+nicfg.scheduler.indicator.preopto = [0 0 0 1]; % [R G B doubler], 0-3 for R, B, G
 nicfg.scheduler.indicator.inopto = [0 3 0 1];
-nicfg.scheduler.indicator.postopto = [3 0 0 1];
+nicfg.scheduler.indicator.postopto = [0 0 0 1];
 nicfg.scheduler.indicator.switchoffmode = 0; % 0: off, 1: stay, 2: preopto, 3: inopto, 4: postopto
 
 % Hardware Opto RNG (determines a train goes through or not)
@@ -142,7 +142,7 @@ nicfg.optodelayTTL.conditional = [true, false, false, false]; %true TTL delivery
 nicfg.optodelayTTL.actiondelay = 0; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.actiondur = 10; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
 nicfg.optodelayTTL.deliverydur = [50 50 50 50]; % Duration in 100 ms. E.g., 50 means 5 seconds. Default 50 (5s)
-nicfg.optodelayTTL.useRNG = true;
+nicfg.optodelayTTL.useRNG = false;
 nicfg.optodelayTTL.RNGpasschance = 50;
 
 
