@@ -81,9 +81,11 @@ void shedulerindicator(byte color){
   if (color == 0){
     // Color input = 0 means turn off everything
     if (useschedulerindicator == 1){
-      pwm.setPin(0, 0, false);
-      pwm.setPin(1, 0, false);
-      pwm.setPin(2, 0, false);
+      #if usePCA9685
+        pwm.setPin(0, 0, false);
+        pwm.setPin(1, 0, false);
+        pwm.setPin(2, 0, false);
+      #endif
     }
     else if (useschedulerindicator == 2){
       pinMode(extrapins[1], OUTPUT);
@@ -138,9 +140,11 @@ void shedulerindicator(byte color){
 
   // Write color
   if (useschedulerindicator == 1){
-    pwm.setPin(0, cscale[Rv], false);
-    pwm.setPin(1, cscale[Gv], false);
-    pwm.setPin(2, cscale[Bv], false);
+    #if usePCA9685
+      pwm.setPin(0, cscale[Rv], false);
+      pwm.setPin(1, cscale[Gv], false);
+      pwm.setPin(2, cscale[Bv], false);
+    #endif
   }
   else if (useschedulerindicator == 2){
     analogWrite(extrapins[1], cscale2[Rv]);

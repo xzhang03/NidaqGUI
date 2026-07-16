@@ -44,10 +44,14 @@ uint16_t i2cPing(void){
   #if usePCA9685
     Wire.beginTransmission(PCA9685add);
     byte errorPCA = Wire.endTransmission();
+  #else
+    byte errorPCA = 2; // Not compiled in -> report as no connection (NACK on address)
   #endif
   #if useMCP23008
     Wire.beginTransmission(MCP23008add);
     byte errorMCP = Wire.endTransmission();
+  #else
+    byte errorMCP = 2; // Not compiled in -> report as no connection (NACK on address)
   #endif
   error = error + errorPCA + (errorMCP << 4);
   return error;
