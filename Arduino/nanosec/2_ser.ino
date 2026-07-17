@@ -1037,8 +1037,11 @@ void parseserial(){
       break;
 
     case 69:
-      // 69: Turn on scheduler indicator (PCA9685/PWMINT) (n = 2 PWMINT, 1 PCA9685, 0 no)[u]
+      // 69: Turn on scheduler indicator (PCA9685/PWMINT/audiopin) (n = 3 audiopin, 2 PWMINT, 1 PCA9685, 0 no)[u]
       useschedulerindicator = n;
+      if (useschedulerindicator == 3){
+        noTone(audiopin);
+      }
       break;
 
     case 70:

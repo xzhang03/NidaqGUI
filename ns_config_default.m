@@ -86,14 +86,14 @@ nicfg.scoptophotometry.pulsecycle1 = 200; % Pulse cycle 1 in X * 100 us. E.g., 1
 nicfg.scoptophotometry.pulsecycle2 = 0; % Pulse cycle 1 in X * 100 us. E.g., 100 means 10 ms. Default 100 (10 ms)
 
 % Scheduler
-nicfg.scheduler.enable = false; % Default false
+nicfg.scheduler.enable = false; % 2 PWMINT (native), 1 PWMRGB (i2c), 0 off, 3 LED (buzzer)
 nicfg.scheduler.delay = 120; % Delayed opto start in seconds. E.g., 120 means 2 min delay. Default 120s. Max 65535s.
 nicfg.scheduler.ntrains = 10; % Number of trains. Default 10.
 nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Default false (don't leave floating if true).
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external input. This will enable manualoverride above.
 
 % Scheduler indicator
-nicfg.scheduler.indicator.enable = 2; % 2 PWMINT (native), 1 PWMRGB (i2c), 0 off
+nicfg.scheduler.indicator.enable = 3; % 2 PWMINT (native), 1 PWMRGB (i2c), 0 off
 nicfg.scheduler.indicator.preopto = [0 0 3 1]; % [R G B doubler], 0-3 for R, B, G
 nicfg.scheduler.indicator.inopto = [0 3 0 1];
 nicfg.scheduler.indicator.postopto = [3 0 0 1];

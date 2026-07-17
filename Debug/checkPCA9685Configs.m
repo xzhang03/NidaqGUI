@@ -38,7 +38,7 @@ for i = 1 : numel(files)
     rewardtype1     = getnested(nicfg, {'optodelayTTL', 'type1', 'rewardtype'});
 
     fprintf('%s\n', fp);
-    fprintf('  scheduler.indicator.enable    = %-10s%s\n', tostr(indicatorEnable), flagtagset(indicatorEnable, {0, 2}));
+    fprintf('  scheduler.indicator.enable    = %-10s%s\n', tostr(indicatorEnable), flagtagset(indicatorEnable, {0, 3}));
     fprintf('  optodelayTTL.type1.cuetype    = %-10s%s\n', tostr(cuetype1), flagtag(cuetype1, 'LED'));
     fprintf('  optodelayTTL.type1.rewardtype = %-10s%s\n', tostr(rewardtype1), flagtag(rewardtype1, 'Native'));
 

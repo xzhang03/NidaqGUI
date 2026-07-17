@@ -73,10 +73,10 @@ void schedulerdisable(void){
 
 
 void shedulerindicator(byte color){
-  // 2 PWMINT, 1 PCA9685
+  // 3 audiopin (digital), 2 PWMINT, 1 PCA9685
   const uint16_t cscale[8] = {0, 3, 11, 35, 114, 374, 1223, 3998}; // Color scale (log scale, max 4095). This is for external PWM (PCA9685).
   const uint8_t cscale2[8] = {0, 4, 8, 16, 32, 64, 128, 255}; // Color scale (log scale, max 255). This is for internal RGB PWM.
-  
+
   // Turn off
   if (color == 0){
     // Color input = 0 means turn off everything
@@ -94,6 +94,9 @@ void shedulerindicator(byte color){
       digitalWrite(extrapins[2], LOW);
       pinMode(extrapins[3], OUTPUT);
       digitalWrite(extrapins[3], LOW);
+    }
+    else if (useschedulerindicator == 3){
+      digitalWrite(audiopin, LOW);
     }
     return;
   }
@@ -150,5 +153,8 @@ void shedulerindicator(byte color){
     analogWrite(extrapins[1], cscale2[Rv]);
     analogWrite(extrapins[2], cscale2[Gv]);
     analogWrite(extrapins[3], cscale2[Bv]);
+  }
+  else if (useschedulerindicator == 3){
+    digitalWrite(audiopin, HIGH);
   }
 }

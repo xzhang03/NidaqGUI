@@ -47,7 +47,7 @@
 // 17: Enable manual scheduler override [A]
 // 27: Listening mode on or off (n = 1 yes, 0 no). Will turn on manual override [K]
 // 28: Listen mode polarity (1 = active high, 0 = active low) [L]
-// 69: Turn on scheduler indicator (PCA9685/PWMINT) (n = 2 PWMINT, 1 PCA9685, 0 no)[u]
+// 69: Turn on scheduler indicator (PCA9685/PWMINT/audiopin) (n = 3 audiopin, 2 PWMINT, 1 PCA9685, 0 no)[u]
 // 70: Preopto PCA9685/PWMINT color [0 Shared_bit R R G G B B] [v]
 // 71: Inopto PCA9685/PWMINT color [0 Shared_bit R R G G B B] [w]
 // 72: Postopto PCA9685/PWMINT color [0 Shared_bit R R G G B B] [x]
