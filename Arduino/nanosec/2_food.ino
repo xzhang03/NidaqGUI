@@ -671,5 +671,25 @@ void testfoodttls(uint8_t testclicks){
     delay(150);
     digitalWrite(foodTTLpin, LOW);
     delay(150);
-  } 
+  }
+}
+
+// Test audiopin: 3 pulses, 500 ms on / 500 ms off (3 s total)
+void testaudiopin(void){
+  for (byte ipulse = 0; ipulse < 3; ipulse++){
+    digitalWrite(audiopin, HIGH);
+    delay(500);
+    digitalWrite(audiopin, LOW);
+    delay(500);
+  }
+}
+
+// Test PWMINT: sweep R, G, B on the internal PWM indicator pins (extrapins[1..3])
+void testPWMINT(void){
+  for (byte iled = 1; iled < 4; iled++){
+    for (byte iint = 1; iint < 17; iint++){
+      analogWrite(extrapins[iled], 256 - 16 * iint);
+      delay(30);
+    }
+  }
 }

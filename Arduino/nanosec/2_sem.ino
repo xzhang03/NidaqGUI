@@ -113,8 +113,8 @@
 // 68: Test MCP23008 [t]
 // 84: Ping known i2c address
 
-// 86:
-// 87:
+// 86: Test audiopin (3 pulses, 500 ms on/off)
+// 87: Test PWMINT (RGB sweep)
 // 88:
 // 89: 
 // 90: 

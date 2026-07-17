@@ -92,6 +92,12 @@ while true
             % Dump trial type RNG
             disp('Food RNG of last experiment:');
             dump_rng(4);
+        case 15
+            % Audiopin test
+            testaudiopin();
+        case 16
+            % PWMINT test
+            testPWMINT();
     end
 end
 
@@ -101,7 +107,7 @@ end
         fn = {'Firmware Version', 'I2c scan', 'Test PWM RGB', 'Test DIO expander',...
             'Dump Nanosec state', 'Dump opto RNG', 'Dump ITI RNG', 'Dump trial type RNG',...
             'Dump deterministic trial types', 'Dump all serial', '30s_encoder_test', 'Food TTL test',...
-            'Cam TTL test', 'Dump food RNG'};
+            'Cam TTL test', 'Dump food RNG', 'Test audiopin', 'Test PWMINT'};
         [indx, ~] = listdlg('PromptString', sprintf('Select test %s (Nanosec)', com),...
             'SelectionMode','single', 'InitialValue', ini, 'ListString',fn);
     end
@@ -192,6 +198,24 @@ end
         serialin = serialinitial(com, baudrate);
         pause(0.1);
         arduinoWrite(serialin, [61 0]);
+        pause(0.1);
+        arduinoClose(serialin);
+    end
+
+    % Test audiopin
+    function testaudiopin()
+        serialin = serialinitial(com, baudrate);
+        pause(0.1);
+        arduinoWrite(serialin, [86 0]);
+        pause(0.1);
+        arduinoClose(serialin);
+    end
+
+    % Test PWMINT
+    function testPWMINT()
+        serialin = serialinitial(com, baudrate);
+        pause(0.1);
+        arduinoWrite(serialin, [87 0]);
         pause(0.1);
         arduinoClose(serialin);
     end

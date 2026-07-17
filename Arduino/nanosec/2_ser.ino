@@ -1181,6 +1181,20 @@ void parseserial(){
         Serial.println(n);
       }
       break;
+
+    case 86:
+      // 86: Test audiopin (3 pulses, 500 ms on/off)
+      digitalWrite(led_pin, HIGH);
+      testaudiopin();
+      digitalWrite(led_pin, LOW);
+      break;
+
+    case 87:
+      // 87: Test PWMINT (RGB sweep)
+      digitalWrite(led_pin, HIGH);
+      testPWMINT();
+      digitalWrite(led_pin, LOW);
+      break;
   }
 
   #if (debugpins)

@@ -98,7 +98,7 @@ nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Def
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external input. This will enable manualoverride above.
 
 % Scheduler indicator
-nicfg.scheduler.indicator.enable = 0; % 2 PWMINT (native), 1 PWMRGB (i2c), 0 off, 3 LED (buzzer)
+nicfg.scheduler.indicator.enable = 3; % 2 PWMINT (native), 1 PWMRGB (i2c), 0 off, 3 LED (buzzer)
 nicfg.scheduler.indicator.preopto = [0 0 0 1]; % [R G B doubler], 0-3 for R, B, G
 nicfg.scheduler.indicator.inopto = [0 3 0 1];
 nicfg.scheduler.indicator.postopto = [0 0 0 1];
@@ -135,7 +135,7 @@ nicfg.optodelayTTL.lead = 4; % How many seconds is the food TTL armed before an 
 
 % Opto-delayed TTL buzzer
 % Cue: Opto start => buzzer delay => buzzer duration
-nicfg.optodelayTTL.cueenable = true; % Buzzer or not (default false)
+nicfg.optodelayTTL.cueenable = false; % Buzzer or not (default false)
 nicfg.optodelayTTL.cuedelay = 0; % Delay in 100 ms. E.g., 20 means 2 seconds. Default 20 (2s)
 nicfg.optodelayTTL.cuedur = [10 4 8 16]; % Delay in 100 ms. E.g., 10 means 1 seconds. Default 10 (1s)
 
