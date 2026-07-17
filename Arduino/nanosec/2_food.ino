@@ -653,6 +653,11 @@ uint8_t getcuetype(uint16_t trialioprivate){
     case 0B001:
       cuetype = 2;
       break;
+
+    default:
+      // Undefined bit pattern -> fall back to 0B100 (Buzzer)
+      cuetype = 0;
+      break;
   }
   return cuetype;
 }
