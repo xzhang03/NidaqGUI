@@ -48,24 +48,22 @@ end
 %% TCP
 if nicfg.tcp.enable
     % Pulse cycle 1
-    if isfield(nicfg.tcp, 'pulsecycle1')
-        b = floor(nicfg.tcp.pulsecycle1 / 256);
-        a = nicfg.tcp.pulsecycle1 - b * 256;
-        arduinoWrite(nicfg.arduino_serial, [53 a]);
-        if b > 0
-            arduinoWrite(nicfg.arduino_serial, [57 b]);
-        end
+    if ~isfield(nicfg.tcp, 'pulsecycle1')
+        nicfg.tcp.pulsecycle1 = 100;
     end
+    b = floor(nicfg.tcp.pulsecycle1 / 256);
+    a = nicfg.tcp.pulsecycle1 - b * 256;
+    arduinoWrite(nicfg.arduino_serial, [53 a]);
+    arduinoWrite(nicfg.arduino_serial, [57 b]);
     
     % Pulse cycle 2
-    if isfield(nicfg.tcp, 'pulsecycle2')
-        b = floor(nicfg.tcp.pulsecycle2 / 256);
-        a = nicfg.tcp.pulsecycle2 - b * 256;
-        arduinoWrite(nicfg.arduino_serial, [54 a]);
-        if b > 0
-            arduinoWrite(nicfg.arduino_serial, [58 b]);
-        end
+    if ~isfield(nicfg.tcp, 'pulsecycle2')
+        nicfg.tcp.pulsecycle2= 100;
     end
+    b = floor(nicfg.tcp.pulsecycle2 / 256);
+    a = nicfg.tcp.pulsecycle2 - b * 256;
+    arduinoWrite(nicfg.arduino_serial, [54 a]);
+    arduinoWrite(nicfg.arduino_serial, [58 b]);
     
     % TCP behavioral cycle
     arduinoWrite(nicfg.arduino_serial, [47 nicfg.tcp.behaviorcycle]);
@@ -84,24 +82,24 @@ if nicfg.optophotometry.enable
     disp('Mode -> Optophotometry');
     
     % Pulse cycle 1
-    if isfield(nicfg.optophotometry, 'pulsecycle1')
-        b = floor(nicfg.optophotometry.pulsecycle1 / 256);
-        a = nicfg.optophotometry.pulsecycle1 - b * 256;
-        arduinoWrite(nicfg.arduino_serial, [36 a]);
-        if b > 0
-            arduinoWrite(nicfg.arduino_serial, [55 b]);
-        end
+    if ~isfield(nicfg.optophotometry, 'pulsecycle1')
+        nicfg.optophotometry.pulsecycle1 = 65;
     end
+    b = floor(nicfg.optophotometry.pulsecycle1 / 256);
+    a = nicfg.optophotometry.pulsecycle1 - b * 256;
+    arduinoWrite(nicfg.arduino_serial, [36 a]);
+    arduinoWrite(nicfg.arduino_serial, [55 b]);
+
     
     % Pulse cycle 2
-    if isfield(nicfg.optophotometry, 'pulsecycle2')
-        b = floor(nicfg.optophotometry.pulsecycle2 / 256);
-        a = nicfg.optophotometry.pulsecycle2 - b * 256;
-        arduinoWrite(nicfg.arduino_serial, [37 a]);
-        if b > 0
-            arduinoWrite(nicfg.arduino_serial, [56 b]);
-        end
+    if ~isfield(nicfg.optophotometry, 'pulsecycle2')
+        nicfg.optophotometry.pulsecycle2 = 135;
     end
+    b = floor(nicfg.optophotometry.pulsecycle2 / 256);
+    a = nicfg.optophotometry.pulsecycle2 - b * 256;
+    arduinoWrite(nicfg.arduino_serial, [37 a]);
+    arduinoWrite(nicfg.arduino_serial, [56 b]);
+
     
     % Frequency
     arduinoWrite(nicfg.arduino_serial, [6 nicfg.optophotometry.freqmod]);
@@ -131,24 +129,23 @@ if nicfg.scoptophotometry.enable
     disp('Mode -> Same-color optophotometry');
     
     % Pulse cycle 1
-    if isfield(nicfg.scoptophotometry, 'pulsecycle1')
-        b = floor(nicfg.scoptophotometry.pulsecycle1 / 256);
-        a = nicfg.scoptophotometry.pulsecycle1 - b * 256;
-        arduinoWrite(nicfg.arduino_serial, [78 a]);
-        if b > 0
-            arduinoWrite(nicfg.arduino_serial, [80 b]);
-        end
+    if ~isfield(nicfg.scoptophotometry, 'pulsecycle1')
+        nicfg.scoptophotometry.pulsecycle1 = 200;
     end
+    b = floor(nicfg.scoptophotometry.pulsecycle1 / 256);
+    a = nicfg.scoptophotometry.pulsecycle1 - b * 256;
+    arduinoWrite(nicfg.arduino_serial, [78 a]);
+    arduinoWrite(nicfg.arduino_serial, [80 b]);
+
     
     % Pulse cycle 2
-    if isfield(nicfg.scoptophotometry, 'pulsecycle2')
-        b = floor(nicfg.scoptophotometry.pulsecycle2 / 256);
-        a = nicfg.scoptophotometry.pulsecycle2 - b * 256;
-        arduinoWrite(nicfg.arduino_serial, [79 a]);
-        if b > 0
-            arduinoWrite(nicfg.arduino_serial, [81 b]);
-        end
+    if ~isfield(nicfg.scoptophotometry, 'pulsecycle2')
+        nicfg.scoptophotometry.pulsecycle2 = 0;
     end
+    b = floor(nicfg.scoptophotometry.pulsecycle2 / 256);
+    a = nicfg.scoptophotometry.pulsecycle2 - b * 256;
+    arduinoWrite(nicfg.arduino_serial, [79 a]);
+    arduinoWrite(nicfg.arduino_serial, [81 b]);
 
     % Frequency
     arduinoWrite(nicfg.arduino_serial, [10 nicfg.scoptophotometry.freqmod]);
@@ -411,6 +408,8 @@ if nicfg.optodelayTTL.enable
         if nicfg.optodelayTTL.useRNG
             arduinoWrite(nicfg.arduino_serial, [83 nicfg.optodelayTTL.RNGpasschance]);
         end
+    else
+        arduinoWrite(nicfg.arduino_serial, [82 0]);
     end
 
     % Overwrite trial types (deterministic instead of probablistic, only in scheduler mode)
@@ -467,6 +466,8 @@ end
 % Pulse on time (optional, ms)
 if isfield(nicfg, 'pulsewidth')
     arduinoWrite(nicfg.arduino_serial, [85 nicfg.pulsewidth]);
+else
+    arduinoWrite(nicfg.arduino_serial, [85 2]);
 end
 
 %% Encoder
