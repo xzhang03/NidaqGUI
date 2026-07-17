@@ -96,7 +96,7 @@ nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Def
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external input. This will enable manualoverride above.
 
 % Scheduler indicator
-nicfg.scheduler.indicator.enable = true;
+nicfg.scheduler.indicator.enable = 0;
 nicfg.scheduler.indicator.preopto = [0 0 3 1]; % [R G B doubler], 0-3 for R, B, G
 nicfg.scheduler.indicator.inopto = [0 3 0 1];
 nicfg.scheduler.indicator.postopto = [3 0 0 1];
@@ -150,22 +150,22 @@ nicfg.optodelayTTL.ntrialtypes = 1; % Multiple trial types (Max is 4). Only this
 nicfg.optodelayTTL.trialfreq = [3 0 0 0]; % Relative weights of trial frequency
 nicfg.optodelayTTL.determtrialtypes = false;
 
-nicfg.optodelayTTL.type1.cuetype = 'Buzzer'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
+nicfg.optodelayTTL.type1.cuetype = 'LED'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT', 'LED'
 nicfg.optodelayTTL.type1.RGB = [0 0 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type1.rewardtype = 'Native'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type1.DIOport = 0; % Only used in DIO
 
-nicfg.optodelayTTL.type2.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
+nicfg.optodelayTTL.type2.cuetype = 'PWMINT'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT', 'LED
 nicfg.optodelayTTL.type2.RGB = [7 0 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type2.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type2.DIOport = 0; % Only used in DIO
 
-nicfg.optodelayTTL.type3.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
+nicfg.optodelayTTL.type3.cuetype = 'PWMINT'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT', 'LED
 nicfg.optodelayTTL.type3.RGB = [0 7 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type3.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type3.DIOport = 1; % Only used in DIO
 
-nicfg.optodelayTTL.type4.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
+nicfg.optodelayTTL.type4.cuetype = 'PWMINT'; %  'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT', 'LED
 nicfg.optodelayTTL.type4.RGB = [0 0 7]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type4.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type4.DIOport = 2; % Only used in DIO

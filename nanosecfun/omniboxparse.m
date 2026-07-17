@@ -318,10 +318,25 @@ if nicfg.optodelayTTL.enable
         % Constructing Trial IO (a single uint16 integer to specify input/output pins a trial type)
         trialinfo = nicfg.optodelayTTL.(sprintf('type%i', i));
         trialio = uint16(0);
+
+        % Cue type truth table (must match getcuetype() in 2_food.ino)
+        % Bit:                                        15  14  13
+        % 'Buzzer' - PWM tone/LED cue (1 channel):   [ 1   0   0]
+        % 'LED'    - Native digital on/off:          [ 1   1   0]
+        % 'DIO'    - Digital cue via MCP23008:       [ 0   1   0]
+        % 'PWMINT' - Internal RGB pwm (3 channels):  [ 1   0   1]
+        % 'PWMRGB' - PWM cue via i2c LED:            [ 0   0   1]
+        % Note: bitset() below is 1-indexed from the LSB, so bit 15 above
+        % is bitset(...,16), bit 14 is bitset(...,15), bit 13 is bitset(...,14).
         switch trialinfo.cuetype
             case 'Buzzer'
                 trialio = bitset(trialio, 16);
-                
+
+            case 'LED'
+                % Native digital on/off (e.g. low-power LED on the Buzzer pin, no tone())
+                trialio = bitset(trialio, 16);
+                trialio = bitset(trialio, 15);
+
             case 'DIO'
                 trialio = bitset(trialio, 15);
                 if any(trialinfo.RGB > 1)
@@ -330,13 +345,14 @@ if nicfg.optodelayTTL.enable
                 end
                 trialio = ... % 3 or 4 Channel binary info (DO7, DO6, DO5, DO4)
                     trialio + bitshift(trialinfo.RGB(1), 12)...
-                    + bitshift(trialinfo.RGB(2), 11) + bitshift(trialinfo.RGB(3), 10); 
+                    + bitshift(trialinfo.RGB(2), 11) + bitshift(trialinfo.RGB(3), 10);
                 if length(trialinfo.RGB) == 4
                     trialio = trialio + bitshift(trialinfo.RGB(4), 9);
                 end
-                
-            case 'PWMRGB'
+
+            case 'PWMINT'
                 trialio = bitset(trialio, 14);
+                trialio = bitset(trialio, 16);
                 if any(trialinfo.RGB > 7)
                     trialinfo.RGB(trialinfo.RGB > 7) = 7;
                     msgbox('RGB color intensity is capped at 7');
@@ -344,9 +360,8 @@ if nicfg.optodelayTTL.enable
                 trialio = trialio + bitshift(trialinfo.RGB(1), 10)...
                     + bitshift(trialinfo.RGB(2), 7) + bitshift(trialinfo.RGB(3), 4); % RGB
 
-            case 'PWMINT'
+            case 'PWMRGB'
                 trialio = bitset(trialio, 14);
-                trialio = bitset(trialio, 16);
                 if any(trialinfo.RGB > 7)
                     trialinfo.RGB(trialinfo.RGB > 7) = 7;
                     msgbox('RGB color intensity is capped at 7');
@@ -383,7 +398,7 @@ if nicfg.optodelayTTL.enable
     
     % Cue delay
     arduinoWrite(nicfg.arduino_serial, [31 nicfg.optodelayTTL.cuedelay]);
-    
+
     % Action period delay
     arduinoWrite(nicfg.arduino_serial, [33 nicfg.optodelayTTL.actiondelay]);
     

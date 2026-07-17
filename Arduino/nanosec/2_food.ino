@@ -338,7 +338,7 @@ byte gettrialtype(void){
 // Cue on
 // Type 1: tone PWM
 void docueon(uint16_t trialio, uint8_t trialtype){
-  byte cuetype = getcuetype(trialio); // 0 - native pwm, 1 - MCP23008 DIO, 2 - external PWM, 3 - internal RGB pwm
+  byte cuetype = getcuetype(trialio); // 0 - Buzzer, 1 - single LED, 2 - MCP23008 DIO, 3 - internal RGB pwm, 4 - external PWM
   const uint16_t cscale[8] = {0, 3, 11, 35, 114, 374, 1223, 3998}; // Color scale (log scale, max 4095). This is for external PWM (PCA9685).
   const uint8_t cscale2[8] = {0, 4, 8, 16, 32, 64, 128, 255}; // Color scale (log scale, max 255). This is for internal RGB PWM.
   byte Rv = (trialio >> 10) & 0b111 ; // Red value
@@ -348,8 +348,31 @@ void docueon(uint16_t trialio, uint8_t trialtype){
   
   switch (cuetype){
     case 0:
-      // Native PWM
+      // Native PWM (Buzzer)
       tone(audiopin, audiofreq);
+
+      #if useMCP23008
+        // Hardcoded trial type flags
+        switch (trialtype){
+          case 0:
+            MCP.digitalWrite(4, HIGH);
+            break;
+          case 1:
+            MCP.digitalWrite(5, HIGH);
+            break;
+          case 2:
+            MCP.digitalWrite(6, HIGH);
+            break;
+          case 3:
+            MCP.digitalWrite(7, HIGH);
+            break;
+        }
+      #endif
+      break;
+
+    case 4:
+      // Single LED (Buzzer pin driven with digitalWrite instead of tone())
+      digitalWrite(audiopin, HIGH);
 
       #if useMCP23008
         // Hardcoded trial type flags
@@ -383,14 +406,12 @@ void docueon(uint16_t trialio, uint8_t trialtype){
       #endif
       break;
 
-    case 2:
-      // External pwm
-      #if usePCA9685
-        pwm.setPin(0, cscale[Rv], false);
-        pwm.setPin(1, cscale[Gv], false);
-        pwm.setPin(2, cscale[Bv], false);
-      #endif
-      
+    case 3:
+      // Internal pwm (using extra pins[1-3], i.e., pins 7, 8, 9)
+      analogWrite(extrapins[1], cscale2[Rv]);
+      analogWrite(extrapins[2], cscale2[Gv]);
+      analogWrite(extrapins[3], cscale2[Bv]);
+
       #if useMCP23008
         // Hardcoded trial type flags
         switch (trialtype){
@@ -414,12 +435,14 @@ void docueon(uint16_t trialio, uint8_t trialtype){
       #endif
       break;
 
-    case 3:
-      // Internal pwm (using extra pins[1-3], i.e., pins 7, 8, 9)
-      analogWrite(extrapins[1], cscale2[Rv]);
-      analogWrite(extrapins[2], cscale2[Gv]);
-      analogWrite(extrapins[3], cscale2[Bv]);
-      
+    case 2:
+      // External pwm (PCA9685)
+      #if usePCA9685
+        pwm.setPin(0, cscale[Rv], false);
+        pwm.setPin(1, cscale[Gv], false);
+        pwm.setPin(2, cscale[Bv], false);
+      #endif
+
       #if useMCP23008
         // Hardcoded trial type flags
         switch (trialtype){
@@ -448,7 +471,7 @@ void docueon(uint16_t trialio, uint8_t trialtype){
 // Cue off
 // Type 1: tone PWM
 void docueoff(uint16_t trialio){
-  byte cuetype = getcuetype(trialio); // 0 - native pwm, 1 - MCP23008 DIO, 2 - external PWM, 3 - internal RGB pwm
+  byte cuetype = getcuetype(trialio); // 0 - Buzzer, 4 - single LED, 1 - MCP23008 DIO, 3 - internal RGB pwm, 2 - external PWM
   byte Rv = (trialio >> 10) & 0b111 ; // Red value
   byte Gv = (trialio >> 7) & 0b111 ; // Green value
   byte Bv = (trialio >> 4) & 0b111 ; // Blue value
@@ -456,8 +479,19 @@ void docueoff(uint16_t trialio){
   
   switch (cuetype){
     case 0:
-      // Native PWM
+      // Native PWM (Buzzer)
       noTone(audiopin);
+      #if useMCP23008
+        MCP.digitalWrite(4, LOW);
+        MCP.digitalWrite(5, LOW);
+        MCP.digitalWrite(6, LOW);
+        MCP.digitalWrite(7, LOW);
+      #endif
+      break;
+
+    case 4:
+      // Single LED (Buzzer pin driven with digitalWrite instead of tone())
+      digitalWrite(audiopin, LOW);
       #if useMCP23008
         MCP.digitalWrite(4, LOW);
         MCP.digitalWrite(5, LOW);
@@ -479,32 +513,6 @@ void docueoff(uint16_t trialio){
       #endif
       break;
 
-    case 2:
-      // External pwm
-      #if usePCA9685
-        if (Rv > 0){
-          pwm.setPin(0, 0, false);
-        }
-        if (Gv > 0){
-          pwm.setPin(1, 0, false);
-        }
-        if (Gv > 0){
-          pwm.setPin(2, 0, false);
-        }
-      #endif
-      
-      #if useMCP23008
-        MCP.digitalWrite(4, LOW);
-        MCP.digitalWrite(5, LOW);
-        MCP.digitalWrite(6, LOW);
-        MCP.digitalWrite(7, LOW);
-      #endif
-
-      #if universalcuemarker
-        digitalWrite(audiopin, LOW);
-      #endif
-      break;
-
     case 3:
       // Internal pwm
       if (Rv > 0){
@@ -519,7 +527,7 @@ void docueoff(uint16_t trialio){
         pinMode(extrapins[3], OUTPUT);
         digitalWrite(extrapins[3], LOW);
       }
-      
+
       #if useMCP23008
         MCP.digitalWrite(4, LOW);
         MCP.digitalWrite(5, LOW);
@@ -531,7 +539,32 @@ void docueoff(uint16_t trialio){
         digitalWrite(audiopin, LOW);
       #endif
       break;
-      
+
+    case 2:
+      // External pwm (PCA9685)
+      #if usePCA9685
+        if (Rv > 0){
+          pwm.setPin(0, 0, false);
+        }
+        if (Gv > 0){
+          pwm.setPin(1, 0, false);
+        }
+        if (Gv > 0){
+          pwm.setPin(2, 0, false);
+        }
+      #endif
+
+      #if useMCP23008
+        MCP.digitalWrite(4, LOW);
+        MCP.digitalWrite(5, LOW);
+        MCP.digitalWrite(6, LOW);
+        MCP.digitalWrite(7, LOW);
+      #endif
+
+      #if universalcuemarker
+        digitalWrite(audiopin, LOW);
+      #endif
+      break;
   }
 }
 
@@ -593,29 +626,34 @@ bool checklicks(uint16_t trialio){
 // Get cue type
 // 15-13: Cue type (choose 1)
 // Bit:                                           15  14  13
-// 0. PWM tone/LED cue (1 channel):              [ 1   0   0]
+// 0. PWM tone (1 channel, Buzzer):      		 [ 1   0   0]
+// 4. Single LED (buzzer with digitalWrite):     [ 1   1   0]
 // 1. Digital cue using dio expander (MCP23008): [ 0   1   0]
-// 2. PWM cue using i2c led (PCA9685):           [ 0   0   1]
 // 3. Internal RGB pwm (3 channels):             [ 1   0   1]
+// 2. PWM cue using i2c led (PCA9685):           [ 0   0   1]
 uint8_t getcuetype(uint16_t trialioprivate){
   uint8_t cuetype;
-  switch ((trialioprivate >> 12) & 0B111){
+  switch ((trialioprivate >> 13) & 0B111){
     case 0B100:
       cuetype = 0;
       break;
-    
-    case 0B010:
-      cuetype = 1;
+
+    case 0B110:
+      cuetype = 4;
       break;
 
-    case 0B001:
-      cuetype = 2;
+    case 0B010:
+      cuetype = 1;
       break;
 
     case 0B101:
       cuetype = 3;
       break;
-  }  
+
+    case 0B001:
+      cuetype = 2;
+      break;
+  }
   return cuetype;
 }
 

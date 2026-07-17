@@ -152,22 +152,22 @@ nicfg.optodelayTTL.trialfreq = [3 3 3 3]; % Relative weights of trial frequency
 nicfg.optodelayTTL.overwritetrialtypes = false;
 nicfg.optodelayTTL.manualtrialtypes = [0 0 0 1 1 1 2 2 2 3 3 3 0 1 2 3]; % Must have 4 x n entries
 
-nicfg.optodelayTTL.type1.cuetype = 'Buzzer'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
+nicfg.optodelayTTL.type1.cuetype = 'LED';  %'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT', 'LED'
 nicfg.optodelayTTL.type1.RGB = [0 7 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type1.rewardtype = 'Native'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type1.DIOport = 0; % Only used in DIO
 
-nicfg.optodelayTTL.type2.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
+nicfg.optodelayTTL.type2.cuetype = 'PWMINT'; %  'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT', 'LED'
 nicfg.optodelayTTL.type2.RGB = [7 0 0]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type2.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type2.DIOport = 0; % Only used in DIO
 
-nicfg.optodelayTTL.type3.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
+nicfg.optodelayTTL.type3.cuetype = 'PWMINT'; %  'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT', 'LED'
 nicfg.optodelayTTL.type3.RGB = [0 5 5]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type3.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type3.DIOport = 1; % Only used in DIO
 
-nicfg.optodelayTTL.type4.cuetype = 'PWMRGB'; % 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT'
+nicfg.optodelayTTL.type4.cuetype = 'PWMINT'; % ' 'Buzzer' (native PWM), 'DIO', 'PWMRGB', 'PWMINT', 'LED'
 nicfg.optodelayTTL.type4.RGB = [0 0 3]; % [R G B] Only used in DIO or PWMRGB. Values 0-7 for intensity PWM and 0-1 for DIO.
 nicfg.optodelayTTL.type4.rewardtype = 'DIO'; % 'Native', 'DIO'
 nicfg.optodelayTTL.type4.DIOport = 2; % Only used in DIO
