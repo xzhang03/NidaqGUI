@@ -94,7 +94,7 @@ nicfg.scheduler.manualoverride = false; % Allow for manual swichingoverride. Def
 nicfg.scheduler.listenmode = false; % Enable listenmode, which makes each tran triggered by external input. This will enable manualoverride above.
 
 % Scheduler indicator
-nicfg.scheduler.indicator.enable = 0; % 2 PWMINT (native), 1 PWMRGB (i2c), 0 off
+nicfg.scheduler.indicator.enable = 0; % 2 PWMINT (native), 1 PWMRGB (i2c), 0 off, 3 LED (buzzer)
 nicfg.scheduler.indicator.preopto = [0 0 0 1]; % [R G B doubler], 0-3 for R, B, G
 nicfg.scheduler.indicator.inopto = [0 3 0 1];
 nicfg.scheduler.indicator.postopto = [0 0 0 1];
