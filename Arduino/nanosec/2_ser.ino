@@ -785,10 +785,10 @@ void parseserial(){
 
     case 45:
       // 45: Auto trial and rng echo periodicity (n * 100 ms)
-      echotime_slow = n * 100;
+      cycletime_slow = n * 100;
       if (debugmode){
         Serial.print("Auto trial and rng info serial communication periodicity (ms): ");
-        Serial.println(echotime_slow);
+        Serial.println(cycletime_slow);
       }
       break;
 
