@@ -234,6 +234,11 @@ if nicfg.active
     nicfg.MouseName = get(handles.MouseName, 'String'); % returns contents of Enter_ROI as a double
     nicfg.Run = str2double(get(handles.Runs, 'String')); % returns contents of Enter_ROI as a double
     
+    % Extrafun - initialcall (optional)
+    if isfield(nicfg, 'extrafun')
+        run(nicfg.extrafun.initialcall);
+    end
+
     % Get time
     starttime.local = datetime();
     Nist_Time = tcpclient('time.nist.gov',13);
@@ -319,6 +324,11 @@ if nicfg.active
                 tseconds = floor((tnow - tstart) * timeconv);
                 elapsedmins = floor(tseconds/60.0);
                 set(handles.TimeElapsedNumber, 'String', sprintf('%3i:%02i', elapsedmins, tseconds - elapsedmins*60));
+
+                % Extrafun - middlecall (optional)
+                if isfield(nicfg, 'extrafun')
+                    run(nicfg.extrafun.middlecall);
+                end
             end
 
         end
@@ -382,6 +392,11 @@ if nicfg.active
         end
     end
     
+    % Extrafun - terminal (optional)
+    if isfield(nicfg, 'extrafun')
+        run(nicfg.extrafun.terminalcall);
+    end
+
     uploadToServer(nicfg, nidaqpath, arduinopath);
     
     disp('Finished');

@@ -10,12 +10,12 @@ end
 d4 = typecast(int32(d), 'uint8');
 
 if d4(4) == 1
-    % Scheduler
+    % Scheduler (always sent before RNG)
     schedulerinfo = d4;
-    updateui = true;
-    
+    updateui = false;
+
 elseif d4(4) == 2
-    % RNG
+    % RNG (always sent following scheduler)
     rnginfo = d4;
     updateui = true;
     
